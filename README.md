@@ -1,27 +1,29 @@
 # Gambling Kings Front End
 
 Welcome to our Gambling Kings front end repository.<br />
-The tech stack of this application is React and TypeScript.
+The tech stack of this application is React and TypeScript.<br /><br />
+
+For WebSocket listeners documentation, access the README.md file in /src.
 
 ## Folder Structure (/src)
 
-### '/**tests**'
+### `/tests`
 
 This contains all the tests run in Jest.
 
-### '/assets'
+### `/assets`
 
 This contains all the images and/or videos required for display.
 
-### '/components'
+### `/components`
 
 This contains React components that can be reused throughout the application and to improve code maintainability.
 
-### '/modules'
+### `/modules`
 
 This contains classes and interfaces related to WebSocket, and game logic, so that we can apply OOP concepts to improve readability and apply single responsiblity rule to our functions.
 
-### '/pages'
+### `/pages`
 
 This contains components that are separated by pages. This folder outlines how many unique pages there are in this application.
 

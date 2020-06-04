@@ -7,6 +7,9 @@
  */
 const MESSAGE_FORMATS: Record<string, string[]> = {
   TEST_MESSAGE: ['test_message', 'test_message2'],
+  USERNAME: ['username'],
+  GAMES: [],
+  USERS: [],
 };
 
 /**

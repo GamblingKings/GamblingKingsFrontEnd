@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { HistoryParams } from '../types/react-router';
+import { Link, useHistory } from 'react-router-dom';
+
 import MainThreeJSComponent from '../components/MainThreeJSComponent';
+import WebSocketConnection from '../modules/ws/websocket';
+
+type MainProps = {
+  setWs: React.Dispatch<React.SetStateAction<WebSocketConnection | null>>;
+};
 
 /**
  * Landing Page for the application.
  */
-const MainPage = ({ history }: RouteComponentProps<HistoryParams>): JSX.Element => {
+const MainPage = ({ setWs }: MainProps): JSX.Element => {
   /**
    * States
    */
   const [username, setUsername] = useState<string>('');
+  const history = useHistory();
 
   /**
    * State Handlers.
@@ -24,9 +30,8 @@ const MainPage = ({ history }: RouteComponentProps<HistoryParams>): JSX.Element 
    */
   const connect = (event: React.FormEvent<HTMLInputElement>) => {
     event.preventDefault();
-    console.log(event);
-    console.log(username);
-    // TODO: connect to WS
+    const websocket = new WebSocketConnection(username);
+    setWs(websocket);
     history.push('/lobby');
   };
 
