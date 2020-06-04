@@ -16,11 +16,14 @@ class WebSocketConnection {
 
   private listeners: Record<string, (data: JSON) => void> = {};
 
-  public constructor(url: string = WEBSOCKET_URL) {
+  public constructor(username: string, url: string = WEBSOCKET_URL) {
     this.ws = new WebSocket(url);
-    this.ws.onopen = (event) => {
-      console.log(event);
-      // this.ws.send('');
+    this.ws.onopen = () => {
+      console.log('Socket opened!');
+      const data = {
+        username,
+      };
+      this.sendMessage('USERNAME', data);
     };
 
     this.ws.onclose = (event) => {
