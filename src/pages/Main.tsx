@@ -93,7 +93,7 @@ const MainPage = ({ history }: RouteComponentProps<HistoryParams>): JSX.Element 
           <strong>
             <h1>Mahjong</h1>
           </strong>
-          <div className="min-height-200px min-width-200px margin-30" ref={ThreeJSRefContainer} />
+          <div className="min-height-150px min-width-150px margin-30" ref={ThreeJSRefContainer} />
           <form className="flex-column margin-20">
             <input
               value={username}
