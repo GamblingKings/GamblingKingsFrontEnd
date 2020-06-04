@@ -67,7 +67,7 @@ const MainPage = ({ history }: RouteComponentProps<HistoryParams>): JSX.Element 
     renderer.setSize(clientWidth, clientHeight);
     renderer.setClearColor(0x531cb3, 0.15);
     ThreeJSRefContainer.current.appendChild(renderer.domElement);
-    const geometry: THREE.BoxGeometry = new THREE.BoxGeometry(3, 3, 3);
+    const geometry: THREE.BoxGeometry = new THREE.BoxGeometry(3, 4, 3);
     const cube: THREE.Mesh = new THREE.Mesh(geometry, loadMaterials());
     scene.add(cube);
     camera.position.z = 5;
