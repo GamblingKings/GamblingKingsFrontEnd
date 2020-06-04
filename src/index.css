@@ -286,3 +286,18 @@ footer,
 .font-size-3rem {
   font-size: 3rem;
 }
+
+/*************
+    Height
+*************/
+.min-height-200px {
+  min-height: 200px;
+}
+
+
+/*************
+    Width
+*************/
+.min-width-200px {
+  min-width: 200px;
+}
