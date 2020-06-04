@@ -1,4 +1,29 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Gambling Kings Front End
+
+Welcome to our Gambling Kings front end repository.<br />
+The tech stack of this application is React and TypeScript.
+
+## Folder Structure (/src)
+
+### '/**tests**'
+
+This contains all the tests run in Jest.
+
+### '/assets'
+
+This contains all the images and/or videos required for display.
+
+### '/components'
+
+This contains React components that can be reused throughout the application and to improve code maintainability.
+
+### '/modules'
+
+This contains classes and interfaces related to WebSocket, and game logic, so that we can apply OOP concepts to improve readability and apply single responsiblity rule to our functions.
+
+### '/pages'
+
+This contains components that are separated by pages. This folder outlines how many unique pages there are in this application.
 
 ## Available Scripts
 
@@ -36,9 +61,3 @@ If you aren’t satisfied with the build tool and configuration choices, you can
 Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
