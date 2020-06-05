@@ -2,7 +2,7 @@
 
 This documentation outlines the messages going out of and coming into the client <br /><br />
 
-The title suggests
+The title indicates what the request.body.action value must be.
 
 ## Outgoing from Client
 
@@ -14,13 +14,19 @@ Payload: { username: \$username }
 
 - \$username: username that the client wants to take
 
-### `USERS`
+### `GET_ALL_USERS`
 
 Payload: {}
 
-### `GAMES`
+### `GET_ALL_GAMES`
 
 Payload: {}
+
+### `SEND_MESSAGE`
+
+Payload: { message: \$message }
+
+- \$message: string that gets sent to other clients
 
 ## Incoming to Client
 
