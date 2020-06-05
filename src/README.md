@@ -22,6 +22,14 @@ Payload: {}
 
 Payload: {}
 
+### `CREATE_GAME`
+
+Payload: { gameName: $gameName, gameType: $gameType, gameVersion: \$gameVersion }
+
+- \$gameName: string specified by the client of what their game room should be named
+- \$gameType: Mahjong or BigTwo
+- \$gameVersion: (Chinese or Vietnamese if BigTwo), (HongKong if Mahjong)
+
 ### `SEND_MESSAGE`
 
 Payload: { message: \$message }
@@ -32,10 +40,16 @@ Payload: { message: \$message }
 
 Messages that are sent from WebSocket API so that the client can act upon it.
 
-### `USERS`
+### `GET_ALL_USERS`
 
 Payload: { users: [{user}] }
 
-### `GAMES`
+### `GET_ALL_GAMES`
 
 Payload: { games: [{game}] }
+
+### `SEND_MESSAGE`
+
+Payload: { message: \$message }
+
+- \$message: string that another client has sent
