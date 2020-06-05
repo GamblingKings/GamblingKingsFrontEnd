@@ -24,7 +24,7 @@ class WebSocketConnection {
       const data = {
         username,
       };
-      this.sendMessage('USERNAME', data);
+      this.sendMessage('SET_USERNAME', data);
       callback();
     };
 
