@@ -8,8 +8,8 @@
 const MESSAGE_FORMATS: Record<string, string[]> = {
   TEST_MESSAGE: ['test_message', 'test_message2'],
   USERNAME: ['username'],
-  GAMES: [],
-  USERS: [],
+  GAMES: ['name'],
+  USERS: ['name'],
 };
 
 /**
@@ -24,10 +24,10 @@ class SendMessageValidator {
    * @param data an object, payload of the message
    */
   static validateMessage(key: string, data: Record<string, unknown>): boolean {
-    const acceptedKeys = MESSAGE_FORMATS[key] || [];
+    const acceptedKeys = MESSAGE_FORMATS[key] || null;
     const passedKeys = Object.keys(data);
 
-    if (acceptedKeys.length === 0 || passedKeys.length !== acceptedKeys.length) return false;
+    if (acceptedKeys === null || passedKeys.length !== acceptedKeys.length) return false;
 
     let validMessage = true;
     passedKeys.forEach((passedKey: string) => {

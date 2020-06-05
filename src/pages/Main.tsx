@@ -28,9 +28,12 @@ const MainPage = ({ setWs }: MainProps): JSX.Element => {
    */
   const connect = (event: React.FormEvent<HTMLInputElement>) => {
     event.preventDefault();
-    const websocket = new WebSocketConnection(username);
+
+    const finalizeLogin = (): void => {
+      history.push('/lobby');
+    };
+    const websocket = new WebSocketConnection(username, finalizeLogin);
     setWs(websocket);
-    history.push('/lobby');
   };
 
   return (
