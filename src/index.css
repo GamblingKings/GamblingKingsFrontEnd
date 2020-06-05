@@ -313,3 +313,23 @@ footer,
 .min-width-200px {
   min-width: 200px;
 }
+
+
+/*************
+    ThreeJS
+*************/
+@media (max-height: 600px) {
+  .landscape-threejs {
+    min-height: 75px;
+    min-width: 75px;
+    max-height: 100px;
+    max-width: 200px;
+  }
+}
+
+@media (min-height: 601px) {
+  .portrait-threejs {
+    min-height: 150px;
+    min-width: 150px;
+  }
+}

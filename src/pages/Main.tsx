@@ -46,6 +46,13 @@ const MainPage = ({ history }: RouteComponentProps<HistoryParams>): JSX.Element 
   /**
    * ThreeJS
    */
+
+  let scene: THREE.Scene;
+  let camera: THREE.PerspectiveCamera;
+  let renderer: THREE.WebGLRenderer;
+  let geometry: THREE.BoxGeometry;
+  let cube: THREE.Mesh;
+
   const loadMaterials = () => {
     const loader: THREE.TextureLoader = new THREE.TextureLoader();
     const materials = [
@@ -60,30 +67,41 @@ const MainPage = ({ history }: RouteComponentProps<HistoryParams>): JSX.Element 
     return materials;
   };
   const initThree = () => {
-    const scene: THREE.Scene = new THREE.Scene();
+    scene = new THREE.Scene();
     const { clientHeight, clientWidth } = ThreeJSRefContainer.current;
-    const camera: THREE.PerspectiveCamera = new THREE.PerspectiveCamera(75, clientWidth / clientHeight, 0.1, 1000);
-    const renderer: THREE.WebGLRenderer = new THREE.WebGLRenderer({ alpha: true });
+    camera = new THREE.PerspectiveCamera(75, clientWidth / clientHeight, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer({ alpha: true });
+
     renderer.setSize(clientWidth, clientHeight);
     renderer.setClearColor(0x531cb3, 0.15);
+
     ThreeJSRefContainer.current.appendChild(renderer.domElement);
-    const geometry: THREE.BoxGeometry = new THREE.BoxGeometry(3, 4, 3);
-    const cube: THREE.Mesh = new THREE.Mesh(geometry, loadMaterials());
+
+    geometry = new THREE.BoxGeometry(3, 4, 3);
+    cube = new THREE.Mesh(geometry, loadMaterials());
     scene.add(cube);
     camera.position.z = 5;
+  };
 
-    const animate = () => {
-      requestAnimationFrame(animate);
-      cube.rotation.y += 0.01;
-      cube.rotation.x += 0.01;
-      renderer.render(scene, camera);
-    };
+  const animate = () => {
+    requestAnimationFrame(animate);
+    cube.rotation.y += 0.01;
+    cube.rotation.x += 0.01;
+    renderer.render(scene, camera);
+  };
 
-    animate();
+  const onWindowResize = () => {
+    const { clientHeight, clientWidth } = ThreeJSRefContainer.current;
+    camera.aspect = clientWidth / clientHeight;
+    renderer.setSize(clientWidth, clientHeight);
+    console.log(`ClientWidth: ${clientWidth}, ClientHeight: ${clientHeight}`);
   };
 
   useEffect(() => {
     initThree();
+    animate();
+    window.addEventListener('resize', onWindowResize);
+    return () => window.removeEventListener('resize', onWindowResize);
   }, []);
 
   return (
@@ -93,7 +111,7 @@ const MainPage = ({ history }: RouteComponentProps<HistoryParams>): JSX.Element 
           <strong>
             <h1>Mahjong</h1>
           </strong>
-          <div className="min-height-150px min-width-150px margin-30" ref={ThreeJSRefContainer} />
+          <div className="portrait-threejs landscape-threejs margin-30" ref={ThreeJSRefContainer} />
           <form className="flex-column margin-20">
             <input
               value={username}
