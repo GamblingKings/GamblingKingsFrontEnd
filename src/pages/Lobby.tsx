@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 
 import WebSocketConnection from '../modules/ws/websocket';
 import OutgoingAction from '../modules/ws/outgoing_action';
-import { UsersJSON, GamesJSON } from '../types';
+import IncomingAction from '../modules/ws/incoming_action';
+import { UsersJSON, GamesJSON, MessageJSON } from '../types';
 
 import CreateGameForm from '../components/lobby/create_game';
+import SendMessageForm from '../components/lobby/send_message';
 
 type LobbyProps = {
   ws: WebSocketConnection | null;
@@ -13,14 +15,14 @@ type LobbyProps = {
 const PLACEHOLDER_USERS = [{ username: 'user' }, { username: 'user1' }, { username: 'user2' }];
 const PLACEHOLDER_GAMES = [{ game: 'game' }, { game: 'game1' }, { game: 'game2' }];
 
-// TODO: allow client to use SEND_MESSAGE and listen in on messages
-
 const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
   /**
    * States
    */
   const [users, setUsers] = useState<Record<string, unknown>[]>([]);
   const [games, setGames] = useState<Record<string, unknown>[]>([]);
+
+  const [messages, setMessages] = useState<string[]>([]);
 
   /**
    * Listener Callbacks.
@@ -37,13 +39,22 @@ const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
     setGames(newGames);
   };
 
+  const updateMessages = (payload: unknown) => {
+    const data = payload as MessageJSON;
+    const { message } = data;
+    const newMessages = [...messages];
+    newMessages.push(message);
+    setMessages(newMessages);
+  };
+
   useEffect(() => {
     if (ws) {
       ws.sendMessage(OutgoingAction.GET_ALL_GAMES, {});
       ws.sendMessage(OutgoingAction.GET_ALL_USERS, {});
 
-      ws.addListener('GAMES', updateUsers);
-      ws.addListener('USERS', updateGames);
+      ws.addListener(IncomingAction.GET_ALL_USERS, updateUsers);
+      ws.addListener(IncomingAction.GET_ALL_GAMES, updateGames);
+      ws.addListener(IncomingAction.SEND_MESSAGE, updateMessages);
     } else {
       // TODO: handling of client that has been disconnected from WS
     }
@@ -53,8 +64,9 @@ const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
 
     return function cleanup() {
       if (ws) {
-        ws.removeListener(OutgoingAction.GET_ALL_GAMES);
-        ws.removeListener(OutgoingAction.GET_ALL_USERS);
+        ws.removeListener(IncomingAction.GET_ALL_GAMES);
+        ws.removeListener(IncomingAction.GET_ALL_USERS);
+        ws.removeListener(IncomingAction.SEND_MESSAGE);
       }
     };
   }, [ws]);
@@ -67,6 +79,14 @@ const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
 
       <div>
         <CreateGameForm ws={ws} />
+      </div>
+      <div>
+        <SendMessageForm ws={ws} />
+      </div>
+      <div>
+        {messages.map((message) => (
+          <p>{message}</p>
+        ))}
       </div>
     </div>
   );

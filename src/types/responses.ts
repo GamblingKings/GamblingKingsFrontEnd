@@ -19,3 +19,7 @@ export interface UsersJSON {
 export interface GamesJSON {
   games: Record<string, unknown>[];
 }
+
+export interface MessageJSON {
+  message: string;
+}

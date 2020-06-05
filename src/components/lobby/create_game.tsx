@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 import { WebSocketConnection } from '../../types';
 
 import GameTypes from '../../modules/game/gameTypes';
+import OutgoingAction from '../../modules/ws/outgoing_action';
 
 type CreateGameFormProps = {
   ws?: WebSocketConnection | null;
 };
 
+/**
+ * Form component used to send a request to WebSocket API to create a game.
+ */
 const CreateGameForm = ({ ws }: CreateGameFormProps): JSX.Element => {
   /**
    * States.
@@ -37,7 +41,7 @@ const CreateGameForm = ({ ws }: CreateGameFormProps): JSX.Element => {
     };
     console.log(payload);
     if (ws) {
-      ws.sendMessage('CREATE_GAME', payload);
+      ws.sendMessage(OutgoingAction.CREATE_GAME, payload);
     } else {
       // TODO: handling of client that has been disconnected from WS
     }
