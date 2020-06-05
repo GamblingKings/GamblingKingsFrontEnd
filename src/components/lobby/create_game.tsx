@@ -1,8 +1,11 @@
+/* eslint-disable operator-linebreak */
 import React, { useState } from 'react';
 import { WebSocketConnection } from '../../types';
 
 import GameTypes from '../../modules/game/gameTypes';
 import OutgoingAction from '../../modules/ws/outgoing_action';
+import MahjongVersions from '../../modules/mahjong/versions';
+import BigTwoVersions from '../../modules/bigtwo/versions';
 
 type CreateGameFormProps = {
   ws?: WebSocketConnection | null;
@@ -17,6 +20,7 @@ const CreateGameForm = ({ ws }: CreateGameFormProps): JSX.Element => {
    */
   const [gameName, setGameName] = useState<string>('');
   const [gameType, setGameType] = useState<string>(GameTypes.Mahjong);
+  const [gameVersion, setGameVersion] = useState<string>(MahjongVersions.HongKong);
 
   /**
    * State Handlers.
@@ -26,7 +30,18 @@ const CreateGameForm = ({ ws }: CreateGameFormProps): JSX.Element => {
   };
 
   const handleSetGameType = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setGameType(event.target.value);
+    const specifiedGameType = event.target.value as string;
+    setGameType(specifiedGameType);
+    if (specifiedGameType === GameTypes.Mahjong) {
+      setGameVersion(MahjongVersions.HongKong);
+    }
+    if (specifiedGameType === GameTypes.BigTwo) {
+      setGameVersion(BigTwoVersions.Chinese);
+    }
+  };
+
+  const handleSetGameVersion = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setGameVersion(event.target.value);
   };
 
   /**
@@ -38,6 +53,7 @@ const CreateGameForm = ({ ws }: CreateGameFormProps): JSX.Element => {
     const payload = {
       gameName,
       gameType,
+      gameVersion,
     };
     console.log(payload);
     if (ws) {
@@ -59,6 +75,21 @@ const CreateGameForm = ({ ws }: CreateGameFormProps): JSX.Element => {
             </option>
           ))}
         </select>
+        <select value={gameVersion} onChange={handleSetGameVersion}>
+          {gameType === GameTypes.Mahjong &&
+            Object.keys(MahjongVersions).map((version) => (
+              <option value={version} key={version}>
+                {version}
+              </option>
+            ))}
+          {gameType === GameTypes.BigTwo &&
+            Object.keys(BigTwoVersions).map((version) => (
+              <option value={version} key={version}>
+                {version}
+              </option>
+            ))}
+        </select>
+
         <input type="submit" onClick={createGame} value="Create" />
       </form>
     </div>
