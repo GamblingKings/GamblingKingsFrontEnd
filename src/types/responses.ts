@@ -10,14 +10,14 @@ export interface ReceivedJSON {
  * Interface for USERS payload received
  */
 export interface UsersJSON {
-  users: Record<string, unknown>[];
+  users: Record<string, string>[];
 }
 
 /**
  * Interface for GAMES payload received
  */
 export interface GamesJSON {
-  games: Record<string, unknown>[];
+  games: Record<string, string>[];
 }
 
 export interface MessageJSON {
