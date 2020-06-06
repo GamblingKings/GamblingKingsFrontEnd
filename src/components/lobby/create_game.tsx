@@ -47,7 +47,7 @@ const CreateGameForm = ({ ws }: CreateGameFormProps): JSX.Element => {
   /**
    * Create Game Function
    */
-  const createGame = (event: React.FormEvent<HTMLInputElement>) => {
+  const createGame = (event: React.FormEvent<HTMLInputElement>): void => {
     event.preventDefault();
 
     const payload = {

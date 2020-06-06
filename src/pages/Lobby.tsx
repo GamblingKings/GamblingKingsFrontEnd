@@ -27,19 +27,19 @@ const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
   /**
    * Listener Callbacks.
    */
-  const updateUsers = (payload: unknown) => {
+  const updateUsers = (payload: unknown): void => {
     const data = payload as UsersJSON;
     const { users: newUsers } = data;
     setUsers(newUsers);
   };
 
-  const updateGames = (payload: unknown) => {
+  const updateGames = (payload: unknown): void => {
     const data = payload as GamesJSON;
     const { games: newGames } = data;
     setGames(newGames);
   };
 
-  const updateMessages = (payload: unknown) => {
+  const updateMessages = (payload: unknown): void => {
     const data = payload as MessageJSON;
     const { message } = data;
     const newMessages = [...messages];
