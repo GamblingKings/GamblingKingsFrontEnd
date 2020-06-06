@@ -19,6 +19,17 @@ const MainThreeJSComponent: React.FC = (): JSX.Element => {
   let geometry: THREE.BoxGeometry;
   let cube: THREE.Mesh;
 
+  const FOV = 75;
+  const NEAR = 0.1;
+  const FAR = 1000;
+
+  const RENDERER_COLOR = '0x531cb3';
+  const RENDERER_ALPHA = 0.15;
+
+  const GEOMETRY_DIMENSIONS: number[] = [3, 4, 3];
+
+  const CAMERA_POSITION_Z = 5;
+
   /**
    * Ref
    */
@@ -40,18 +51,18 @@ const MainThreeJSComponent: React.FC = (): JSX.Element => {
   const initThree = () => {
     scene = new THREE.Scene();
     const { clientHeight, clientWidth } = ThreeJSRefContainer.current;
-    camera = new THREE.PerspectiveCamera(75, clientWidth / clientHeight, 0.1, 1000);
+    camera = new THREE.PerspectiveCamera(FOV, clientWidth / clientHeight, NEAR, FAR);
     renderer = new THREE.WebGLRenderer({ alpha: true });
 
     renderer.setSize(clientWidth, clientHeight);
-    renderer.setClearColor(0x531cb3, 0.15);
+    renderer.setClearColor(RENDERER_COLOR, RENDERER_ALPHA);
 
     ThreeJSRefContainer.current.appendChild(renderer.domElement);
 
-    geometry = new THREE.BoxGeometry(3, 4, 3);
+    geometry = new THREE.BoxGeometry(...GEOMETRY_DIMENSIONS);
     cube = new THREE.Mesh(geometry, loadMaterials());
     scene.add(cube);
-    camera.position.z = 5;
+    camera.position.z = CAMERA_POSITION_Z;
   };
 
   const animate = () => {
