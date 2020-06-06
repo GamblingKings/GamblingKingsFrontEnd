@@ -21,14 +21,14 @@ const MainPage = ({ setWs }: MainProps): JSX.Element => {
   /**
    * State Handlers.
    */
-  const handleSetUsername = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSetUsername = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setUsername(event.target.value);
   };
 
   /**
    * Methods
    */
-  const connect = (event: React.FormEvent<HTMLInputElement>) => {
+  const connect = (event: React.FormEvent<HTMLInputElement>): void => {
     event.preventDefault();
 
     const finalizeLogin = (): void => {

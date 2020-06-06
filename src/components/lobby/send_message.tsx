@@ -12,7 +12,7 @@ type SendMessageFormProps = {
 const SendMessageForm = ({ ws }: SendMessageFormProps): JSX.Element => {
   const [message, setMessage] = useState<string>('');
 
-  const handleSetMessage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSetMessage = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setMessage(event.target.value);
   };
 
