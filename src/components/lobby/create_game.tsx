@@ -51,9 +51,11 @@ const CreateGameForm = ({ ws }: CreateGameFormProps): JSX.Element => {
     event.preventDefault();
 
     const payload = {
-      gameName,
-      gameType,
-      gameVersion,
+      game: {
+        gameName,
+        gameType,
+        gameVersion,
+      },
     };
     console.log(payload);
     if (ws) {

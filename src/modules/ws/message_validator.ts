@@ -12,7 +12,7 @@ const MESSAGE_FORMATS: Record<string, string[]> = {
   [OutgoingAction.SET_USERNAME]: ['username'],
   [OutgoingAction.GET_ALL_USERS]: [],
   [OutgoingAction.GET_ALL_GAMES]: [],
-  [OutgoingAction.CREATE_GAME]: ['gameName', 'gameType'],
+  [OutgoingAction.CREATE_GAME]: ['game'],
   [OutgoingAction.SEND_MESSAGE]: ['message'],
 };
 

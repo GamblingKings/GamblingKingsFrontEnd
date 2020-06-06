@@ -36,6 +36,7 @@ class WebSocketConnection {
       let data: ReceivedJSON;
       try {
         data = JSON.parse(message.data);
+        console.log(`Received msg: ${message.data}`);
       } catch (err) {
         console.log(err);
         console.log('Incoming message must be a JSON.');
@@ -55,7 +56,7 @@ class WebSocketConnection {
     console.log(validMessage);
     if (validMessage) {
       const data = JSON.stringify({ action: key, payload });
-      console.log(data);
+      console.log(`Sent msg: ${data}`);
       this.ws.send(data);
       return true;
     }
