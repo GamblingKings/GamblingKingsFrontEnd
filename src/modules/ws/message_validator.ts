@@ -1,3 +1,5 @@
+import OutgoingAction from './outgoing_action';
+
 /**
  * Message Formats that the client is allowed to send.
  * key = $request.body.action
@@ -7,6 +9,11 @@
  */
 const MESSAGE_FORMATS: Record<string, string[]> = {
   TEST_MESSAGE: ['test_message', 'test_message2'],
+  [OutgoingAction.SET_USERNAME]: ['username'],
+  [OutgoingAction.GET_ALL_USERS]: [],
+  [OutgoingAction.GET_ALL_GAMES]: [],
+  [OutgoingAction.CREATE_GAME]: ['game'],
+  [OutgoingAction.SEND_MESSAGE]: ['message'],
 };
 
 /**
@@ -21,10 +28,10 @@ class SendMessageValidator {
    * @param data an object, payload of the message
    */
   static validateMessage(key: string, data: Record<string, unknown>): boolean {
-    const acceptedKeys = MESSAGE_FORMATS[key] || [];
+    const acceptedKeys = MESSAGE_FORMATS[key];
     const passedKeys = Object.keys(data);
 
-    if (acceptedKeys.length === 0 || passedKeys.length !== acceptedKeys.length) return false;
+    if (!acceptedKeys || passedKeys.length !== acceptedKeys.length) return false;
 
     let validMessage = true;
     passedKeys.forEach((passedKey: string) => {

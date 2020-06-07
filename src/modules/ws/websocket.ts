@@ -1,10 +1,6 @@
 import SendMessageValidator from './message_validator';
-
-interface WebSocketConnection {
-  sendMessage(key: string, data: Record<string, unknown>): void;
-  addListener(key: string, callback: () => void): boolean;
-  removeListener(key: string): boolean;
-}
+import { ReceivedJSON } from '../../types';
+import OutgoingAction from './outgoing_action';
 
 const WEBSOCKET_URL = process.env.REACT_APP_WEBSOCKETURL || '';
 
@@ -14,13 +10,17 @@ const WEBSOCKET_URL = process.env.REACT_APP_WEBSOCKETURL || '';
 class WebSocketConnection {
   private ws: WebSocket;
 
-  private listeners: Record<string, (data: JSON) => void> = {};
+  private listeners: Record<string, (payload: unknown) => void> = {};
 
-  public constructor(url: string = WEBSOCKET_URL) {
+  public constructor(username: string, callback: () => void, url: string = WEBSOCKET_URL) {
     this.ws = new WebSocket(url);
-    this.ws.onopen = (event) => {
-      console.log(event);
-      // this.ws.send('');
+    this.ws.onopen = () => {
+      console.log('Socket opened!');
+      const data = {
+        username,
+      };
+      this.sendMessage(OutgoingAction.SET_USERNAME, data);
+      callback();
     };
 
     this.ws.onclose = (event) => {
@@ -33,28 +33,31 @@ class WebSocketConnection {
     };
 
     this.ws.onmessage = (message) => {
-      let data = null;
+      let data: ReceivedJSON;
       try {
         data = JSON.parse(message.data);
+        console.log(`Received msg: ${message.data}`);
       } catch (err) {
         console.log(err);
         console.log('Incoming message must be a JSON.');
         return;
       }
-      const { action } = data;
+      const { action, payload } = data;
 
-      if (action in this.listeners) this.listeners[action](data);
+      if (action in this.listeners) this.listeners[action](payload);
     };
   }
 
   /**
    * Sends a message to the backend if the message is validated.
    */
-  public sendMessage(key: string, data: Record<string, unknown>): boolean {
-    const validMessage = SendMessageValidator.validateMessage(key, data);
+  public sendMessage(key: string, payload: Record<string, unknown>): boolean {
+    const validMessage = SendMessageValidator.validateMessage(key, payload);
+    console.log(validMessage);
     if (validMessage) {
-      const payload = { action: key, ...data };
-      this.ws.send(JSON.stringify(payload));
+      const data = JSON.stringify({ action: key, payload });
+      console.log(`Sent msg: ${data}`);
+      this.ws.send(data);
       return true;
     }
     return false;
@@ -66,7 +69,7 @@ class WebSocketConnection {
    * @param callback a function that client can act on
    * @returns a boolean whether the listener was successfully added
    */
-  public addListener(key: string, callback: (data: JSON) => void): boolean {
+  public addListener(key: string, callback: (payload: unknown) => void): boolean {
     if (key in this.listeners) return false;
 
     this.listeners[key] = callback;
