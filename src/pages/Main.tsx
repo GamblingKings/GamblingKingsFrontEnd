@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { HistoryParams } from '../types/react-router';
+import MainThreeJSComponent from '../components/MainThreeJSComponent';
 
 /**
  * Landing Page for the application.
@@ -36,6 +37,7 @@ const MainPage = ({ history }: RouteComponentProps<HistoryParams>): JSX.Element 
           <strong>
             <h1>Mahjong</h1>
           </strong>
+          <MainThreeJSComponent />
           <form className="flex-column margin-20">
             <input
               value={username}
