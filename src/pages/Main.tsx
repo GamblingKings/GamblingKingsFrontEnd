@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-
 import MainThreeJSComponent from '../components/MainThreeJSComponent';
+
 import WebSocketConnection from '../modules/ws/websocket';
 
 type MainProps = {
