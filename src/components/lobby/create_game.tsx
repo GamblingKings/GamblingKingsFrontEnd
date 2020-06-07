@@ -7,6 +7,8 @@ import OutgoingAction from '../../modules/ws/outgoing_action';
 import MahjongVersions from '../../modules/mahjong/versions';
 import BigTwoVersions from '../../modules/bigtwo/versions';
 
+import { createGamePayload } from '../../modules/ws/payload_creator';
+
 type CreateGameFormProps = {
   ws?: WebSocketConnection | null;
 };
@@ -50,13 +52,7 @@ const CreateGameForm = ({ ws }: CreateGameFormProps): JSX.Element => {
   const createGame = (event: React.FormEvent<HTMLInputElement>): void => {
     event.preventDefault();
 
-    const payload = {
-      game: {
-        gameName,
-        gameType,
-        gameVersion,
-      },
-    };
+    const payload = createGamePayload(gameName, gameType, gameVersion);
     console.log(payload);
     if (ws) {
       ws.sendMessage(OutgoingAction.CREATE_GAME, payload);

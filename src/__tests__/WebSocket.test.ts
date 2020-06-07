@@ -6,8 +6,8 @@ const key = 'TEST_MESSAGE';
 const invalidKey = 'INVALID_KEY';
 const data = { test_message: 'hello world', test_message2: 'hello' };
 
-const json = JSON.stringify({ action: key, ...data });
-const invalidJSON = JSON.stringify({ action: invalidKey, ...data });
+const json = JSON.stringify({ action: key, payload: { ...data } });
+const invalidJSON = JSON.stringify({ action: invalidKey, payload: { ...data } });
 
 test('Mock WS connection: client send server message', async () => {
   WS.clean();
@@ -15,7 +15,7 @@ test('Mock WS connection: client send server message', async () => {
   const mockServer = new WS(fakeURL);
   // await mockServer.connected;
 
-  const wsConnection = new WebSocketConnection(fakeURL);
+  const wsConnection = new WebSocketConnection('username', () => {}, fakeURL);
 
   wsConnection.sendMessage(key, data);
   wsConnection.sendMessage(invalidKey, data);
@@ -32,10 +32,10 @@ test('Mock WS Connection: Add listener and receive message', async () => {
   const mockServer = new WS(fakeURL);
   // await mockServer.connected;
 
-  const wsConnection = new WebSocketConnection(fakeURL);
+  const wsConnection = new WebSocketConnection('username', () => {}, fakeURL);
 
   const message: string[] = [];
-  const callback = (mockData: JSON) => {
+  const callback = (mockData: unknown) => {
     const jsonString = JSON.stringify(mockData);
     message.push(jsonString);
   };
@@ -49,7 +49,8 @@ test('Mock WS Connection: Add listener and receive message', async () => {
   mockServer.send(json);
   mockServer.send(invalidJSON);
 
-  expect(message).toEqual([json]);
+  const receivedPayload = JSON.parse(json).payload;
+  expect(message).toEqual([JSON.stringify(receivedPayload)]);
 });
 
 test('Mock WS Connection: Add/Remove listener', async () => {
@@ -58,10 +59,10 @@ test('Mock WS Connection: Add/Remove listener', async () => {
   const mockServer = new WS(fakeURL);
   // await mockServer.connected;
 
-  const wsConnection = new WebSocketConnection(fakeURL);
+  const wsConnection = new WebSocketConnection('username', () => {}, fakeURL);
 
   const message: string[] = [];
-  const callback = (mockData: JSON) => {
+  const callback = (mockData: unknown) => {
     const jsonString = JSON.stringify(mockData);
     message.push(jsonString);
   };
