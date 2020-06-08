@@ -3,7 +3,7 @@ import { Link, useHistory } from 'react-router-dom';
 import MainThreeJSComponent from '../components/MainThreeJSComponent';
 
 import WebSocketConnection from '../modules/ws/websocket';
-import { CurrentUser } from '../types';
+import { CurrentUser, LoginSuccessJSON } from '../types';
 
 type MainProps = {
   setWs: React.Dispatch<React.SetStateAction<WebSocketConnection | null>>;
@@ -33,7 +33,10 @@ const MainPage = ({ setWs, setCurrentUser }: MainProps): JSX.Element => {
   const connect = (event: React.FormEvent<HTMLInputElement>): void => {
     event.preventDefault();
 
-    const finalizeLogin = (): void => {
+    const finalizeLogin = (payload: unknown): void => {
+      const data = payload as LoginSuccessJSON;
+      // TODO: do something if login true or false
+      console.log(data);
       const user = {
         username,
       } as CurrentUser;

@@ -13,9 +13,9 @@ class WebSocketConnection {
 
   private listeners: Record<string, (payload: unknown) => void> = {};
 
-  public constructor(username: string, callback: () => void, url: string = WEBSOCKET_URL) {
+  public constructor(username: string, callback: (payload: unknown) => void, url: string = WEBSOCKET_URL) {
     this.ws = new WebSocket(url);
-    this.addListener(IncomingAction.LOGIN_SUCCESSFUL, callback);
+    this.addListener(IncomingAction.LOGIN_SUCCESS, callback);
     this.ws.onopen = () => {
       console.log('Socket opened!');
       const data = {

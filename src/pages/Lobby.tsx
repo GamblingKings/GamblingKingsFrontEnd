@@ -46,26 +46,36 @@ const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
    */
   const [users, setUsers] = useState<User[]>([]);
   const [games, setGames] = useState<Game[]>([]);
-
   const [messages, setMessages] = useState<string[]>([]);
 
   /**
    * Listener Callbacks.
    */
+
+  /**
+   * For GET_ALL_USERS
+   * @param payload UsersJSON
+   */
   const updateUsers = (payload: unknown): void => {
     const data = payload as UsersJSON;
-    console.log(data);
     const { users: newUsers } = data;
     setUsers(newUsers);
   };
 
+  /**
+   * For GET_ALL_GAMES
+   * @param payload GamesJSON
+   */
   const updateGames = (payload: unknown): void => {
     const data = payload as GamesJSON;
-    console.log(data);
     const { games: newGames } = data;
     setGames(newGames);
   };
 
+  /**
+   * For SEND_MESSAGE
+   * @param payload MessageJSON
+   */
   const updateMessages = (payload: unknown): void => {
     const data = payload as MessageJSON;
     const { message } = data;
@@ -74,6 +84,10 @@ const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
     setMessages(newMessages);
   };
 
+  /**
+   * For CREATE_GAME
+   * @param payload
+   */
   const createdGame = (payload: unknown): void => {
     // TODO: act on when game is created
     console.log(payload);

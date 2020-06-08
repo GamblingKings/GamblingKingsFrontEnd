@@ -9,19 +9,37 @@ export interface ReceivedJSON {
 }
 
 /**
- * Interface for USERS payload received
+ * Interface for LOGIN_SUCCESS payload received
+ */
+export interface LoginSuccessJSON {
+  success: boolean;
+  error?: string;
+}
+
+/**
+ * Interface for GET_ALL_USERS payload received
  */
 export interface UsersJSON {
   users: User[];
 }
 
 /**
- * Interface for GAMES payload received
+ * Interface for GET_ALL_GAMES payload received
  */
 export interface GamesJSON {
   games: Game[];
 }
 
+/**
+ * Interface for SEND_MESSAGE payload received
+ */
 export interface MessageJSON {
   message: string;
+  username: string;
+}
+
+export interface CreateGameJSON {
+  success: boolean;
+  game: Game;
+  error?: string;
 }
