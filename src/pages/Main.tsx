@@ -3,15 +3,17 @@ import { Link, useHistory } from 'react-router-dom';
 import MainThreeJSComponent from '../components/MainThreeJSComponent';
 
 import WebSocketConnection from '../modules/ws/websocket';
+import { CurrentUser } from '../types';
 
 type MainProps = {
   setWs: React.Dispatch<React.SetStateAction<WebSocketConnection | null>>;
+  setCurrentUser: React.Dispatch<React.SetStateAction<CurrentUser>>;
 };
 
 /**
  * Landing Page for the application.
  */
-const MainPage = ({ setWs }: MainProps): JSX.Element => {
+const MainPage = ({ setWs, setCurrentUser }: MainProps): JSX.Element => {
   /**
    * States
    */
@@ -32,6 +34,10 @@ const MainPage = ({ setWs }: MainProps): JSX.Element => {
     event.preventDefault();
 
     const finalizeLogin = (): void => {
+      const user = {
+        username,
+      } as CurrentUser;
+      setCurrentUser(user);
       history.push('/lobby');
     };
     const websocket = new WebSocketConnection(username, finalizeLogin);
