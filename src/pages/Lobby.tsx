@@ -1,15 +1,17 @@
+/* eslint-disable object-curly-newline */
 import React, { useEffect, useState } from 'react';
 
 import WebSocketConnection from '../modules/ws/websocket';
 import OutgoingAction from '../modules/ws/outgoing_action';
 import IncomingAction from '../modules/ws/incoming_action';
-import { UsersJSON, GamesJSON, MessageJSON } from '../types';
+import { UsersJSON, GamesJSON, MessageJSON, CurrentUser, User, Game } from '../types';
 
 import CreateGameForm from '../components/lobby/create_game';
 import SendMessageForm from '../components/lobby/send_message';
 
 type LobbyProps = {
   ws: WebSocketConnection | null;
+  currentUser: CurrentUser;
 };
 
 const PLACEHOLDER_USERS = [
@@ -42,8 +44,8 @@ const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
   /**
    * States
    */
-  const [users, setUsers] = useState<Record<string, string>[]>([]);
-  const [games, setGames] = useState<Record<string, string>[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [games, setGames] = useState<Game[]>([]);
 
   const [messages, setMessages] = useState<string[]>([]);
 
@@ -110,13 +112,14 @@ const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
 
   return (
     <div>
-      <p>This is the lobby</p>
-      <div>
+      <div className="border-color-black">
+        <p>Users</p>
         {users.map((user) => (
           <p key={user.connectionId}>{user.username}</p>
         ))}
       </div>
-      <div>
+      <div className="border-color-black">
+        <p>Games</p>
         {games.map((game) => (
           <p key={game.gameId}>{game.gameName}</p>
         ))}

@@ -24,6 +24,7 @@ const SendMessageForm = ({ ws }: SendMessageFormProps): JSX.Element => {
 
     if (ws) {
       ws.sendMessage(OutgoingAction.SEND_MESSAGE, payload);
+      setMessage('');
     } else {
       // TODO: handling of client that has been disconnected from WS
     }

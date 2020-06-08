@@ -1,3 +1,5 @@
+import { User, Game } from './client';
+
 /**
  * Interface for all messages received from WebSocket.
  */
@@ -10,14 +12,14 @@ export interface ReceivedJSON {
  * Interface for USERS payload received
  */
 export interface UsersJSON {
-  users: Record<string, string>[];
+  users: User[];
 }
 
 /**
  * Interface for GAMES payload received
  */
 export interface GamesJSON {
-  games: Record<string, string>[];
+  games: Game[];
 }
 
 export interface MessageJSON {
