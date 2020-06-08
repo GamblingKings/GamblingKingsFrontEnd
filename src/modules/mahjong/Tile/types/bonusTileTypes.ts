@@ -1,6 +1,6 @@
 enum BonusTileTypes {
   SEASON = 'season',
-  Flower = 'flower',
+  FLOWER = 'flower',
 }
 
 export default BonusTileTypes;

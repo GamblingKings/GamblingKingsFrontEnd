@@ -27,3 +27,5 @@ yarn.lock
 package-lock.json
 .env
 .eslintcache
+
+**/*.js
