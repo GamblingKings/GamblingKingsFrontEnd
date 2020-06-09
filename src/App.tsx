@@ -16,7 +16,7 @@ function App(): JSX.Element {
   return (
     <Router>
       <Switch>
-        <Route exact path="/" component={() => <Main setWs={setWs} setCurrentUser={setCurrentUser} />} />
+        <Route exact path="/" component={() => <Main setWs={setWs} setCurrentUser={setCurrentUser} ws={ws} />} />
         <Route exact path="/aboutUs" component={About} />
         <Route exact path="/lobby" component={() => <Lobby ws={ws} currentUser={currentUser} />} />
       </Switch>

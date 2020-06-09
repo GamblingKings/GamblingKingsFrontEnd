@@ -4,16 +4,18 @@ import MainThreeJSComponent from '../components/MainThreeJSComponent';
 
 import WebSocketConnection from '../modules/ws/websocket';
 import { CurrentUser, LoginSuccessJSON } from '../types';
+import IncomingAction from '../modules/ws/incoming_action';
 
 type MainProps = {
   setWs: React.Dispatch<React.SetStateAction<WebSocketConnection | null>>;
   setCurrentUser: React.Dispatch<React.SetStateAction<CurrentUser>>;
+  ws: WebSocketConnection | null;
 };
 
 /**
  * Landing Page for the application.
  */
-const MainPage = ({ setWs, setCurrentUser }: MainProps): JSX.Element => {
+const MainPage = ({ setWs, setCurrentUser, ws }: MainProps): JSX.Element => {
   /**
    * States
    */
@@ -32,16 +34,21 @@ const MainPage = ({ setWs, setCurrentUser }: MainProps): JSX.Element => {
    */
   const connect = (event: React.FormEvent<HTMLInputElement>): void => {
     event.preventDefault();
-
+    // TODO: prevent user from editing username when this process is happening
     const finalizeLogin = (payload: unknown): void => {
       const data = payload as LoginSuccessJSON;
-      // TODO: do something if login true or false
+      const { success, error } = data;
       console.log(data);
-      const user = {
-        username,
-      } as CurrentUser;
-      setCurrentUser(user);
-      history.push('/lobby');
+      if (success) {
+        const user = {
+          username,
+        } as CurrentUser;
+        setCurrentUser(user);
+        ws?.removeListener(IncomingAction.LOGIN_SUCCESS);
+        history.push('/lobby');
+      } else {
+        console.log(`LOGIN ERROR: ${error}`);
+      }
     };
     const websocket = new WebSocketConnection(username, finalizeLogin);
     setWs(websocket);
