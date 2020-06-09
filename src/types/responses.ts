@@ -36,8 +36,12 @@ export interface GamesJSON {
 export interface MessageJSON {
   message: string;
   username: string;
+  date: Date;
 }
 
+/**
+ * Interface for CREATE_GAME payload received
+ */
 export interface CreateGameJSON {
   success: boolean;
   game: Game;
