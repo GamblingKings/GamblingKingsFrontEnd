@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import WebSocketConnection from '../modules/ws/websocket';
 import OutgoingAction from '../modules/ws/outgoing_action';
 import IncomingAction from '../modules/ws/incoming_action';
-import { UsersJSON, GamesJSON, MessageJSON, CurrentUser, User, Game } from '../types';
+import { UsersJSON, GamesJSON, MessageJSON, CurrentUser, User, Game, CreateGameJSON } from '../types';
 
 import CreateGameForm from '../components/lobby/create_game';
 import SendMessageForm from '../components/lobby/send_message';
@@ -59,7 +59,12 @@ const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
   const updateUsers = (payload: unknown): void => {
     const data = payload as UsersJSON;
     const { users: newUsers } = data;
-    setUsers(newUsers);
+
+    /**
+     * Only add user if they have a username associated.
+     */
+    const filteredUsers = newUsers.filter((user) => user.username);
+    setUsers(filteredUsers);
   };
 
   /**
@@ -90,7 +95,8 @@ const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
    */
   const createdGame = (payload: unknown): void => {
     // TODO: act on when game is created
-    console.log(payload);
+    const data = payload as CreateGameJSON;
+    console.log(data);
   };
 
   useEffect(() => {
@@ -100,6 +106,10 @@ const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
         ws.addListener(IncomingAction.GET_ALL_GAMES, updateGames),
         ws.addListener(IncomingAction.SEND_MESSAGE, updateMessages),
         ws.addListener(IncomingAction.CREATE_GAME, createdGame),
+        ws.addListener(IncomingAction.GAME_UPDATE, () => {}),
+        ws.addListener(IncomingAction.USER_UPDATE, () => {}),
+        ws.addListener(IncomingAction.LEAVE_GAME, () => {}),
+        ws.addListener(IncomingAction.JOIN_GAME, () => {}),
       ];
 
       const failedAdded = addListeners.filter((bool) => !bool);
@@ -120,6 +130,10 @@ const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
         ws.removeListener(IncomingAction.GET_ALL_USERS);
         ws.removeListener(IncomingAction.SEND_MESSAGE);
         ws.removeListener(IncomingAction.CREATE_GAME);
+        ws.removeListener(IncomingAction.GAME_UPDATE);
+        ws.removeListener(IncomingAction.USER_UPDATE);
+        ws.removeListener(IncomingAction.LEAVE_GAME);
+        ws.removeListener(IncomingAction.JOIN_GAME);
       }
     };
   }, [ws]);
@@ -146,6 +160,7 @@ const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
         <SendMessageForm ws={ws} />
       </div>
       <div>
+        <p>Messages</p>
         {messages.map((message) => (
           <p key={message}>{message}</p>
         ))}
