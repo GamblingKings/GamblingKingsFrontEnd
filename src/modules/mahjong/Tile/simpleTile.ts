@@ -12,6 +12,10 @@ class SimpleTile extends Tile {
     this.value = value;
   }
 
+  public getType(): SimpleTileType {
+    return this.type;
+  }
+
   public toString(): string {
     return `${this.value} ${this.type}`;
   }

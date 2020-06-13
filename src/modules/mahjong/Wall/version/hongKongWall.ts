@@ -30,16 +30,11 @@ class HongKongWall extends Wall {
   }
 
   public generateHand(): Tile[] {
-    const { length } = this.tiles;
-    return this.tiles.splice(length - 13, 13);
+    return super.generateHand();
   }
 
   public draw(): Tile | null | undefined {
-    if (this.tiles.length > 0) {
-      return this.tiles.pop();
-    }
-
-    return null;
+    return super.draw();
   }
 
   public getTiles(): Tile[] {

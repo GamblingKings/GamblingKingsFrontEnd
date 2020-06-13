@@ -65,6 +65,7 @@
     "jest-websocket-mock": "^2.0.2",
     "lint-staged": "^10.2.7",
     "mock-socket": "^9.0.3",
-    "prettier": "^2.0.5"
+    "prettier": "^2.0.5",
+    "ts-node": "^8.10.2"
   }
 }

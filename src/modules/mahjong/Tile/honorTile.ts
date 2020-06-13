@@ -1,12 +1,16 @@
 import Tile from './tile';
-import HonorTileTypes from './types/honorTileTypes';
+import HonorTileType from './types/honorTileTypes';
 
 class HonorTile extends Tile {
-  private type: HonorTileTypes;
+  private type: HonorTileType;
 
-  constructor(type: HonorTileTypes) {
+  constructor(type: HonorTileType) {
     super();
     this.type = type;
+  }
+
+  public getType(): HonorTileType {
+    return this.type;
   }
 
   public toString(): string {

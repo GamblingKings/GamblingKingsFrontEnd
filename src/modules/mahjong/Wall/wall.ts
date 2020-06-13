@@ -49,7 +49,20 @@ abstract class Wall {
     }
   }
 
-  protected getTiles(): Tile[] {
+  public generateHand(): Tile[] {
+    const { length } = this.tiles;
+    return this.tiles.splice(length - 13, 13);
+  }
+
+  public draw(): Tile | null | undefined {
+    if (this.tiles.length > 0) {
+      return this.tiles.pop();
+    }
+
+    return null;
+  }
+
+  public getTiles(): Tile[] {
     return this.tiles;
   }
 }
