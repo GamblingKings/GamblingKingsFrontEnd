@@ -1,7 +1,7 @@
 enum SimpleTileTypes {
-  DOT = 'dot',
-  BAMBOO = 'bamboo',
-  CHARACTER = 'character',
+  DOT = 'DOT',
+  BAMBOO = 'BAMBOO',
+  CHARACTER = 'CHARACTER',
 }
 
 export default SimpleTileTypes;

@@ -4,7 +4,6 @@ import DeadPile from '../DeadPile/deadPile';
 import SimpleTileTypes from '../Tile/types/simpleTileTypes';
 import HonorTileTypes from '../Tile/types/honorTileTypes';
 import BonusTileTypes from '../Tile/types/bonusTileTypes';
-import HongKongWall from '../Wall/version/hongKongWall';
 
 interface SortHandWeights {
   [SimpleTileTypes.DOT]: number;
@@ -28,11 +27,11 @@ class Hand {
 
   private deadPile: DeadPile;
 
-  constructor(wall: Wall, deadPile: DeadPile) {
+  constructor(wall: Wall, deadPile: DeadPile, weights: SortHandWeights) {
     this.wall = wall;
     this.deadPile = deadPile;
     this.hand = this.wall.generateHand();
-    this.sort_hand();
+    this.sort_hand(weights);
   }
 
   static generateHandWeights(
@@ -88,30 +87,21 @@ class Hand {
     return null;
   }
 
-  public sort_hand(): void {
-    const weights: SortHandWeights = Hand.generateHandWeights();
-
+  public sort_hand(weights: SortHandWeights): void {
     this.hand.sort((t1, t2) => {
       const t1Type = t1.getType();
       const t2Type = t2.getType();
+
+      if (t1Type === t2Type && t1Type in SimpleTileTypes) {
+        const v1 = t1.getValue();
+        const v2 = t2.getValue();
+
+        return v1 - v2;
+      }
 
       return weights[t1Type] - weights[t2Type];
     });
   }
 }
-
-const w = new HongKongWall();
-const d = new DeadPile();
-
-const handOne = new Hand(w, d);
-const handTwo = new Hand(w, d);
-const handThree = new Hand(w, d);
-const handFour = new Hand(w, d);
-
-console.log(w.getTiles().length);
-console.log(`HAND ONE ${handOne.getHand()}`);
-console.log(`HAND TWO ${handTwo.getHand()}`);
-console.log(`HAND THREE ${handThree.getHand()}`);
-console.log(`HAND FOUR ${handFour.getHand()}`);
 
 export default Hand;

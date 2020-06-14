@@ -16,6 +16,10 @@ class BonusTile extends Tile {
     return this.type;
   }
 
+  public getValue(): number {
+    return this.value;
+  }
+
   public toString(): string {
     return `${this.value} ${this.type}`;
   }

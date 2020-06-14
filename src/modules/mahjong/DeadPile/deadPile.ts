@@ -14,6 +14,10 @@ class DeadPile {
     return this.deadpile;
   }
 
+  public getLastThrown(): Tile | null {
+    return this.lastThrow;
+  }
+
   public add(t: Tile): boolean {
     this.deadpile.push(t);
     return true;
@@ -25,6 +29,11 @@ class DeadPile {
     }
 
     this.lastThrow = t;
+  }
+
+  public clear(): void {
+    this.deadpile = [];
+    this.lastThrow = null;
   }
 }
 

@@ -13,11 +13,19 @@ class HongKongWall extends Wall {
     this.initalizeWall();
   }
 
-  initalizeWall(): void {
+  public initalizeWall(reset = false): void {
+    if (reset) {
+      super.clear();
+    }
+
     super.initializeSimpleTiles();
     super.initializeHonorTiles();
     this.initializeBonusTiles();
     super.shuffleTiles();
+  }
+
+  public reset(): void {
+    this.initalizeWall(true);
   }
 
   private initializeBonusTiles(): void {

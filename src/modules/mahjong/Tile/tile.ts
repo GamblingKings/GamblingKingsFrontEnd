@@ -6,6 +6,8 @@ abstract class Tile {
   abstract toString(): string;
 
   abstract getType(): SimpleTileType | HonorTileType | BonusTileType;
+
+  abstract getValue(): number;
 }
 
 export default Tile;

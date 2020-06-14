@@ -17,7 +17,7 @@ abstract class Wall {
   /**
    * Abstract Methods
    */
-  abstract initalizeWall(): void;
+  abstract initalizeWall(reset: boolean): void;
 
   /**
    * Common methods to be used by children
@@ -64,6 +64,10 @@ abstract class Wall {
 
   public getTiles(): Tile[] {
     return this.tiles;
+  }
+
+  public clear(): void {
+    this.tiles = [];
   }
 }
 
