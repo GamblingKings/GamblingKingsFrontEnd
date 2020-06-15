@@ -4,6 +4,7 @@ enum OutgoingAction {
   GET_ALL_USERS = 'GET_ALL_USERS',
   CREATE_GAME = 'CREATE_GAME',
   SEND_MESSAGE = 'SEND_MESSAGE',
+  LEAVE_GAME = 'LEAVE_GAME',
 }
 
 export default OutgoingAction;

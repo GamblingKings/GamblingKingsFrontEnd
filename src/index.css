@@ -321,6 +321,17 @@ footer,
 }
 
 /*************
+    Modal
+*************/
+.modal {
+  display: block;
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+}
+
+/*************
     ThreeJS
 *************/
 @media (max-height: 600px) {

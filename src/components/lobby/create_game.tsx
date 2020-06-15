@@ -11,12 +11,13 @@ import { createGamePayload } from '../../modules/ws/payload_creator';
 
 type CreateGameFormProps = {
   ws?: WebSocketConnection | null;
+  toggleOff: () => void;
 };
 
 /**
  * Form component used to send a request to WebSocket API to create a game.
  */
-const CreateGameForm = ({ ws }: CreateGameFormProps): JSX.Element => {
+const CreateGameForm = ({ ws, toggleOff }: CreateGameFormProps): JSX.Element => {
   /**
    * States.
    */
@@ -53,7 +54,6 @@ const CreateGameForm = ({ ws }: CreateGameFormProps): JSX.Element => {
     event.preventDefault();
 
     const payload = createGamePayload(gameName, gameType, gameVersion);
-    console.log(payload);
     if (ws) {
       ws.sendMessage(OutgoingAction.CREATE_GAME, payload);
     } else {
@@ -64,7 +64,10 @@ const CreateGameForm = ({ ws }: CreateGameFormProps): JSX.Element => {
   return (
     <div>
       <p>Create Game</p>
-      <form>
+      <button type="button" onClick={toggleOff}>
+        Cancel
+      </button>
+      <form className="flex-column">
         <input value={gameName} onChange={handleSetGameName} placeholder="Enter a game name." />
         <select value={gameType} onChange={handleSetGameType}>
           {Object.keys(GameTypes).map((game) => (
