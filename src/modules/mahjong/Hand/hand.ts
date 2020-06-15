@@ -5,9 +5,9 @@
  * is reached.
  */
 
-import Tile from '../Tile/tile';
-import Wall from '../Wall/wall';
-import DeadPile from '../DeadPile/deadPile';
+import Tile from '../Tile/Tile';
+import Wall from '../Wall/Wall';
+import DeadPile from '../DeadPile/DeadPile';
 import SimpleTileTypes from '../Tile/types/simpleTileTypes';
 import HonorTileTypes from '../Tile/types/honorTileTypes';
 import BonusTileTypes from '../Tile/types/bonusTileTypes';

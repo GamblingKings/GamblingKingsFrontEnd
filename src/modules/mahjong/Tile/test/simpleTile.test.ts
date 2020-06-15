@@ -1,5 +1,5 @@
-import SimpleTile from '../simpleTile';
-import SimpleTileTypes from '../types/simpleTileTypes';
+import SimpleTile from '../SimpleTile';
+import SimpleTileTypes from '../types/SimpleTileTypes';
 
 test('SimpleTile fails to initialize is range is not between 1 - 9', () => {
   const t = () => {

@@ -1,6 +1,6 @@
-import Hand from '../hand';
-import DeadPile from '../../DeadPile/deadPile';
-import HongKongWall from '../../Wall/version/hongKongWall';
+import Hand from '../Hand';
+import DeadPile from '../../DeadPile/DeadPile';
+import HongKongWall from '../../Wall/version/HongKongWall';
 
 const w = new HongKongWall();
 const d = new DeadPile();

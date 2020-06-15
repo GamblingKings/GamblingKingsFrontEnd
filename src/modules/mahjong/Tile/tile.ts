@@ -4,9 +4,9 @@
  * as simple (dots, bamboo, characters), honors (dragons and winds), and bonus (flowers, seasons)
  */
 
-import BonusTileType from './types/bonusTileTypes';
-import SimpleTileType from './types/simpleTileTypes';
-import HonorTileType from './types/honorTileTypes';
+import BonusTileType from './types/BonusTileTypes';
+import SimpleTileType from './types/SimpleTileTypes';
+import HonorTileType from './types/HonorTileTypes';
 
 abstract class Tile {
   abstract toString(): string;
