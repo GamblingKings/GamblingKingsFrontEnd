@@ -5,8 +5,8 @@ import Main from './pages/Main';
 import About from './pages/About';
 import Lobby from './pages/Lobby';
 
-import WebSocketConnection from './modules/ws/websocket';
 import { CurrentUser } from './types';
+import { WebSocketConnection } from './modules/ws';
 
 const DEFAULT_USER = { username: '' } as CurrentUser;
 

@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 
-import WebSocketConnection from '../modules/ws/websocket';
-import OutgoingAction from '../modules/ws/outgoing_action';
-import IncomingAction from '../modules/ws/incoming_action';
+import { WebSocketConnection, IncomingAction, OutgoingAction } from '../modules/ws';
 import {
   UsersJSON,
   GamesJSON,
@@ -26,31 +24,31 @@ type LobbyProps = {
   currentUser: CurrentUser;
 };
 
-const PLACEHOLDER_USERS = [
-  { username: 'user', connectionId: '123' },
-  { username: 'user1', connectionId: '1233' },
-  { username: 'user2', connectionId: '1223' },
-];
-const PLACEHOLDER_GAMES = [
-  {
-    gameId: '123',
-    gameName: 'game',
-    gameType: 'Mahjong',
-    gameVersion: 'HongKong',
-  },
-  {
-    gameId: '1234',
-    gameName: 'game12323',
-    gameType: 'Mahjong',
-    gameVersion: 'HongKong',
-  },
-  {
-    gameId: '123123',
-    gameName: 'game2323',
-    gameType: 'Mahjong',
-    gameVersion: 'HongKong',
-  },
-];
+// const PLACEHOLDER_USERS = [
+//   { username: 'user', connectionId: '123' },
+//   { username: 'user1', connectionId: '1233' },
+//   { username: 'user2', connectionId: '1223' },
+// ];
+// const PLACEHOLDER_GAMES = [
+//   {
+//     gameId: '123',
+//     gameName: 'game',
+//     gameType: 'Mahjong',
+//     gameVersion: 'HongKong',
+//   },
+//   {
+//     gameId: '1234',
+//     gameName: 'game12323',
+//     gameType: 'Mahjong',
+//     gameVersion: 'HongKong',
+//   },
+//   {
+//     gameId: '123123',
+//     gameName: 'game2323',
+//     gameType: 'Mahjong',
+//     gameVersion: 'HongKong',
+//   },
+// ];
 
 const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
   /**
@@ -193,6 +191,7 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
       const index = newGames.findIndex((g) => g.gameId === newGameId);
       if (index === -1) {
         newGames.push(game);
+        setGames(newGames);
       }
     }
     // Remove game from state
@@ -224,7 +223,7 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
 
   /**
    * For LEAVE_GAME
-   * @param payload
+   * @param payload LeaveGameJSON
    */
   const leaveGame = (payload: unknown): void => {
     const data = payload as LeaveGameJSON;
@@ -258,9 +257,6 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
     } else {
       // TODO: handling of client that has been disconnected from WS
     }
-
-    setUsers(PLACEHOLDER_USERS);
-    setGames(PLACEHOLDER_GAMES);
 
     return function cleanup() {
       if (ws) {

@@ -52,7 +52,7 @@ export interface UpdateGameJSON {
 export interface MessageJSON {
   message: string;
   username: string;
-  date: Date;
+  time: Date;
 }
 
 /**
@@ -77,6 +77,30 @@ export interface JoinGameJSON {
  * Interface for LEAVE_GAME payload received
  */
 export interface LeaveGameJSON {
+  success: boolean;
+  error?: string;
+}
+
+/**
+ * Interface for IN_GAME_MESSAGE payload received
+ */
+export interface InGameMessageJSON {
+  message: string;
+  username: string;
+  time: Date;
+}
+
+/**
+ * Interface for IN_GAME_UPDATE payload received
+ */
+export interface InGameUpdateJSON {
+  connections: string; // placeholder
+}
+
+/**
+ * Interface for START_GAME payload received
+ */
+export interface StartGameJSON {
   success: boolean;
   error?: string;
 }

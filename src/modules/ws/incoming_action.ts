@@ -15,6 +15,13 @@ enum IncomingAction {
   USER_UPDATE = 'USER_UPDATE',
   LEAVE_GAME = 'LEAVE_GAME',
   JOIN_GAME = 'JOIN_GAME',
+
+  /**
+   * Game Lobby
+   */
+  IN_GAME_UPDATE = 'IN_GAME_UPDATE',
+  IN_GAME_MESSAGE = 'IN_GAME_MESSAGE',
+  START_GAME = 'START_GAME',
 }
 
 export default IncomingAction;

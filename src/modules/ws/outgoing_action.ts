@@ -5,6 +5,7 @@ enum OutgoingAction {
   CREATE_GAME = 'CREATE_GAME',
   SEND_MESSAGE = 'SEND_MESSAGE',
   LEAVE_GAME = 'LEAVE_GAME',
+  START_GAME = 'START_GAME',
 }
 
 export default OutgoingAction;
