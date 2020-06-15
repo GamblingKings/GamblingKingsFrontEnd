@@ -7,12 +7,12 @@
  * and thus this class is left for inheritence
  */
 
-import Tile from '../Tile/tile';
-import SimpleTile from '../Tile/simpleTile';
-import HonorTile from '../Tile/honorTile';
+import Tile from '../Tile/Tile';
+import SimpleTile from '../Tile/SimpleTile';
+import HonorTile from '../Tile/HonorTile';
 
-import simpleTileInit from './init/simple';
-import honorTileInit from './init/honor';
+import simpleTileInit from './init/Simple';
+import honorTileInit from './init/Honor';
 
 abstract class Wall {
   static DEFAULT_NUM_OF_TILE = 4;
