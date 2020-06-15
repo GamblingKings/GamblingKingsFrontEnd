@@ -18,14 +18,14 @@ class HongKongWall extends Wall {
    */
   constructor() {
     super();
-    this.initalizeWall();
+    this.initializeWall();
   }
 
   /**
    * Initializes the tiles in the wall.
    * @param reset Boolean, if true, clears the wall as well
    */
-  public initalizeWall(reset = false): void {
+  public initializeWall(reset = false): void {
     if (reset) {
       super.clear();
     }
@@ -40,7 +40,7 @@ class HongKongWall extends Wall {
    * Resets and initialize the wall.
    */
   public reset(): void {
-    this.initalizeWall(true);
+    this.initializeWall(true);
   }
 
   /**

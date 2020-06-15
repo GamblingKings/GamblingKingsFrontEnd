@@ -4,19 +4,19 @@ const DEFAULT_WALL_LENGTH = 144;
 
 test('wall to have DEFAULT_WALL_LENGTH tiles when initialized', () => {
   const wall = new HongKongWall();
-  expect(wall.getTiles().length).toBe(DEFAULT_WALL_LENGTH);
+  expect(wall.getTiles()).toHaveLength(DEFAULT_WALL_LENGTH);
 });
 
 test('Generate hand will yield a hand of 13 tiles', () => {
   const wall = new HongKongWall();
   const hand = wall.generateHand();
-  expect(hand.length).toBe(13);
+  expect(hand).toHaveLength(13);
 });
 
 test('Generate hand will remove 13 tiles from the wall', () => {
   const wall = new HongKongWall();
   const hand = wall.generateHand();
-  expect(wall.getTiles().length).toBe(DEFAULT_WALL_LENGTH - hand.length);
+  expect(wall.getTiles()).toHaveLength(DEFAULT_WALL_LENGTH - hand.length);
 });
 
 test('Generate hand will take the last 13 tiles from the wall', () => {
@@ -44,7 +44,7 @@ test('Drawing from the wall removes 1 from the wall', () => {
     wall.draw();
   }
 
-  expect(wall.getTiles().length).toBe(DEFAULT_WALL_LENGTH - drawCount);
+  expect(wall.getTiles()).toHaveLength(DEFAULT_WALL_LENGTH - drawCount);
 });
 
 test('able to rest the wall', () => {
@@ -57,5 +57,5 @@ test('able to rest the wall', () => {
 
   wall.reset();
 
-  expect(wall.getTiles().length).toBe(DEFAULT_WALL_LENGTH);
+  expect(wall.getTiles()).toHaveLength(DEFAULT_WALL_LENGTH);
 });

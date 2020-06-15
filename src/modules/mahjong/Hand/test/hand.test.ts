@@ -43,7 +43,7 @@ test('Drawing removes 1 tile from the wall', () => {
   h3.draw(w);
   h4.draw(w);
 
-  expect(w.getTiles().length).toBe(wallLength - 4);
+  expect(w.getTiles()).toHaveLength(wallLength - 4);
 });
 
 test('Throwing a tile adds to the dead pile', () => {
@@ -54,7 +54,7 @@ test('Throwing a tile adds to the dead pile', () => {
   h3.throw(2, d);
   h4.throw(2, d);
 
-  expect(d.getDeadPile().length).toBe(3); // Last tile is held in lastThrow property
+  expect(d.getDeadPile()).toHaveLength(3); // Last tile is held in lastThrow property
 });
 
 test('Can throw a specific tile', () => {

@@ -14,5 +14,5 @@ test('Test that the DeadPile stores the last thrown and gets thrown into deadpil
 });
 
 test('Test that the DeadPile only has one tile in the dead pile', () => {
-  expect(d.getDeadPile().length).toBe(1);
+  expect(d.getDeadPile()).toHaveLength(1);
 });
