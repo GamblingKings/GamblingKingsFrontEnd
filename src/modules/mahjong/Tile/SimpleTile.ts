@@ -3,8 +3,8 @@
  * Represents a Dot, Bamboo, or Character Tile
  */
 
-import Tile from './tile';
-import SimpleTileType from './types/simpleTileTypes';
+import Tile from './Tile';
+import SimpleTileType from './types/SimpleTileTypes';
 
 class SimpleTile extends Tile {
   private type: SimpleTileType;

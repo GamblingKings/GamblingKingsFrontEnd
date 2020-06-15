@@ -3,12 +3,12 @@
  * The HongKong wall has bonus tiles (flowers and seasons)
  */
 
-import Wall from '../wall';
-import Tile from '../../Tile/tile';
-import BonusTile from '../../Tile/bonusTile';
-import MahjongVersion from './versions';
+import Wall from '../Wall';
+import Tile from '../../Tile/Tile';
+import BonusTile from '../../Tile/BonusTile';
+import MahjongVersion from './Versions';
 
-import BonusTileInit from '../init/bonus';
+import BonusTileInit from '../init/Bonus';
 
 class HongKongWall extends Wall {
   static version: MahjongVersion = MahjongVersion.HongKong;

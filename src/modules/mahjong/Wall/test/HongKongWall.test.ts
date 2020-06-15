@@ -1,4 +1,4 @@
-import HongKongWall from '../version/hongKongWall';
+import HongKongWall from '../version/HongKongWall';
 
 const DEFAULT_WALL_LENGTH = 144;
 

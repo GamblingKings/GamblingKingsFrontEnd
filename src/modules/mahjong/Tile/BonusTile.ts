@@ -3,8 +3,8 @@
  * Represents a Flower or Season tile.
  */
 
-import Tile from './tile';
-import BonusTileType from './types/bonusTileTypes';
+import Tile from './Tile';
+import BonusTileType from './types/BonusTileTypes';
 
 class BonusTile extends Tile {
   private type: BonusTileType;

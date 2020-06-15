@@ -4,7 +4,7 @@ import { WebSocketConnection } from '../../types';
 
 import GameTypes from '../../modules/game/gameTypes';
 import OutgoingAction from '../../modules/ws/outgoing_action';
-import MahjongVersions from '../../modules/mahjong/Wall/version/versions';
+import MahjongVersions from '../../modules/mahjong/Wall/version/Versions';
 import BigTwoVersions from '../../modules/bigtwo/versions';
 
 import { createGamePayload } from '../../modules/ws/payload_creator';
