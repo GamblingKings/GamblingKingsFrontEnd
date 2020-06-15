@@ -27,8 +27,7 @@ export interface UsersJSON {
  * Interface for USER_UPDATE payload received
  */
 export interface UpdateUserJSON {
-  connectionId: string;
-  username: string;
+  user: User;
   state: string;
 }
 
