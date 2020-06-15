@@ -52,7 +52,7 @@ const PLACEHOLDER_GAMES = [
   },
 ];
 
-const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
+const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
   /**
    * Hook that holds a reference to a state.
    * Used in WebSocket callbacks as initialized callbacks do not have updated reference to state.
@@ -156,12 +156,13 @@ const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
    */
   const updateUser = (payload: unknown): void => {
     const data = payload as UpdateUserJSON;
-    const { connectionId, username, state } = data;
+    const { user, state } = data;
+    const { connectionId, username } = user;
     const originalUsers = usersRef.current as User[];
     const newUsers = [...originalUsers];
     // Add user to state if not already in the list
     if (state === 'CONNECT') {
-      const index = newUsers.findIndex((user) => user.connectionId === connectionId);
+      const index = newUsers.findIndex((u) => u.connectionId === connectionId);
       if (index === -1) {
         newUsers.push({ username, connectionId });
         setUsers(newUsers);
@@ -169,7 +170,7 @@ const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
     }
     // Remove user from state if found in the list
     if (state === 'DISCONNECT') {
-      const index = newUsers.findIndex((user) => user.connectionId === connectionId);
+      const index = newUsers.findIndex((u) => u.connectionId === connectionId);
       if (index !== -1) {
         newUsers.splice(index, 1);
         setUsers(newUsers);
@@ -309,7 +310,7 @@ const LobbyPage = ({ ws }: LobbyProps): JSX.Element => {
       )}
 
       <div>
-        <SendMessageForm ws={ws} />
+        <SendMessageForm ws={ws} currentUser={currentUser} />
       </div>
       <div>
         <p>Messages</p>
