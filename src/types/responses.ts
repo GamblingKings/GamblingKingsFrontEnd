@@ -24,10 +24,27 @@ export interface UsersJSON {
 }
 
 /**
+ * Interface for USER_UPDATE payload received
+ */
+export interface UpdateUserJSON {
+  connectionId: string;
+  username: string;
+  state: string;
+}
+
+/**
  * Interface for GET_ALL_GAMES payload received
  */
 export interface GamesJSON {
   games: Game[];
+}
+
+/**
+ * Interface for GAME_UPDATE payload received
+ */
+export interface UpdateGameJSON {
+  game: Game;
+  state: string;
 }
 
 /**
@@ -45,5 +62,22 @@ export interface MessageJSON {
 export interface CreateGameJSON {
   success: boolean;
   game: Game;
+  error?: string;
+}
+
+/**
+ * Interface for JOIN_GAME payload received
+ */
+export interface JoinGameJSON {
+  success: boolean;
+  game: Game;
+  error?: string;
+}
+
+/**
+ * Interface for LEAVE_GAME payload received
+ */
+export interface LeaveGameJSON {
+  success: boolean;
   error?: string;
 }
