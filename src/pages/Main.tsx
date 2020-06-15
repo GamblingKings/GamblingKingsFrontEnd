@@ -32,13 +32,13 @@ const MainPage = ({ setWs, setCurrentUser, ws }: MainProps): JSX.Element => {
   /**
    * Methods
    */
-  const connect = (event: React.FormEvent<HTMLInputElement>): void => {
+  const connect = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // TODO: prevent user from editing username when this process is happening
-    const finalizeLogin = (payload: unknown): void => {
+    let websocket = null as unknown;
+    const testfunc = (payload: unknown) => {
+      setWs(websocket as WebSocketConnection);
       const data = payload as LoginSuccessJSON;
       const { success, error } = data;
-      console.log(data);
       if (success) {
         const user = {
           username,
@@ -50,8 +50,7 @@ const MainPage = ({ setWs, setCurrentUser, ws }: MainProps): JSX.Element => {
         console.log(`LOGIN ERROR: ${error}`);
       }
     };
-    const websocket = new WebSocketConnection(username, finalizeLogin);
-    setWs(websocket);
+    websocket = new WebSocketConnection(username, testfunc) as WebSocketConnection;
   };
 
   return (
@@ -62,19 +61,14 @@ const MainPage = ({ setWs, setCurrentUser, ws }: MainProps): JSX.Element => {
             <h1>Mahjong</h1>
           </strong>
           <MainThreeJSComponent />
-          <form className="flex-column margin-20">
+          <form className="flex-column margin-20" onSubmit={connect}>
             <input
               value={username}
               onChange={handleSetUsername}
               className="margin-bottom-10 font-size-1rem padding-5"
               placeholder="Enter a name"
             />
-            <input
-              type="submit"
-              value="Play"
-              onClick={connect}
-              className="background-color-primary button color-white padding-5"
-            />
+            <input type="submit" value="Play" className="background-color-primary button color-white padding-5" />
           </form>
         </div>
       </div>

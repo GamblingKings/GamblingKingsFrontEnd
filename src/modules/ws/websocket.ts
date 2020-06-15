@@ -54,7 +54,7 @@ class WebSocketConnection {
    */
   public sendMessage(key: string, payload: Record<string, unknown>): boolean {
     const validMessage = SendMessageValidator.validateMessage(key, payload);
-    console.log(validMessage);
+    console.log(`Valid message sent: ${validMessage}`);
     if (validMessage) {
       const data = JSON.stringify({ action: key, payload });
       console.log(`Sent msg: ${data}`);
