@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import MainThreeJSComponent from '../components/MainThreeJSComponent';
 
-import WebSocketConnection from '../modules/ws/websocket';
+import { WebSocketConnection, IncomingAction } from '../modules/ws';
 import { CurrentUser, LoginSuccessJSON } from '../types';
-import IncomingAction from '../modules/ws/incoming_action';
 
 type MainProps = {
   setWs: React.Dispatch<React.SetStateAction<WebSocketConnection | null>>;
