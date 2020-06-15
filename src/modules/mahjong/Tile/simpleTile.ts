@@ -1,3 +1,8 @@
+/**
+ * Class that extends the Tile.ts class.
+ * Represents a Dot, Bamboo, or Character Tile
+ */
+
 import Tile from './tile';
 import SimpleTileType from './types/simpleTileTypes';
 

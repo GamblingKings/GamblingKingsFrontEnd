@@ -1,3 +1,10 @@
+/**
+ * The Hand class represents a player's hand in Mahjong. It consists of
+ * a 13 tile hand that contains various different tiles. The player
+ * continuously draws and throws tile from the hand until a winning hand
+ * is reached.
+ */
+
 import Hand from '../hand';
 import DeadPile from '../../DeadPile/deadPile';
 import HongKongWall from '../../Wall/version/hongKongWall';

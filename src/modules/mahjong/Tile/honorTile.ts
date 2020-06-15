@@ -1,3 +1,8 @@
+/**
+ * Class that extends the Tile.ts class.
+ * Represents a Wind or Dragon tile.
+ */
+
 import Tile from './tile';
 import HonorTileType from './types/honorTileTypes';
 

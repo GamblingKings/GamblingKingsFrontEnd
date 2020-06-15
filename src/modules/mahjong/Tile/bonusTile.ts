@@ -1,3 +1,8 @@
+/**
+ * Class that extends the Tile.ts class.
+ * Represents a Flower or Season tile.
+ */
+
 import Tile from './tile';
 import BonusTileType from './types/bonusTileTypes';
 

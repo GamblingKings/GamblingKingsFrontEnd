@@ -1,3 +1,8 @@
+/**
+ * Extends the Wall.ts class.
+ * The HongKong wall has bonus tiles (flowers and seasons)
+ */
+
 import Wall from '../wall';
 import Tile from '../../Tile/tile';
 import BonusTile from '../../Tile/bonusTile';

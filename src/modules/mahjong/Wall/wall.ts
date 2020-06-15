@@ -1,3 +1,12 @@
+/**
+ * The Wall class represents the "wall" or pool of available tiles.
+ * The wall contains 144 tiles(if Hong Kong version) at the start and 92 once hands(4) have been formed.
+ * Players are able to draw a tile from the wall. Typically the game will end
+ * if no players have a winning hand or the end of the wall is reached.
+ * Different versions of mahjong have different implementations of the wall
+ * and thus this class is left for inheritence
+ */
+
 import Tile from '../Tile/tile';
 import SimpleTile from '../Tile/simpleTile';
 import HonorTile from '../Tile/honorTile';
