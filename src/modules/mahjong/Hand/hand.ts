@@ -23,14 +23,8 @@ interface SortHandWeights {
 class Hand {
   private hand: Tile[];
 
-  private wall: Wall;
-
-  private deadPile: DeadPile;
-
-  constructor(wall: Wall, deadPile: DeadPile, weights: SortHandWeights) {
-    this.wall = wall;
-    this.deadPile = deadPile;
-    this.hand = this.wall.generateHand();
+  constructor(wall: Wall, weights: SortHandWeights) {
+    this.hand = wall.generateHand();
     this.sort_hand(weights);
   }
 
@@ -68,17 +62,17 @@ class Hand {
     return this.hand;
   }
 
-  public throw(index: number): boolean {
+  public throw(index: number, deadPile: DeadPile): boolean {
     if (this.hand.length > index) {
-      this.deadPile.lastThrown(this.hand.splice(index, 1)[0]);
+      deadPile.lastThrown(this.hand.splice(index, 1)[0]);
       return true;
     }
 
     return false;
   }
 
-  public draw(): Tile | null {
-    const t: Tile | undefined | null = this.wall.draw();
+  public draw(wall: Wall): Tile | null {
+    const t: Tile | undefined | null = wall.draw();
     if (t) {
       this.hand.push(t);
       return t;
