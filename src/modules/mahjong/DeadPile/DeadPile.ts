@@ -4,7 +4,7 @@
  * Tiles in the deadpile are therefore considered to be out of play.
  */
 
-import Tile from '../Tile/tile';
+import Tile from '../Tile/Tile';
 
 class DeadPile {
   private deadpile: Tile[];

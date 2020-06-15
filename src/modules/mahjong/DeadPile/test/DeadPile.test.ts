@@ -1,6 +1,6 @@
 import DeadPile from '../DeadPile';
 import SimpleTile from '../../Tile/SimpleTile';
-import SimpleTileTypes from '../../Tile/types/simpleTileTypes';
+import SimpleTileTypes from '../../Tile/types/SimpleTileTypes';
 
 const charSimpleTile = new SimpleTile(SimpleTileTypes.CHARACTER, 1);
 const bambooSimpleTile = new SimpleTile(SimpleTileTypes.BAMBOO, 5);

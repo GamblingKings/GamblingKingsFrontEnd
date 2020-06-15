@@ -2,7 +2,7 @@
  * Object used to initialize Honor Tiles in the wall class
  */
 
-import HonorTileTypes from '../../Tile/types/honorTileTypes';
+import HonorTileTypes from '../../Tile/types/HonorTileTypes';
 
 type HonorTileInitObject = {
   east: {

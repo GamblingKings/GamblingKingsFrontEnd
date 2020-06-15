@@ -3,8 +3,8 @@
  * Represents a Wind or Dragon tile.
  */
 
-import Tile from './tile';
-import HonorTileType from './types/honorTileTypes';
+import Tile from './Tile';
+import HonorTileType from './types/HonorTileTypes';
 
 class HonorTile extends Tile {
   private type: HonorTileType;
