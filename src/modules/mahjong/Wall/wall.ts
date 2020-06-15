@@ -19,6 +19,9 @@ abstract class Wall {
 
   protected tiles: Tile[];
 
+  /**
+   * Public constructor.
+   */
   constructor() {
     this.tiles = [];
   }
@@ -31,6 +34,10 @@ abstract class Wall {
   /**
    * Common methods to be used by children
    */
+
+  /**
+   * Intializes all Simple tiles using an the SimpleTileInit object
+   */
   protected initializeSimpleTiles(): void {
     Object.values(simpleTileInit).forEach((object) => {
       for (let value = 1; value <= object.range; value += 1) {
@@ -42,6 +49,9 @@ abstract class Wall {
     });
   }
 
+  /**
+   * Intializes all Honor tiles using an the HonorTileInit object
+   */
   protected initializeHonorTiles(): void {
     Object.values(honorTileInit).forEach((object) => {
       for (let i = 0; i < Wall.DEFAULT_NUM_OF_TILE; i += 1) {
@@ -51,6 +61,9 @@ abstract class Wall {
     });
   }
 
+  /**
+   * Shuffles all the tile in the wall
+   */
   protected shuffleTiles(): void {
     for (let i = 0; i < this.tiles.length; i += 1) {
       const rnd = Math.floor(Math.random() * this.tiles.length);
@@ -58,11 +71,19 @@ abstract class Wall {
     }
   }
 
+  /**
+   * Generates a hand from the wall
+   * @returns a Tile Array
+   */
   public generateHand(): Tile[] {
     const { length } = this.tiles;
     return this.tiles.splice(length - 13, 13);
   }
 
+  /**
+   * Draws a tile from the wall
+   * @returns a Tile if available, otherwise null
+   */
   public draw(): Tile | null | undefined {
     if (this.tiles.length > 0) {
       return this.tiles.pop();
@@ -71,10 +92,16 @@ abstract class Wall {
     return null;
   }
 
+  /**
+   * @returns the tile property
+   */
   public getTiles(): Tile[] {
     return this.tiles;
   }
 
+  /**
+   * Clears the tiles array
+   */
   public clear(): void {
     this.tiles = [];
   }

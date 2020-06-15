@@ -1,3 +1,7 @@
+/**
+ * Object used to initialize Honor Tiles in the wall class
+ */
+
 import HonorTileTypes from '../../Tile/types/honorTileTypes';
 
 type HonorTileInitObject = {
