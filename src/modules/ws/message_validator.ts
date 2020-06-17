@@ -14,6 +14,9 @@ const MESSAGE_FORMATS: Record<string, string[]> = {
   [OutgoingAction.GET_ALL_GAMES]: [],
   [OutgoingAction.CREATE_GAME]: ['game'],
   [OutgoingAction.SEND_MESSAGE]: ['message', 'username'],
+  [OutgoingAction.JOIN_GAME]: ['gameId'],
+  [OutgoingAction.LEAVE_GAME]: ['gameId'],
+  [OutgoingAction.START_GAME]: ['gameId'],
 };
 
 /**

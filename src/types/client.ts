@@ -21,6 +21,7 @@ export interface Game {
   gameName: string;
   gameType: string;
   gameVersion: string;
+  users: User[];
 }
 
 /**

@@ -94,7 +94,7 @@ export interface InGameMessageJSON {
  * Interface for IN_GAME_UPDATE payload received
  */
 export interface InGameUpdateJSON {
-  connections: string; // placeholder
+  users: User[];
 }
 
 /**

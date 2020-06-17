@@ -78,6 +78,8 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
   const messagesRef = useStateRef(messages);
 
   const [currentGame, setCurrentGame] = useState<Game | null>(null);
+  const currentGameRef = useStateRef(currentGame);
+
   const [inGame, setInGame] = useState<boolean>(false);
 
   const [createGameModal, setCreateGameModal] = useState<boolean>(false);
@@ -87,6 +89,15 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
    */
   const toggleCreateGameModal = (): void => setCreateGameModal(!createGameModal);
   const closeCreateGameModal = (): void => setCreateGameModal(false);
+
+  /**
+   * Functions
+   */
+  const requestJoinGame = (gameId: string) => {
+    if (ws) {
+      ws.sendMessage(OutgoingAction.JOIN_GAME, { gameId });
+    }
+  };
 
   /**
    * Listener Callbacks.
@@ -142,6 +153,11 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
       setCurrentGame(game);
       closeCreateGameModal();
       setInGame(true);
+
+      const originalGames = gamesRef.current as Game[];
+      const newGames = [...originalGames];
+      newGames.push(game);
+      setGames(newGames);
     } else {
       // TODO: implement create game error modal
       console.log(`Error in creating game: ${error}`);
@@ -288,7 +304,9 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
         <div className="border-color-black padding-30">
           <p>Games</p>
           {games.map((game) => (
-            <p key={game.gameId}>{game.gameName}</p>
+            <button type="button" onClick={() => requestJoinGame(game.gameId)} key={game.gameId}>
+              {game.gameName}
+            </button>
           ))}
         </div>
       </div>
@@ -316,7 +334,7 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
       </div>
       {inGame && (
         <div className="modal background-color-primary margin-top-30">
-          <GameLobby ws={ws} game={currentGame} />
+          <GameLobby ws={ws} gameRef={currentGameRef} game={currentGame} setGame={setCurrentGame} />
         </div>
       )}
     </div>

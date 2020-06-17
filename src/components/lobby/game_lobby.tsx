@@ -6,6 +6,8 @@ import { WebSocketConnection, IncomingAction, OutgoingAction } from '../../modul
 type GameLobbyProps = {
   ws?: WebSocketConnection | null;
   game: Game | null;
+  gameRef: React.MutableRefObject<unknown>;
+  setGame: React.Dispatch<React.SetStateAction<Game | null>>;
 };
 
 // TODO: only host can see the start game button.
@@ -15,7 +17,7 @@ type GameLobbyProps = {
  * Users can send messages to other users in the same game, and can leave the game.
  * Only the host can start the game.
  */
-const GameLobby = ({ ws, game }: GameLobbyProps): JSX.Element => {
+const GameLobby = ({ ws, game, gameRef, setGame }: GameLobbyProps): JSX.Element => {
   /**
    * Hook that holds a reference to a state.
    * Used in WebSocket callbacks as initialized callbacks do not have updated reference to state.
@@ -79,8 +81,11 @@ const GameLobby = ({ ws, game }: GameLobbyProps): JSX.Element => {
    */
   const updateGame = (payload: unknown): void => {
     const data = payload as InGameUpdateJSON;
-    // TODO: update state of game lobby
-    console.log(data);
+    const { users } = data;
+    const originalGame = gameRef.current as Game;
+    const newGame = { ...originalGame };
+    newGame.users = users;
+    setGame(newGame);
   };
 
   /**
@@ -121,6 +126,10 @@ const GameLobby = ({ ws, game }: GameLobbyProps): JSX.Element => {
       <button type="button" onClick={requestStartGame}>
         Start Game
       </button>
+      <div>
+        <p>Users</p>
+        {game && game.users.map((user) => <p key={user.connectionId}>{user.username}</p>)}
+      </div>
       <div>
         {messages.map(({ message, username, time }) => (
           <p>{`${time} ${username} ${message}`}</p>
