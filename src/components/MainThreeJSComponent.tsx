@@ -84,6 +84,7 @@ const MainThreeJSComponent: React.FC = (): JSX.Element => {
     animate();
     window.addEventListener('resize', onWindowResize);
     return () => window.removeEventListener('resize', onWindowResize);
+    // eslint-disable-next-line
   }, []);
 
   return <div className="portrait-threejs landscape-threejs margin-30" ref={ThreeJSRefContainer} />;

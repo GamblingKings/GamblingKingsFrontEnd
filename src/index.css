@@ -275,6 +275,13 @@ footer,
 }
 
 /*************
+    BorderRadius
+*************/
+.border-color-black {
+  border: 1px solid var(--black);
+}
+
+/*************
     FontSize
 *************/
 .font-size-1rem {
@@ -300,7 +307,6 @@ footer,
   min-height: 200px;
 }
 
-
 /*************
     Width
 *************/
@@ -314,6 +320,16 @@ footer,
   min-width: 200px;
 }
 
+/*************
+    Modal
+*************/
+.modal {
+  display: block;
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+}
 
 /*************
     ThreeJS

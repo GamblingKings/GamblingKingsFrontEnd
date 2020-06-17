@@ -1,6 +1,7 @@
 import SendMessageValidator from './message_validator';
 import { ReceivedJSON } from '../../types';
 import OutgoingAction from './outgoing_action';
+import IncomingAction from './incoming_action';
 
 const WEBSOCKET_URL = process.env.REACT_APP_WEBSOCKETURL || '';
 
@@ -12,15 +13,15 @@ class WebSocketConnection {
 
   private listeners: Record<string, (payload: unknown) => void> = {};
 
-  public constructor(username: string, callback: () => void, url: string = WEBSOCKET_URL) {
+  public constructor(username: string, callback: (payload: unknown) => void, url: string = WEBSOCKET_URL) {
     this.ws = new WebSocket(url);
+    this.addListener(IncomingAction.LOGIN_SUCCESS, callback);
     this.ws.onopen = () => {
       console.log('Socket opened!');
       const data = {
         username,
       };
       this.sendMessage(OutgoingAction.SET_USERNAME, data);
-      callback();
     };
 
     this.ws.onclose = (event) => {
@@ -53,7 +54,7 @@ class WebSocketConnection {
    */
   public sendMessage(key: string, payload: Record<string, unknown>): boolean {
     const validMessage = SendMessageValidator.validateMessage(key, payload);
-    console.log(validMessage);
+    console.log(`Valid message sent: ${validMessage}`);
     if (validMessage) {
       const data = JSON.stringify({ action: key, payload });
       console.log(`Sent msg: ${data}`);

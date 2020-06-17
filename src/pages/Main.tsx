@@ -2,16 +2,19 @@ import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import MainThreeJSComponent from '../components/MainThreeJSComponent';
 
-import WebSocketConnection from '../modules/ws/websocket';
+import { WebSocketConnection, IncomingAction } from '../modules/ws';
+import { CurrentUser, LoginSuccessJSON } from '../types';
 
 type MainProps = {
   setWs: React.Dispatch<React.SetStateAction<WebSocketConnection | null>>;
+  setCurrentUser: React.Dispatch<React.SetStateAction<CurrentUser>>;
+  ws: WebSocketConnection | null;
 };
 
 /**
  * Landing Page for the application.
  */
-const MainPage = ({ setWs }: MainProps): JSX.Element => {
+const MainPage = ({ setWs, setCurrentUser, ws }: MainProps): JSX.Element => {
   /**
    * States
    */
@@ -28,14 +31,25 @@ const MainPage = ({ setWs }: MainProps): JSX.Element => {
   /**
    * Methods
    */
-  const connect = (event: React.FormEvent<HTMLInputElement>): void => {
+  const connect = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    const finalizeLogin = (): void => {
-      history.push('/lobby');
+    let websocket = null as unknown;
+    const testfunc = (payload: unknown) => {
+      setWs(websocket as WebSocketConnection);
+      const data = payload as LoginSuccessJSON;
+      const { success, error } = data;
+      if (success) {
+        const user = {
+          username,
+        } as CurrentUser;
+        setCurrentUser(user);
+        ws?.removeListener(IncomingAction.LOGIN_SUCCESS);
+        history.push('/lobby');
+      } else {
+        console.log(`LOGIN ERROR: ${error}`);
+      }
     };
-    const websocket = new WebSocketConnection(username, finalizeLogin);
-    setWs(websocket);
+    websocket = new WebSocketConnection(username, testfunc) as WebSocketConnection;
   };
 
   return (
@@ -46,19 +60,14 @@ const MainPage = ({ setWs }: MainProps): JSX.Element => {
             <h1>Mahjong</h1>
           </strong>
           <MainThreeJSComponent />
-          <form className="flex-column margin-20">
+          <form className="flex-column margin-20" onSubmit={connect}>
             <input
               value={username}
               onChange={handleSetUsername}
               className="margin-bottom-10 font-size-1rem padding-5"
               placeholder="Enter a name"
             />
-            <input
-              type="submit"
-              value="Play"
-              onClick={connect}
-              className="background-color-primary button color-white padding-5"
-            />
+            <input type="submit" value="Play" className="background-color-primary button color-white padding-5" />
           </form>
         </div>
       </div>

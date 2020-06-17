@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import WebSocketConnection from '../../modules/ws/websocket';
 import OutgoingAction from '../../modules/ws/outgoing_action';
+import { CurrentUser } from '../../types';
 
 type SendMessageFormProps = {
   ws: WebSocketConnection | null;
+  currentUser: CurrentUser;
 };
 
 /**
  * Form Component used to send message to WebSocket to all clients.
  */
-const SendMessageForm = ({ ws }: SendMessageFormProps): JSX.Element => {
+const SendMessageForm = ({ ws, currentUser }: SendMessageFormProps): JSX.Element => {
   const [message, setMessage] = useState<string>('');
 
   const handleSetMessage = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -20,10 +22,12 @@ const SendMessageForm = ({ ws }: SendMessageFormProps): JSX.Element => {
     event.preventDefault();
     const payload = {
       message,
+      username: currentUser.username,
     };
 
     if (ws) {
       ws.sendMessage(OutgoingAction.SEND_MESSAGE, payload);
+      setMessage('');
     } else {
       // TODO: handling of client that has been disconnected from WS
     }
