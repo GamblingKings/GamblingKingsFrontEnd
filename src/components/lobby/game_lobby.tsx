@@ -122,8 +122,6 @@ const GameLobby = ({ ws, game, gameRef, setGame, removeGame }: GameLobbyProps): 
     }
   };
 
-  console.log(game);
-
   useEffect(() => {
     if (ws) {
       ws.addListener(IncomingAction.IN_GAME_MESSAGE, updateMessage);
