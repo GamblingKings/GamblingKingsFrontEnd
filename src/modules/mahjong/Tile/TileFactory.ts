@@ -28,7 +28,7 @@ class TileFactory {
       return new HonorTile(<HonorTileTypes>mappedTile.type);
     }
 
-    if (splitMappedTile.length === 2 && Object.values(SimpleTileTypes).includes(<SimpleTileTypes>splitMappedTile[1])) {
+    if (Object.values(SimpleTileTypes).includes(<SimpleTileTypes>splitMappedTile[1])) {
       return new SimpleTile(<SimpleTileTypes>mappedTile.type, mappedTile.value);
     }
 
