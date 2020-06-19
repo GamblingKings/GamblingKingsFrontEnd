@@ -101,6 +101,8 @@ const GameLobby = ({ ws, game, gameRef, setGame }: GameLobbyProps): JSX.Element 
     }
   };
 
+  console.log(game);
+
   useEffect(() => {
     if (ws) {
       ws.addListener(IncomingAction.IN_GAME_MESSAGE, updateMessage);
@@ -118,8 +120,17 @@ const GameLobby = ({ ws, game, gameRef, setGame }: GameLobbyProps): JSX.Element 
   }, []);
 
   return (
-    <div>
-      <p>Game Lobby</p>
+    <div className="padding-30">
+      <p className="padding-10 color-white">Game Lobby</p>
+      {game && (
+        <>
+          <p>Game Info</p>
+          <p>{`Game Name: ${game.gameName}`}</p>
+          <p>{`Game Type: ${game.gameVersion}`}</p>
+          <p>{`Game Version: ${game.gameVersion}`}</p>
+          <p>{`Host: ${game.host.connectionId}`}</p>
+        </>
+      )}
       <button type="button" onClick={requestLeaveGame}>
         Leave Game
       </button>
@@ -132,7 +143,7 @@ const GameLobby = ({ ws, game, gameRef, setGame }: GameLobbyProps): JSX.Element 
       </div>
       <div>
         {messages.map(({ message, username, time }) => (
-          <p>{`${time} ${username} ${message}`}</p>
+          <p key={time.toString()}>{`${time} ${username} ${message}`}</p>
         ))}
       </div>
     </div>
