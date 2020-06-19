@@ -9,6 +9,8 @@ import SimpleTileType from './types/SimpleTileTypes';
 import HonorTileType from './types/HonorTileTypes';
 
 abstract class Tile {
+  static DELIMITER = '_';
+
   abstract toString(): string;
 
   abstract getType(): SimpleTileType | HonorTileType | BonusTileType;

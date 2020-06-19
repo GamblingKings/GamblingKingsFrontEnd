@@ -45,7 +45,7 @@ class SimpleTile extends Tile {
    * @returns a string representation of the object
    */
   public toString(): string {
-    return `${this.value} ${this.type}`;
+    return `${this.value}${Tile.DELIMITER}${this.type}`;
   }
 }
 
