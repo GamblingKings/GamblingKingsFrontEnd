@@ -8,11 +8,11 @@ import {
   CurrentUser,
   User,
   Game,
+  Message,
   CreateGameJSON,
   UpdateUserJSON,
   UpdateGameJSON,
   JoinGameJSON,
-  LeaveGameJSON,
 } from '../types';
 
 import CreateGameForm from '../components/lobby/create_game';
@@ -74,13 +74,11 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
   const [games, setGames] = useState<Game[]>([]);
   const gamesRef = useStateRef(games);
 
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const messagesRef = useStateRef(messages);
 
   const [currentGame, setCurrentGame] = useState<Game | null>(null);
   const currentGameRef = useStateRef(currentGame);
-
-  const [inGame, setInGame] = useState<boolean>(false);
 
   const [createGameModal, setCreateGameModal] = useState<boolean>(false);
 
@@ -134,10 +132,9 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
    */
   const updateMessages = (payload: unknown): void => {
     const data = payload as MessageJSON;
-    const { message } = data;
-    const originalMessages = messagesRef.current as string[];
+    const originalMessages = messagesRef.current as Message[];
     const newMessages = [...originalMessages];
-    newMessages.push(message);
+    newMessages.push(data);
     setMessages(newMessages);
   };
 
@@ -152,7 +149,6 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
       console.log(game);
       setCurrentGame(game);
       closeCreateGameModal();
-      setInGame(true);
 
       const originalGames = gamesRef.current as Game[];
       const newGames = [...originalGames];
@@ -228,27 +224,11 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
     const data = payload as JoinGameJSON;
     const { success, game, error } = data;
     if (success) {
-      setInGame(true);
       setCurrentGame(game);
       console.log(game);
     } else {
       // TODO: implement join game error modal
       console.log(`Error joining game: ${error}`);
-    }
-  };
-
-  /**
-   * For LEAVE_GAME
-   * @param payload LeaveGameJSON
-   */
-  const leaveGame = (payload: unknown): void => {
-    const data = payload as LeaveGameJSON;
-    const { success, error } = data;
-    if (success) {
-      setInGame(false);
-    } else {
-      // TODO: implement something that player couldn't leave game properly
-      console.log(`Error in leaving game: ${error}`);
     }
   };
 
@@ -261,7 +241,6 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
         ws.addListener(IncomingAction.CREATE_GAME, createdGame),
         ws.addListener(IncomingAction.GAME_UPDATE, updateGame),
         ws.addListener(IncomingAction.USER_UPDATE, updateUser),
-        ws.addListener(IncomingAction.LEAVE_GAME, leaveGame),
         ws.addListener(IncomingAction.JOIN_GAME, joinGame),
       ];
 
@@ -282,7 +261,6 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
         ws.removeListener(IncomingAction.CREATE_GAME);
         ws.removeListener(IncomingAction.GAME_UPDATE);
         ws.removeListener(IncomingAction.USER_UPDATE);
-        ws.removeListener(IncomingAction.LEAVE_GAME);
         ws.removeListener(IncomingAction.JOIN_GAME);
       }
     };
@@ -323,16 +301,16 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
         </div>
       )}
 
-      <div>
+      <div className="margin-top-30">
         <SendMessageForm ws={ws} currentUser={currentUser} />
       </div>
       <div>
         <p>Messages</p>
-        {messages.map((message) => (
-          <p key={message}>{message}</p>
+        {messages.map(({ time, username, message }) => (
+          <p key={time.toString()}>{`${time} ${username} ${message}`}</p>
         ))}
       </div>
-      {inGame && (
+      {currentGame && (
         <div className="modal background-color-primary margin-top-30">
           <GameLobby ws={ws} gameRef={currentGameRef} game={currentGame} setGame={setCurrentGame} />
         </div>
