@@ -5,6 +5,7 @@ import Main from './pages/Main';
 import About from './pages/About';
 import Lobby from './pages/Lobby';
 import Game from './pages/Game';
+import GameTest from './pages/GameTest';
 
 import { CurrentUser } from './types';
 import { WebSocketConnection } from './modules/ws';
@@ -21,6 +22,7 @@ function App(): JSX.Element {
         <Route exact path="/aboutUs" component={About} />
         <Route exact path="/lobby" component={() => <Lobby ws={ws} currentUser={currentUser} />} />
         <Route exact path="/game" component={() => <Game />} />
+        <Route exact path="/gametest" component={() => <GameTest />} />
       </Switch>
     </Router>
   );
