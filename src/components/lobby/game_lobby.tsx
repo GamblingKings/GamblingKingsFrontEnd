@@ -1,6 +1,7 @@
 /* eslint-disable object-curly-newline */
 import React, { useState, useRef, useEffect } from 'react';
-import { Game, Message, InGameMessageJSON, InGameUpdateJSON, StartGameJSON } from '../../types';
+import { useHistory } from 'react-router-dom';
+import { Game, Message, InGameMessageJSON, InGameUpdateJSON, StartGameJSON, LeaveGameJSON } from '../../types';
 import { WebSocketConnection, IncomingAction, OutgoingAction } from '../../modules/ws';
 
 type GameLobbyProps = {
@@ -35,6 +36,7 @@ const GameLobby = ({ ws, game, gameRef, setGame }: GameLobbyProps): JSX.Element 
   /**
    * States
    */
+  const history = useHistory();
   const [messages, setMessages] = useState<Message[]>([]);
   const messagesRef = useStateRef(messages);
 
@@ -89,31 +91,46 @@ const GameLobby = ({ ws, game, gameRef, setGame }: GameLobbyProps): JSX.Element 
   };
 
   /**
+   * For LEAVE_GAME
+   * @param payload LeaveGameJSON
+   */
+  const leaveGame = (payload: unknown): void => {
+    const data = payload as LeaveGameJSON;
+    const { success, error } = data;
+    if (success) {
+      setGame(null);
+    } else {
+      // TODO: implement something that player couldn't leave game properly
+      console.log(`Error in leaving game: ${error}`);
+    }
+  };
+
+  /**
    * For START_GAME
    * @param payload StartGameJSON
    */
   const startGame = (payload: unknown): void => {
     const { success, error } = payload as StartGameJSON;
     if (success) {
-      console.log('start game');
+      history.push('/game');
     } else {
       console.log(`Error in starting game: ${error}`);
     }
   };
-
-  console.log(game);
 
   useEffect(() => {
     if (ws) {
       ws.addListener(IncomingAction.IN_GAME_MESSAGE, updateMessage);
       ws.addListener(IncomingAction.IN_GAME_UPDATE, updateGame);
       ws.addListener(IncomingAction.START_GAME, startGame);
+      ws.addListener(IncomingAction.LEAVE_GAME, leaveGame);
     }
     return function cleanup() {
       if (ws) {
         ws.removeListener(IncomingAction.IN_GAME_MESSAGE);
         ws.removeListener(IncomingAction.IN_GAME_UPDATE);
         ws.removeListener(IncomingAction.START_GAME);
+        ws.removeListener(IncomingAction.LEAVE_GAME);
       }
     };
     // eslint-disable-next-line
