@@ -33,7 +33,7 @@ class HongKongWall extends Wall {
     super.initializeSimpleTiles();
     super.initializeHonorTiles();
     this.initializeBonusTiles();
-    // super.shuffleTiles();
+    super.shuffleTiles();
   }
 
   /**
