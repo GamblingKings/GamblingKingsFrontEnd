@@ -4,7 +4,7 @@
   "private": true,
   "jest": {
     "collectCoverageFrom": [
-      "src/modules/**.{js,jsx,ts,tsx}",
+      "src/modules/**/*.{js,jsx,ts,tsx}",
       "!<rootDir>/node_modules/"
     ]
   },
