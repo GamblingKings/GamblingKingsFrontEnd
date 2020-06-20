@@ -104,7 +104,7 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
   const removeGameFromList = (gameId: string) => {
     const newGames = [...games];
     const index = games.findIndex((game) => game.gameId === gameId);
-    if (index !== 1) {
+    if (index !== -1) {
       newGames.splice(index, 1);
       setGames(newGames);
     }
