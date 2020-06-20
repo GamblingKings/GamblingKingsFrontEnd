@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
-import CHUN from '../assets/tiles/Regular/Chun.png';
-import MAN1 from '../assets/tiles/Regular/Man1.png';
-import HATSU from '../assets/tiles/Regular/Hatsu.png';
-import NAN from '../assets/tiles/Regular/Nan.png';
-import PEI from '../assets/tiles/Regular/Pei.png';
-import SOU1 from '../assets/tiles/Regular/Sou1.png';
+import REDDRAGON from '../assets/tiles/Regular/REDDRAGON.png';
+import ONE_CHARACTER from '../assets/tiles/Regular/1_CHARACTER.png';
+import GREENDRAGON from '../assets/tiles/Regular/GREENDRAGON.png';
+import SOUTH from '../assets/tiles/Regular/SOUTH.png';
+import NORTH from '../assets/tiles/Regular/NORTH.png';
+import ONE_BAMBOO from '../assets/tiles/Regular/1_BAMBOO.png';
 
 const MainThreeJSComponent: React.FC = (): JSX.Element => {
   /**
@@ -38,12 +38,12 @@ const MainThreeJSComponent: React.FC = (): JSX.Element => {
   const loadMaterials = () => {
     const loader: THREE.TextureLoader = new THREE.TextureLoader();
     const materials = [
-      new THREE.MeshBasicMaterial({ map: loader.load(MAN1) }),
-      new THREE.MeshBasicMaterial({ map: loader.load(HATSU) }),
-      new THREE.MeshBasicMaterial({ map: loader.load(CHUN) }),
-      new THREE.MeshBasicMaterial({ map: loader.load(SOU1) }),
-      new THREE.MeshBasicMaterial({ map: loader.load(PEI) }),
-      new THREE.MeshBasicMaterial({ map: loader.load(NAN) }),
+      new THREE.MeshBasicMaterial({ map: loader.load(ONE_CHARACTER) }),
+      new THREE.MeshBasicMaterial({ map: loader.load(GREENDRAGON) }),
+      new THREE.MeshBasicMaterial({ map: loader.load(REDDRAGON) }),
+      new THREE.MeshBasicMaterial({ map: loader.load(ONE_BAMBOO) }),
+      new THREE.MeshBasicMaterial({ map: loader.load(NORTH) }),
+      new THREE.MeshBasicMaterial({ map: loader.load(SOUTH) }),
     ];
 
     return materials;

@@ -20,9 +20,9 @@ interface SortHandWeights {
   [HonorTileTypes.SOUTH]: number;
   [HonorTileTypes.WEST]: number;
   [HonorTileTypes.NORTH]: number;
-  [HonorTileTypes.GREEN_DRAGON]: number;
-  [HonorTileTypes.RED_DRAGON]: number;
-  [HonorTileTypes.WHITE_DRAGON]: number;
+  [HonorTileTypes.GREENDRAGON]: number;
+  [HonorTileTypes.REDDRAGON]: number;
+  [HonorTileTypes.WHITEDRAGON]: number;
   [BonusTileTypes.FLOWER]: number;
   [BonusTileTypes.SEASON]: number;
 }
@@ -78,9 +78,9 @@ class Hand {
       [HonorTileTypes.SOUTH]: south,
       [HonorTileTypes.WEST]: west,
       [HonorTileTypes.NORTH]: north,
-      [HonorTileTypes.GREEN_DRAGON]: green,
-      [HonorTileTypes.RED_DRAGON]: red,
-      [HonorTileTypes.WHITE_DRAGON]: white,
+      [HonorTileTypes.GREENDRAGON]: green,
+      [HonorTileTypes.REDDRAGON]: red,
+      [HonorTileTypes.WHITEDRAGON]: white,
       [BonusTileTypes.FLOWER]: flower,
       [BonusTileTypes.SEASON]: season,
     };
