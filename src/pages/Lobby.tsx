@@ -222,6 +222,10 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
     // Remove game from state
     if (state === 'DELETED') {
       removeGameFromList(newGameId);
+      const gameRef = currentGameRef.current as Game;
+      if (gameRef && gameRef.gameId === newGameId) {
+        setCurrentGame(null);
+      }
     }
   };
 
