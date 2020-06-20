@@ -42,13 +42,13 @@ const honorTileInit: HonorTileInitObject = {
     type: HonorTileTypes.NORTH,
   },
   red: {
-    type: HonorTileTypes.RED_DRAGON,
+    type: HonorTileTypes.REDDRAGON,
   },
   green: {
-    type: HonorTileTypes.GREEN_DRAGON,
+    type: HonorTileTypes.GREENDRAGON,
   },
   white: {
-    type: HonorTileTypes.WHITE_DRAGON,
+    type: HonorTileTypes.WHITEDRAGON,
   },
 };
 
