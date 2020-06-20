@@ -98,6 +98,19 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
   };
 
   /**
+   * Remove game from games list.
+   * @param gameId string
+   */
+  const removeGameFromList = (gameId: string) => {
+    const newGames = [...games];
+    const index = games.findIndex((game) => game.gameId === gameId);
+    if (index !== 1) {
+      newGames.splice(index, 1);
+      setGames(newGames);
+    }
+  };
+
+  /**
    * Listener Callbacks.
    */
 
@@ -208,11 +221,7 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
     }
     // Remove game from state
     if (state === 'DELETED') {
-      const index = newGames.findIndex((g) => g.gameId === newGameId);
-      if (index !== -1) {
-        newGames.splice(index, 1);
-        setGames(newGames);
-      }
+      removeGameFromList(newGameId);
     }
   };
 
@@ -312,7 +321,13 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
       </div>
       {currentGame && (
         <div className="modal background-color-primary margin-top-30">
-          <GameLobby ws={ws} gameRef={currentGameRef} game={currentGame} setGame={setCurrentGame} />
+          <GameLobby
+            ws={ws}
+            gameRef={currentGameRef}
+            game={currentGame}
+            setGame={setCurrentGame}
+            removeGame={removeGameFromList}
+          />
         </div>
       )}
     </div>
