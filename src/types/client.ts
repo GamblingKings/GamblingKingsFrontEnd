@@ -22,6 +22,7 @@ export interface Game {
   gameType: string;
   gameVersion: string;
   users: User[];
+  host: User;
 }
 
 /**

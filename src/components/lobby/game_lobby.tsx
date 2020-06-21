@@ -1,6 +1,7 @@
 /* eslint-disable object-curly-newline */
 import React, { useState, useRef, useEffect } from 'react';
-import { Game, Message, InGameMessageJSON, InGameUpdateJSON, StartGameJSON } from '../../types';
+import { useHistory } from 'react-router-dom';
+import { Game, Message, InGameMessageJSON, InGameUpdateJSON, StartGameJSON, LeaveGameJSON } from '../../types';
 import { WebSocketConnection, IncomingAction, OutgoingAction } from '../../modules/ws';
 
 type GameLobbyProps = {
@@ -8,6 +9,7 @@ type GameLobbyProps = {
   game: Game | null;
   gameRef: React.MutableRefObject<unknown>;
   setGame: React.Dispatch<React.SetStateAction<Game | null>>;
+  removeGame: (gameId: string) => void;
 };
 
 // TODO: only host can see the start game button.
@@ -17,7 +19,7 @@ type GameLobbyProps = {
  * Users can send messages to other users in the same game, and can leave the game.
  * Only the host can start the game.
  */
-const GameLobby = ({ ws, game, gameRef, setGame }: GameLobbyProps): JSX.Element => {
+const GameLobby = ({ ws, game, gameRef, setGame, removeGame }: GameLobbyProps): JSX.Element => {
   /**
    * Hook that holds a reference to a state.
    * Used in WebSocket callbacks as initialized callbacks do not have updated reference to state.
@@ -35,6 +37,7 @@ const GameLobby = ({ ws, game, gameRef, setGame }: GameLobbyProps): JSX.Element 
   /**
    * States
    */
+  const history = useHistory();
   const [messages, setMessages] = useState<Message[]>([]);
   const messagesRef = useStateRef(messages);
 
@@ -89,13 +92,31 @@ const GameLobby = ({ ws, game, gameRef, setGame }: GameLobbyProps): JSX.Element 
   };
 
   /**
+   * For LEAVE_GAME
+   * @param payload LeaveGameJSON
+   */
+  const leaveGame = (payload: unknown): void => {
+    const data = payload as LeaveGameJSON;
+    const { success, game: g, error } = data;
+    if (success) {
+      setGame(null);
+      if (g.users.length === 0) {
+        removeGame(g.gameId);
+      }
+    } else {
+      // TODO: implement something that player couldn't leave game properly
+      console.log(`Error in leaving game: ${error}`);
+    }
+  };
+
+  /**
    * For START_GAME
    * @param payload StartGameJSON
    */
   const startGame = (payload: unknown): void => {
     const { success, error } = payload as StartGameJSON;
     if (success) {
-      console.log('start game');
+      history.push('/game');
     } else {
       console.log(`Error in starting game: ${error}`);
     }
@@ -106,20 +127,31 @@ const GameLobby = ({ ws, game, gameRef, setGame }: GameLobbyProps): JSX.Element 
       ws.addListener(IncomingAction.IN_GAME_MESSAGE, updateMessage);
       ws.addListener(IncomingAction.IN_GAME_UPDATE, updateGame);
       ws.addListener(IncomingAction.START_GAME, startGame);
+      ws.addListener(IncomingAction.LEAVE_GAME, leaveGame);
     }
     return function cleanup() {
       if (ws) {
         ws.removeListener(IncomingAction.IN_GAME_MESSAGE);
         ws.removeListener(IncomingAction.IN_GAME_UPDATE);
         ws.removeListener(IncomingAction.START_GAME);
+        ws.removeListener(IncomingAction.LEAVE_GAME);
       }
     };
     // eslint-disable-next-line
   }, []);
 
   return (
-    <div>
-      <p>Game Lobby</p>
+    <div className="padding-30">
+      <p className="padding-10 color-white">Game Lobby</p>
+      {game && (
+        <>
+          <p>Game Info</p>
+          <p>{`Game Name: ${game.gameName}`}</p>
+          <p>{`Game Type: ${game.gameType}`}</p>
+          <p>{`Game Version: ${game.gameVersion}`}</p>
+          <p>{`Host: ${game.host.username}`}</p>
+        </>
+      )}
       <button type="button" onClick={requestLeaveGame}>
         Leave Game
       </button>
@@ -132,7 +164,7 @@ const GameLobby = ({ ws, game, gameRef, setGame }: GameLobbyProps): JSX.Element 
       </div>
       <div>
         {messages.map(({ message, username, time }) => (
-          <p>{`${time} ${username} ${message}`}</p>
+          <p key={time.toString()}>{`${time} ${username} ${message}`}</p>
         ))}
       </div>
     </div>

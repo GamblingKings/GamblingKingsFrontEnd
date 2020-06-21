@@ -33,10 +33,14 @@ jobs:
           ${{ runner.os }}-
 
     - name: Install Dependencies
-      run: npm install
+      run: yarn install
+    - name: Install codecov
+      run: yarn global add codecov
 
     - name: Build
-      run: npm build
+      run: yarn build
 
     - name: Test
-      run: npm test
+      run: yarn test --coverage --watchAll=false
+    - name: Codecov
+      run: yarn codecov-test

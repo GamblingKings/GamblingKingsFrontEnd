@@ -78,6 +78,7 @@ export interface JoinGameJSON {
  */
 export interface LeaveGameJSON {
   success: boolean;
+  game: Game;
   error?: string;
 }
 
