@@ -43,4 +43,4 @@ jobs:
     - name: Test
       run: yarn test --coverage --watchAll=false
     - name: Codecov
-      run: yarn codecov test
+      run: yarn codecov-test
