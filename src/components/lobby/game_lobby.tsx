@@ -147,7 +147,7 @@ const GameLobby = ({ ws, game, gameRef, setGame, removeGame }: GameLobbyProps): 
         <>
           <p>Game Info</p>
           <p>{`Game Name: ${game.gameName}`}</p>
-          <p>{`Game Type: ${game.gameVersion}`}</p>
+          <p>{`Game Type: ${game.gameType}`}</p>
           <p>{`Game Version: ${game.gameVersion}`}</p>
           <p>{`Host: ${game.host.username}`}</p>
         </>
