@@ -184,7 +184,7 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
     const originalUsers = usersRef.current as User[];
     const newUsers = [...originalUsers];
     // Add user to state if not already in the list
-    if (state === 'CONNECT') {
+    if (state === 'CONNECTED') {
       const index = newUsers.findIndex((u) => u.connectionId === connectionId);
       if (index === -1) {
         newUsers.push({ username, connectionId });
@@ -192,7 +192,7 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
       }
     }
     // Remove user from state if found in the list
-    if (state === 'DISCONNECT') {
+    if (state === 'DISCONNECTED') {
       const index = newUsers.findIndex((u) => u.connectionId === connectionId);
       if (index !== -1) {
         newUsers.splice(index, 1);
