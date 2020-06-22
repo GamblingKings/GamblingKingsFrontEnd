@@ -19,7 +19,7 @@ type GameLobbyProps = {
  * Users can send messages to other users in the same game, and can leave the game.
  * Only the host can start the game.
  */
-const GameLobby = ({ ws, game, gameRef, setGame, removeGame }: GameLobbyProps): JSX.Element => {
+const GameLobby = ({ ws, game, gameRef, setGame }: GameLobbyProps): JSX.Element => {
   /**
    * Hook that holds a reference to a state.
    * Used in WebSocket callbacks as initialized callbacks do not have updated reference to state.
@@ -97,12 +97,9 @@ const GameLobby = ({ ws, game, gameRef, setGame, removeGame }: GameLobbyProps): 
    */
   const leaveGame = (payload: unknown): void => {
     const data = payload as LeaveGameJSON;
-    const { success, game: g, error } = data;
+    const { success, error } = data;
     if (success) {
       setGame(null);
-      if (g.users.length === 0) {
-        removeGame(g.gameId);
-      }
     } else {
       // TODO: implement something that player couldn't leave game properly
       console.log(`Error in leaving game: ${error}`);
