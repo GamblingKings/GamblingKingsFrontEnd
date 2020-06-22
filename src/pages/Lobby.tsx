@@ -102,12 +102,8 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
    * @param gameId string
    */
   const removeGameFromList = (gameId: string) => {
-    const newGames = [...games];
-    const index = games.findIndex((game) => game.gameId === gameId);
-    if (index !== -1) {
-      newGames.splice(index, 1);
-      setGames(newGames);
-    }
+    const updatedGames = [...games].filter((game) => game.gameId !== gameId);
+    setGames(updatedGames);
   };
 
   /**
@@ -193,11 +189,8 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
     }
     // Remove user from state if found in the list
     if (state === 'DISCONNECTED') {
-      const index = newUsers.findIndex((u) => u.connectionId === connectionId);
-      if (index !== -1) {
-        newUsers.splice(index, 1);
-        setUsers(newUsers);
-      }
+      const updatedUsers = newUsers.filter((u) => u.connectionId !== connectionId);
+      setUsers(updatedUsers);
     }
   };
 
