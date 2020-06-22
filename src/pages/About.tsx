@@ -1,7 +1,8 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable operator-linebreak */
 /* eslint-disable jsx-a11y/alt-text */
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Text } from 'react-native';
 import withMainBackGround from '../components/common/withMainBackground';
 
 const Title = (): JSX.Element => {
@@ -112,47 +113,19 @@ const Name = (): JSX.Element => {
   return <div style={nStyle}>{name}</div>;
 };
 
-const getWidthAndHeightByDivId = (id: string) => {
-  const boundingClient = document.getElementById(id)?.getBoundingClientRect();
-  const width = boundingClient?.width;
-  const height = boundingClient?.height;
-  return { width, height };
-};
-
 const Description = (props: DescriptionProps): JSX.Element => {
-  const [divDimensions, setDivDimentions] = useState(getWidthAndHeightByDivId('descriptionDiv'));
-
-  const handleDivResize = () => {
-    setDivDimentions(getWidthAndHeightByDivId('descriptionDiv'));
-  };
-
-  useEffect(() => {
-    console.log('useEffect for window listener', divDimensions);
-    window.addEventListener('resize', handleDivResize);
-    console.log('after event listener added', divDimensions);
-    return () => {
-      window.removeEventListener('resize', handleDivResize);
-      console.log('After clean up');
-      console.log(divDimensions);
-    };
-  });
-
   const dStyle = {
     fontSize: '10px',
     order: 2,
-    overflow: 'hidden',
+    flex: 1,
+    // overflow: 'hidden',
     // whiteSpace: 'nowrap',
     // textOverflow: 'ellipsis',
   } as React.CSSProperties;
-  console.log(divDimensions);
+  // console.log(divDimensions);
 
   const { description } = props;
-  return (
-    <div id="descriptionDiv" style={dStyle}>
-      {description}
-      {/* <EllipsisText text={description} length={10000} /> */}
-    </div>
-  );
+  return <Text style={dStyle}>{description}</Text>;
 };
 
 const ObservableView = (): JSX.Element => {
