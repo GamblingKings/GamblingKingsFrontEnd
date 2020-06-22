@@ -1,11 +1,14 @@
+/* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable operator-linebreak */
 /* eslint-disable jsx-a11y/alt-text */
-import React from 'react';
-import withMainBackGround from '../modules/common/components/withMainBackground';
+import React, { useEffect, useState } from 'react';
+import withMainBackGround from '../components/common/withMainBackground';
 
 const Title = (): JSX.Element => {
   const tStyle = {
     flex: 1,
+    textAlign: 'center',
+
     // backgroundColor: 'teal',
   } as React.CSSProperties;
   return (
@@ -21,13 +24,12 @@ const VerticalList = (): JSX.Element => {
   const vLStyle = {
     // backgroundColor: 'green',
     flexDirection: 'column',
-    padding: '10px',
   } as React.CSSProperties;
   return (
     <div style={vLStyle}>
       <SingleRowDiv />
-      <SingleRowDiv />
-      <SingleRowDiv />
+      {/* <SingleRowDiv />
+      <SingleRowDiv /> */}
     </div>
   );
 };
@@ -42,7 +44,7 @@ const SingleRowDiv = (): JSX.Element => {
   return (
     <div style={sRDStyle}>
       <PersonCard />
-      <PersonCard />
+      {/* <PersonCard /> */}
     </div>
   );
 };
@@ -50,8 +52,9 @@ const SingleRowDiv = (): JSX.Element => {
 const PersonCard = (): JSX.Element => {
   const pCStyle = {
     height: '200px',
+    width: '50%',
     display: 'flex',
-    margin: '10px',
+    margin: '0.5%',
     flexFlow: 'row nowrap',
     justifyContent: 'flex-start',
     alignItems: 'center',
@@ -78,19 +81,76 @@ const ProfilePicture = (): JSX.Element => {
 const ProfileDescription = (): JSX.Element => {
   const pDStyle = {
     order: 2,
-    margin: '15px 25px',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    height: '150px',
-    display: 'inline-block',
+    margin: '1px 2px',
+    padding: '1% 1%',
+    height: '100%',
+    display: 'flex',
+    flexFlow: 'column nowrap',
+    textAlign: 'left',
+    flexGrow: 2,
   } as React.CSSProperties;
-  // const possibleLines: number = 8;
   const description =
-    'Lorem Ipsum is simply dummy text of the printing andLorem Ipsum is simply dummy text of the printing andLorem Lorem Ipsum is simply dummy text of the printing andLorem Ipsum is simply dummy text of the printing andLoreLorem Ipsum is simply dummy text of the printing andLorem Ipsum is simply dummy text of the printing andLorem Lorem Ipsum is simply dummy text of the printing andLorem Ipsum is simply dummy text of the printing andLoreLorem Ipsum is simply dummy text of the printing andLorem Ipsum is simply dummy text of the printing andLorem Lorem Ipsum is simply dummy text of the printing andLorem Ipsum is simply dummy text of the printing andLoreLorem Ipsum is simply dummy text of the printing andLorem Ipsum is simply dummy text of the printing andLorem Lorem Ipsum is simply dummy text of the printing andLorem Ipsum is simply dummy text of the printing andLoreLorem Ipsum is simply dummy text of the printing andLorem Ipsum is simply dummy text of the printing andLorem Lorem Ipsum is simply dummy text of the printing andLorem Ipsum is simply dummy text of the printing andLoreLorem Ipsum is simply dummy text of the printing andLorem Ipsum is simply dummy text of the printing andLorem Lorem Ipsum is simply dummy text of the printing andLorem Ipsum is simply dummy text of the printing andLore';
-  // if (description.length > )
+    'Lorem Ipsum is simply dummy text my text of the printing andLorem Lorem Ipsum is simply dummy text of the printing andLorem Ipsum is simply dummy text of the printing andLoreLorem Ipsum is simply dummy text my text of the printing andLorem Lorem Ipsum is simply dummy text of the printing andLorem Ipsum is simply dummy text of the printing andLore';
+  // const desp2 = 'helloworld';
   return (
     <div style={pDStyle}>
-      <p>{description}</p>
+      <Name />
+      {/* <Description description={desp2} /> */}
+
+      <Description description={description} />
+    </div>
+  );
+};
+
+const Name = (): JSX.Element => {
+  const nStyle = {
+    fontSize: '30px',
+    order: 1,
+    // flexFlow: 'row nowrap',
+  } as React.CSSProperties;
+  const name = 'Tom Riddle';
+  return <div style={nStyle}>{name}</div>;
+};
+
+const getWidthAndHeightByDivId = (id: string) => {
+  const boundingClient = document.getElementById(id)?.getBoundingClientRect();
+  const width = boundingClient?.width;
+  const height = boundingClient?.height;
+  return { width, height };
+};
+
+const Description = (props: DescriptionProps): JSX.Element => {
+  const [divDimensions, setDivDimentions] = useState(getWidthAndHeightByDivId('descriptionDiv'));
+
+  const handleDivResize = () => {
+    setDivDimentions(getWidthAndHeightByDivId('descriptionDiv'));
+  };
+
+  useEffect(() => {
+    console.log('useEffect for window listener', divDimensions);
+    window.addEventListener('resize', handleDivResize);
+    console.log('after event listener added', divDimensions);
+    return () => {
+      window.removeEventListener('resize', handleDivResize);
+      console.log('After clean up');
+      console.log(divDimensions);
+    };
+  });
+
+  const dStyle = {
+    fontSize: '10px',
+    order: 2,
+    overflow: 'hidden',
+    // whiteSpace: 'nowrap',
+    // textOverflow: 'ellipsis',
+  } as React.CSSProperties;
+  console.log(divDimensions);
+
+  const { description } = props;
+  return (
+    <div id="descriptionDiv" style={dStyle}>
+      {description}
+      {/* <EllipsisText text={description} length={10000} /> */}
     </div>
   );
 };
@@ -99,12 +159,11 @@ const ObservableView = (): JSX.Element => {
   const innerDivStyle = {
     backgroundColor: 'white',
 
-    alignItems: 'stretch',
-    textAlign: 'center',
-    borderRadius: '5px',
-    padding: '5px',
+    // alignItems: 'stretch',
+    borderRadius: '2.5%',
+    padding: '0.1%',
     display: 'flex',
-    flexDirection: 'column',
+    flexFlow: 'column nowrap',
 
     margin: '5px 10px',
   } as React.CSSProperties;
@@ -119,3 +178,7 @@ const ObservableView = (): JSX.Element => {
 const AboutPage = (): React.ReactElement<unknown, string> | null => withMainBackGround(ObservableView)(1);
 
 export default AboutPage;
+
+export interface DescriptionProps {
+  description?: string;
+}
