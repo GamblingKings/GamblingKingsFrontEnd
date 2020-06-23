@@ -25,14 +25,14 @@ class TileFactory {
     const splitMappedTile: string[] = strDef.split(Tile.DELIMITER);
 
     if (splitMappedTile.length === 1) {
-      return new HonorTile(<HonorTileTypes>mappedTile.type);
+      return new HonorTile(mappedTile.type as HonorTileTypes);
     }
 
-    if (Object.values(SimpleTileTypes).includes(<SimpleTileTypes>splitMappedTile[1])) {
-      return new SimpleTile(<SimpleTileTypes>mappedTile.type, mappedTile.value);
+    if (Object.values(SimpleTileTypes).includes(splitMappedTile[1] as SimpleTileTypes)) {
+      return new SimpleTile(mappedTile.type as SimpleTileTypes, mappedTile.value);
     }
 
-    return new BonusTile(<BonusTileTypes>mappedTile.type, mappedTile.value);
+    return new BonusTile(mappedTile.type as BonusTileTypes, mappedTile.value);
   }
 }
 
