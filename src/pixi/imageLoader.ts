@@ -1,4 +1,9 @@
 import SimpleTileTypes from '../modules/mahjong/Tile/types/SimpleTileTypes';
+import HonorTileTypes from '../modules/mahjong/Tile/types/HonorTileTypes';
+import BonusTileTypes from '../modules/mahjong/Tile/types/BonusTileTypes';
+import GameTypes from '../modules/game/gameTypes';
+
+import RED_X from '../assets/Red_X.svg';
 
 function importAll(r: __WebpackModuleApi.RequireContext) {
   const images: Record<string, string> = {};
@@ -16,17 +21,52 @@ type ImageType = {
   url: string;
 };
 
-function ImageInit(): ImageType[] {
+/**
+ * Import images and create an array that is loadable for Pixi.js.
+ * @param gameType GameTypes
+ */
+function ImageInit(gameType: GameTypes): ImageType[] {
   const images: ImageType[] = [];
-  for (let i = 1; i <= 9; i += 1) {
-    Object.values(SimpleTileTypes).forEach((type) => {
-      const imageName = `${i}_${type}`;
+
+  if (gameType === GameTypes.Mahjong) {
+    for (let i = 1; i <= 9; i += 1) {
+      Object.values(SimpleTileTypes).forEach((type) => {
+        const imageName = `${i}_${type}`;
+        images.push({
+          name: imageName,
+          url: imageImport[imageName],
+        });
+
+        if (i === 5) {
+          const doraImage = `${imageName}_DORA`;
+          images.push({
+            name: doraImage,
+            url: imageImport[imageName],
+          });
+        }
+      });
+    }
+    Object.values(HonorTileTypes).forEach((type) => {
       images.push({
-        name: imageName,
-        url: imageImport[imageName],
+        name: type,
+        url: imageImport[type],
       });
     });
+    Object.values(BonusTileTypes).forEach((type) => {
+      console.log(type);
+      // TODO: find bonus tile assets
+      // images.push({
+      //   name: type,
+      //   url: imageImport[type],
+      // });
+    });
   }
+
+  // This must always be loaded.
+  images.push({
+    name: 'RED_X',
+    url: RED_X,
+  });
   return images;
 }
 
