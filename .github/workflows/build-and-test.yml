@@ -37,7 +37,6 @@ jobs:
     - name: Install codecov
       run: |
         yarn global add codecov
-        export CODECOV_TOKEN="${{ secrets.CODECOV_UPLOAD_TOKEN }}"
 
 
     - name: Build
@@ -46,4 +45,6 @@ jobs:
     - name: Test
       run: yarn test --coverage --watchAll=false
     - name: Codecov
-      run: yarn codecov-test
+      run: |
+        export CODECOV_TOKEN="${{ secrets.CODECOV_UPLOAD_TOKEN }}"
+        yarn codecov-test
