@@ -2,8 +2,53 @@
  * Class to store logic related to validating a Mahjong Hand
  */
 import Tile from '../Tile/Tile';
+import { ValidPair } from '../types/MahjongTypes';
 
 class HandValidator {
+  /**
+   * Creates an object mapping of the tiles to determine the number of each tile in the hand
+   * @param tiles An array of tile objects
+   * @returns object containing the number of each tile in the hand
+   */
+  public static createTileMapping(tiles: Tile[]): { [index: string]: number } {
+    const mapping: { [index: string]: number } = {};
+    tiles.forEach((t) => {
+      if (Object.prototype.hasOwnProperty.call(mapping, t.toString())) mapping[t.toString()] += 1;
+      else mapping[t.toString()] = 1;
+    });
+
+    return mapping;
+  }
+
+  public static determineAllPossiblePairs(tiles: Tile[]): ValidPair[] {
+    const tileMapping = this.createTileMapping(tiles);
+
+    /**
+     * Valid Pair Schema:
+     * {
+     *  pair: '1_CHARACTER',
+     *  remainingTiles: {}
+     * }
+     */
+    const validPairs: ValidPair[] = [];
+    const mappingKeys = Object.keys(tileMapping);
+
+    mappingKeys.forEach((key) => {
+      if (tileMapping[key] >= 2) {
+        const mappingCopy = { ...tileMapping };
+
+        mappingCopy[key] -= 2;
+
+        validPairs.push({
+          pair: key,
+          remainingTiles: mappingCopy,
+        });
+      }
+    });
+
+    return validPairs;
+  }
+
   /**
    * Validates the Length of the hand must be 14
    * @param tiles An array of tile objects

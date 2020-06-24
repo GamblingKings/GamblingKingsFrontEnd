@@ -19,6 +19,43 @@ const validThirteenOrphansHand = [
   '1_DOT',
 ];
 
+const allTripletsHand = [
+  '1_DOT',
+  '1_DOT',
+  '2_DOT',
+  '2_DOT',
+  '2_DOT',
+  '3_DOT',
+  '3_DOT',
+  '3_DOT',
+  '4_DOT',
+  '4_DOT',
+  '4_DOT',
+  '5_DOT',
+  '5_DOT',
+  '5_DOT',
+];
+
+/**
+ * Create Tile Mapping Tests
+ */
+test('Create Tile Mapping function returns an object with the type and amount of each tile', () => {
+  const tiles: Tile[] = [];
+  validThirteenOrphansHand.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
+  const mapping = HandValidator.createTileMapping(tiles);
+  expect(mapping['1_DOT']).toBe(2);
+});
+
+/**
+ * DetermineAllPossiblePairs Tests
+ */
+test('determineAllPossiblePairs should return an array of 5 objects when passed in the allTriplets hand', () => {
+  const tiles: Tile[] = [];
+  allTripletsHand.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
+  const pairs = HandValidator.determineAllPossiblePairs(tiles);
+  expect(pairs).toHaveLength(5);
+});
+
 /**
  * Validate Hand Length Test
  */

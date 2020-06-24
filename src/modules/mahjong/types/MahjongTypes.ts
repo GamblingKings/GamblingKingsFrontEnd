@@ -10,3 +10,8 @@ export interface TileDefinition {
   type: SimpleTileTypes | HonorTileTypes | BonusTileTypes;
   value: number;
 }
+
+export interface ValidPair {
+  pair: string;
+  remainingTiles: { [index: string]: number };
+}
