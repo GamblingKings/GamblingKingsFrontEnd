@@ -61,7 +61,14 @@ function ImageInit(gameType: GameTypes): ImageType[] {
       // });
     });
   }
-
+  images.push({
+    name: 'Back',
+    url: imageImport.Back,
+  });
+  images.push({
+    name: 'Front',
+    url: imageImport.Front,
+  });
   // This must always be loaded.
   images.push({
     name: 'RED_X',

@@ -19,10 +19,12 @@ export default class SpriteGenerator {
     if (this.resources[resourceName]) {
       const resource = this.resources[resourceName] as PIXI.LoaderResource;
       const sprite = new PIXI.Sprite(resource.texture);
+      sprite.name = resourceName;
       return sprite;
     }
     const resource = this.resources.RED_X as PIXI.LoaderResource;
     const sprite = new PIXI.Sprite(resource.texture);
+    sprite.name = resourceName;
     return sprite;
   }
 }
