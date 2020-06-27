@@ -9,9 +9,13 @@ import BonusTileTypes from '../Tile/types/BonusTileTypes';
 export interface TileDefinition {
   type: SimpleTileTypes | HonorTileTypes | BonusTileTypes;
   value: number;
+  next: string | null;
+  prev: string | null;
 }
 
 export interface ValidPair {
   pair: string;
   remainingTiles: { [index: string]: number };
+  numTiles: number;
+  melds?: string[][];
 }

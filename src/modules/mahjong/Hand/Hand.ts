@@ -30,6 +30,8 @@ interface SortHandWeights {
 class Hand {
   private hand: Tile[];
 
+  private playedTiles: Tile[][];
+
   /**
    * Public constructor. Generates a hand from a wall and sorts to the hand
    * @param wall A child of the Wall class
@@ -37,6 +39,7 @@ class Hand {
    */
   constructor(wall: Wall, weights: SortHandWeights) {
     this.hand = wall.generateHand();
+    this.playedTiles = [];
     this.sort_hand(weights);
   }
 
@@ -139,6 +142,21 @@ class Hand {
 
       return weights[t1Type] - weights[t2Type];
     });
+  }
+
+  /**
+   * Adds a meld to the played tiles
+   * @param meld an array of tiles
+   */
+  public addPlayedTiles(meld: Tile[]): void {
+    this.playedTiles.push(meld);
+  }
+
+  /**
+   * Gets the played tiles
+   */
+  public getPlayedTiles(): Tile[][] {
+    return this.playedTiles;
   }
 }
 

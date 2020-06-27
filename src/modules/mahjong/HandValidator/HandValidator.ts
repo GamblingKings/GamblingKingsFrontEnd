@@ -3,8 +3,20 @@
  */
 import Tile from '../Tile/Tile';
 import { ValidPair } from '../types/MahjongTypes';
+import TileMapper from '../Tile/map/TileMapper';
+import SimpleTileTypes from '../Tile/types/SimpleTileTypes';
 
 class HandValidator {
+  public static TRIPLET_SIZE = 3;
+
+  public static KAN_SIZE = 4;
+
+  public static MIN_HAND_SIZE = 14;
+
+  public static DEFAULT_MELD_SIZE = 3;
+
+  public static REQUIRED_NUM_OF_MELDS = 4;
+
   /**
    * Creates an object mapping of the tiles to determine the number of each tile in the hand
    * @param tiles An array of tile objects
@@ -27,11 +39,13 @@ class HandValidator {
      * Valid Pair Schema:
      * {
      *  pair: '1_CHARACTER',
-     *  remainingTiles: {}
+     *  remainingTiles: {},
+     *  numTiles: number
      * }
      */
     const validPairs: ValidPair[] = [];
     const mappingKeys = Object.keys(tileMapping);
+    const numTiles = Object.values(tileMapping).reduce((pv, cv) => pv + cv);
 
     mappingKeys.forEach((key) => {
       if (tileMapping[key] >= 2) {
@@ -42,11 +56,95 @@ class HandValidator {
         validPairs.push({
           pair: key,
           remainingTiles: mappingCopy,
+          numTiles,
         });
       }
     });
 
     return validPairs;
+  }
+
+  /**
+   * Determines all possible valid hands and invalid hands
+   * @param validPairs an array of ValidPairs
+   */
+  public static validiateValidHandStructure(validPairs: ValidPair[]): { [index: string]: ValidPair[] } {
+    const results: { [index: string]: ValidPair[] } = {
+      valid: [],
+      invalid: [],
+    };
+
+    validPairs.forEach((vp) => {
+      const { remainingTiles, numTiles } = vp;
+      const copyRemainingTiles = { ...remainingTiles }; // modify copy to preserve original object
+      const melds: string[][] = [];
+      let passed = true;
+
+      if (numTiles > this.MIN_HAND_SIZE) {
+        // There is a 4 of a kind somewhere in the hand and has to be used as a four of a kind
+        Object.keys(copyRemainingTiles).forEach((key) => {
+          if (copyRemainingTiles[key] === this.KAN_SIZE) {
+            const meld = [key, key, key, key];
+            copyRemainingTiles[key] -= this.KAN_SIZE;
+            melds.push(meld);
+          }
+        });
+      }
+
+      // Start trying to create all consecutive melds
+      // Cannot start with triplets as there is a chance we use the triplet for a consecutive
+      Object.keys(copyRemainingTiles).forEach((key) => {
+        const isSimpleTile: boolean = Object.values(SimpleTileTypes).includes(<SimpleTileTypes>TileMapper[key].type);
+
+        // n = number that can be used to create a consecutive
+        const n = copyRemainingTiles[key] < this.TRIPLET_SIZE || copyRemainingTiles[key] === this.KAN_SIZE;
+
+        if (isSimpleTile && n) {
+          while (passed && (copyRemainingTiles[key] !== 0 || copyRemainingTiles[key] === this.TRIPLET_SIZE)) {
+            const meld = [key];
+            copyRemainingTiles[key] -= 1;
+
+            let currentConsecutive = key;
+            let nextConsecutive = TileMapper[key].next;
+
+            while (meld.length < 3 && nextConsecutive && passed) {
+              if (copyRemainingTiles[nextConsecutive] > 1) {
+                meld.push(nextConsecutive);
+                copyRemainingTiles[nextConsecutive] -= 1;
+                currentConsecutive = nextConsecutive;
+                nextConsecutive = TileMapper[currentConsecutive].next;
+              } else passed = false;
+            }
+
+            if (meld.length === 3) {
+              melds.push(meld);
+            }
+          }
+        }
+      });
+
+      // Start trying to create all triplet melds
+      if (passed) {
+        Object.keys(copyRemainingTiles).forEach((key) => {
+          if (copyRemainingTiles[key] === this.TRIPLET_SIZE) {
+            const meld = [key, key, key];
+            copyRemainingTiles[key] -= this.TRIPLET_SIZE;
+            melds.push(meld);
+          }
+        });
+
+        if (melds.length === this.REQUIRED_NUM_OF_MELDS) {
+          results.valid.push({
+            ...vp,
+            melds,
+          });
+        }
+      } else {
+        results.invalid.push(vp);
+      }
+    });
+
+    return results;
   }
 
   /**
