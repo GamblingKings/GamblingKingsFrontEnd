@@ -2,8 +2,8 @@ import Hand from '../modules/mahjong/Hand/Hand';
 import SpriteFactory from './SpriteFactory';
 import Interactions from './Interactions';
 
-const DEFAULT_MAHJONG_WIDTH = 75;
-const DEFAULT_MAHJONG_HEIGHT = 100;
+const DEFAULT_MAHJONG_WIDTH = 60;
+const DEFAULT_MAHJONG_HEIGHT = 80;
 
 class Renderer {
   static renderMahjongHand(spriteFactory: SpriteFactory, container: PIXI.Container, hand: Hand): void {
@@ -26,6 +26,16 @@ class Renderer {
 
       container.addChild(sprite);
     });
+  }
+
+  static renderOpponentMahjongHand(spriteFactory: SpriteFactory, container: PIXI.Container, number: number): void {
+    for (let i = 0; i < number; i += 1) {
+      const backSprite = spriteFactory.generateSprite('Back');
+      backSprite.width = DEFAULT_MAHJONG_WIDTH;
+      backSprite.height = DEFAULT_MAHJONG_HEIGHT;
+      backSprite.x = i * (DEFAULT_MAHJONG_WIDTH + 5);
+      container.addChild(backSprite);
+    }
   }
 }
 

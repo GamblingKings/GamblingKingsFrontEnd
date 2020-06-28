@@ -8,9 +8,9 @@ import SpriteFactory from '../pixi/SpriteFactory';
 import HongKongWall from '../modules/mahjong/Wall/version/HongKongWall';
 import Hand from '../modules/mahjong/Hand/Hand';
 import Renderer from '../pixi/Renderer';
-// import TileFactory from '../modules/mahjong/Tile/TileFactory';
 
 let pixiApplication: PIXI.Application;
+let pixiLoader: PIXI.Loader;
 let interactionManager: PIXI.InteractionManager;
 
 const STARTING_GAME = {
@@ -24,8 +24,10 @@ const h1 = new Hand(w, DEFAULT_WEIGHTS);
 console.log(h1.getHand());
 
 let spriteFactory: SpriteFactory;
-const playerContainer = new PIXI.Container();
-console.log(playerContainer);
+let playerContainer: PIXI.Container;
+let opponentOneContainer: PIXI.Container;
+let opponentTwoContainer: PIXI.Container;
+let opponentThreeContainer: PIXI.Container;
 
 const GameTestPage = (): JSX.Element => {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -43,6 +45,7 @@ const GameTestPage = (): JSX.Element => {
     }
     // Use default Interaction Manager
     interactionManager = pixiApplication.renderer.plugins.interaction;
+    pixiLoader = pixiApplication.loader;
     console.log(interactionManager);
 
     function animate() {
@@ -51,17 +54,35 @@ const GameTestPage = (): JSX.Element => {
     }
 
     function setup(loader: PIXI.Loader, resources: Partial<Record<string, PIXI.LoaderResource>>) {
-      spriteFactory = new SpriteFactory(resources);
-      pixiApplication.stage.addChild(playerContainer);
-      playerContainer.y = 200;
-      Renderer.renderMahjongHand(spriteFactory, playerContainer, h1);
-
       console.log(loader);
+      spriteFactory = new SpriteFactory(resources);
+
+      playerContainer = new PIXI.Container();
+      opponentOneContainer = new PIXI.Container();
+      opponentTwoContainer = new PIXI.Container();
+      opponentThreeContainer = new PIXI.Container();
+      pixiApplication.stage.addChild(playerContainer);
+      pixiApplication.stage.addChild(opponentOneContainer);
+      pixiApplication.stage.addChild(opponentTwoContainer);
+      pixiApplication.stage.addChild(opponentThreeContainer);
+      playerContainer.y = 475;
+      opponentOneContainer.y = 100;
+      opponentTwoContainer.y = 225;
+      opponentThreeContainer.y = 350;
+      // opponentOneContainer.pivot.x = opponentOneContainer.width / 2;
+      // opponentOneContainer.pivot.y = opponentOneContainer.height / 2;
+      // opponentOneContainer.x = 100;
+      // opponentOneContainer.angle -= 270;
+      Renderer.renderMahjongHand(spriteFactory, playerContainer, h1);
+      Renderer.renderOpponentMahjongHand(spriteFactory, opponentOneContainer, 13);
+      Renderer.renderOpponentMahjongHand(spriteFactory, opponentTwoContainer, 13);
+      Renderer.renderOpponentMahjongHand(spriteFactory, opponentThreeContainer, 13);
+
       animate();
     }
 
     const images = imageInit(STARTING_GAME.gameType);
-    pixiApplication.loader.add(images).load(setup);
+    pixiLoader.add(images).load(setup);
   }, []);
 
   return <div ref={canvasRef} />;
