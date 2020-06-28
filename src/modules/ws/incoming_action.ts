@@ -22,6 +22,12 @@ enum IncomingAction {
   IN_GAME_UPDATE = 'IN_GAME_UPDATE',
   IN_GAME_MESSAGE = 'IN_GAME_MESSAGE',
   START_GAME = 'START_GAME',
+
+  /**
+   * Game
+   */
+  GAME_PAGE_LOAD = 'GAME_PAGE_LOAD',
+  GAME_START = 'GAME_START',
 }
 
 export default IncomingAction;

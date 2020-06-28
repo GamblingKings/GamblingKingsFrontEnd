@@ -7,6 +7,7 @@ enum OutgoingAction {
   LEAVE_GAME = 'LEAVE_GAME',
   START_GAME = 'START_GAME',
   JOIN_GAME = 'JOIN_GAME',
+  GAME_PAGE_LOAD = 'GAME_PAGE_LOAD',
 }
 
 export default OutgoingAction;

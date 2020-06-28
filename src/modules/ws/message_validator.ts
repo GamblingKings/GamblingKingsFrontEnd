@@ -17,6 +17,7 @@ const MESSAGE_FORMATS: Record<string, string[]> = {
   [OutgoingAction.JOIN_GAME]: ['gameId'],
   [OutgoingAction.LEAVE_GAME]: ['gameId'],
   [OutgoingAction.START_GAME]: ['gameId'],
+  [OutgoingAction.GAME_PAGE_LOAD]: ['success'],
 };
 
 /**
