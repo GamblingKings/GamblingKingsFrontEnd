@@ -36,6 +36,93 @@ const allTripletsHand = [
   '5_DOT',
 ];
 
+const allConsecutiveHand = [
+  '1_DOT',
+  '1_DOT',
+  '2_CHARACTER',
+  '3_CHARACTER',
+  '4_CHARACTER',
+  '5_CHARACTER',
+  '6_CHARACTER',
+  '7_CHARACTER',
+  '1_BAMBOO',
+  '2_BAMBOO',
+  '3_BAMBOO',
+  '7_BAMBOO',
+  '8_BAMBOO',
+  '9_BAMBOO',
+];
+
+const allConsecutiveWithLipeikou = [
+  '1_DOT',
+  '1_DOT',
+  '2_CHARACTER',
+  '3_CHARACTER',
+  '4_CHARACTER',
+  '5_CHARACTER',
+  '6_CHARACTER',
+  '7_CHARACTER',
+  '1_BAMBOO',
+  '2_BAMBOO',
+  '3_BAMBOO',
+  '2_CHARACTER',
+  '3_CHARACTER',
+  '4_CHARACTER',
+];
+
+const validHandWith4OfaKindNotBeingUsedAs4OfaKind = [
+  'EAST',
+  'EAST',
+  '1_CHARACTER',
+  '1_CHARACTER',
+  '1_CHARACTER',
+  '1_CHARACTER',
+  '2_CHARACTER',
+  '3_CHARACTER',
+  '1_BAMBOO',
+  '2_BAMBOO',
+  '3_BAMBOO',
+  'REDDRAGON',
+  'REDDRAGON',
+  'REDDRAGON',
+];
+
+const validHandWith4OfaKind = [
+  'EAST',
+  'EAST',
+  '1_CHARACTER',
+  '1_CHARACTER',
+  '1_CHARACTER',
+  '1_CHARACTER',
+  '2_CHARACTER',
+  '3_CHARACTER',
+  '4_CHARACTER',
+  '1_BAMBOO',
+  '2_BAMBOO',
+  '3_BAMBOO',
+  'REDDRAGON',
+  'REDDRAGON',
+  'REDDRAGON',
+];
+
+const invalidHand = [
+  'EAST',
+  'EAST',
+  '1_CHARACTER',
+  '1_CHARACTER',
+  '1_CHARACTER',
+  'WEST',
+  '2_CHARACTER',
+  '9_CHARACTER',
+  '4_CHARACTER',
+  '1_BAMBOO',
+  '2_BAMBOO',
+  '6_BAMBOO',
+  'REDDRAGON',
+  'REDDRAGON',
+  'REDDRAGON',
+];
+
 /**
  * Create Tile Mapping Tests
  */
@@ -54,6 +141,57 @@ test('determineAllPossiblePairs should return an array of 5 objects when passed 
   allTripletsHand.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
   const pairs = HandValidator.determineAllPossiblePairs(tiles);
   expect(pairs).toHaveLength(5);
+});
+
+/**
+ * validate hand structure tests
+ */
+test('allTripletHand should have a valid hand structure', () => {
+  const tiles: Tile[] = [];
+  allTripletsHand.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
+  const pairs = HandValidator.determineAllPossiblePairs(tiles);
+  const result = HandValidator.validiateValidHandStructure(pairs);
+  expect(result.valid.length).toBeGreaterThanOrEqual(1);
+});
+
+test('allConsecutiveHand should have a valid hand structure', () => {
+  const tiles: Tile[] = [];
+  allConsecutiveHand.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
+  const pairs = HandValidator.determineAllPossiblePairs(tiles);
+  const result = HandValidator.validiateValidHandStructure(pairs);
+  expect(result.valid.length).toBeGreaterThanOrEqual(1);
+});
+
+test('allConsecutiveHandWithLipeikou should have a valid hand structure', () => {
+  const tiles: Tile[] = [];
+  allConsecutiveWithLipeikou.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
+  const pairs = HandValidator.determineAllPossiblePairs(tiles);
+  const result = HandValidator.validiateValidHandStructure(pairs);
+  expect(result.valid.length).toBeGreaterThanOrEqual(1);
+});
+
+test('validHandWith4OfaKindNotBeingUsedAs4OfaKind should have a valid hand structure', () => {
+  const tiles: Tile[] = [];
+  validHandWith4OfaKindNotBeingUsedAs4OfaKind.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
+  const pairs = HandValidator.determineAllPossiblePairs(tiles);
+  const result = HandValidator.validiateValidHandStructure(pairs);
+  expect(result.valid.length).toBeGreaterThanOrEqual(1);
+});
+
+test('validHandWith4OfaKind should have a valid hand structure', () => {
+  const tiles: Tile[] = [];
+  validHandWith4OfaKind.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
+  const pairs = HandValidator.determineAllPossiblePairs(tiles);
+  const result = HandValidator.validiateValidHandStructure(pairs);
+  expect(result.valid.length).toBeGreaterThanOrEqual(1);
+});
+
+test('invalidHand should not have a valid hand structure', () => {
+  const tiles: Tile[] = [];
+  invalidHand.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
+  const pairs = HandValidator.determineAllPossiblePairs(tiles);
+  const result = HandValidator.validiateValidHandStructure(pairs);
+  expect(result.valid).toHaveLength(0);
 });
 
 /**

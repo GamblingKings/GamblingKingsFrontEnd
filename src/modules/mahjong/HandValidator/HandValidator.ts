@@ -97,10 +97,11 @@ class HandValidator {
         const isSimpleTile: boolean = Object.values(SimpleTileTypes).includes(<SimpleTileTypes>TileMapper[key].type);
 
         // n = number that can be used to create a consecutive
-        const n = copyRemainingTiles[key] < this.TRIPLET_SIZE || copyRemainingTiles[key] === this.KAN_SIZE;
+        let n = copyRemainingTiles[key] < this.TRIPLET_SIZE || copyRemainingTiles[key] === this.KAN_SIZE;
+        n = copyRemainingTiles[key] > 0 && n;
 
         if (isSimpleTile && n) {
-          while (passed && (copyRemainingTiles[key] !== 0 || copyRemainingTiles[key] === this.TRIPLET_SIZE)) {
+          while (passed && copyRemainingTiles[key] !== 0 && copyRemainingTiles[key] !== this.TRIPLET_SIZE) {
             const meld = [key];
             copyRemainingTiles[key] -= 1;
 
@@ -108,7 +109,7 @@ class HandValidator {
             let nextConsecutive = TileMapper[key].next;
 
             while (meld.length < 3 && nextConsecutive && passed) {
-              if (copyRemainingTiles[nextConsecutive] > 1) {
+              if (copyRemainingTiles[nextConsecutive] >= 1) {
                 meld.push(nextConsecutive);
                 copyRemainingTiles[nextConsecutive] -= 1;
                 currentConsecutive = nextConsecutive;
@@ -116,7 +117,7 @@ class HandValidator {
               } else passed = false;
             }
 
-            if (meld.length === 3) {
+            if (meld.length === this.DEFAULT_MELD_SIZE) {
               melds.push(meld);
             }
           }
