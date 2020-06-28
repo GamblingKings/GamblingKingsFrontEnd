@@ -2,9 +2,10 @@
  * Class to store logic related to validating a Mahjong Hand
  */
 import Tile from '../Tile/Tile';
-import { ValidPair } from '../types/MahjongTypes';
+import { ValidPair, Meld } from '../types/MahjongTypes';
 import TileMapper from '../Tile/map/TileMapper';
 import SimpleTileTypes from '../Tile/types/SimpleTileTypes';
+import MeldTypes from '../enums/MeldEnums';
 
 class HandValidator {
   public static TRIPLET_SIZE = 3;
@@ -77,14 +78,17 @@ class HandValidator {
     validPairs.forEach((vp) => {
       const { remainingTiles, numTiles } = vp;
       const copyRemainingTiles = { ...remainingTiles }; // modify copy to preserve original object
-      const melds: string[][] = [];
+      const melds: Meld[] = [];
       let passed = true;
 
       if (numTiles > this.MIN_HAND_SIZE) {
         // There is a 4 of a kind somewhere in the hand and has to be used as a four of a kind
         Object.keys(copyRemainingTiles).forEach((key) => {
           if (copyRemainingTiles[key] === this.KAN_SIZE) {
-            const meld = [key, key, key, key];
+            const meld: Meld = {
+              tiles: [key, key, key, key],
+              type: MeldTypes.QUAD,
+            };
             copyRemainingTiles[key] -= this.KAN_SIZE;
             melds.push(meld);
           }
@@ -102,23 +106,26 @@ class HandValidator {
 
         if (isSimpleTile && n) {
           while (passed && copyRemainingTiles[key] !== 0 && copyRemainingTiles[key] !== this.TRIPLET_SIZE) {
-            const meld = [key];
+            const meldTiles = [key];
             copyRemainingTiles[key] -= 1;
 
             let currentConsecutive = key;
             let nextConsecutive = TileMapper[key].next;
 
-            while (meld.length < 3 && nextConsecutive && passed) {
+            while (meldTiles.length < 3 && nextConsecutive && passed) {
               if (copyRemainingTiles[nextConsecutive] >= 1) {
-                meld.push(nextConsecutive);
+                meldTiles.push(nextConsecutive);
                 copyRemainingTiles[nextConsecutive] -= 1;
                 currentConsecutive = nextConsecutive;
                 nextConsecutive = TileMapper[currentConsecutive].next;
               } else passed = false;
             }
 
-            if (meld.length === this.DEFAULT_MELD_SIZE) {
-              melds.push(meld);
+            if (meldTiles.length === this.DEFAULT_MELD_SIZE) {
+              melds.push({
+                tiles: meldTiles,
+                type: MeldTypes.CONSECUTIVE,
+              });
             }
           }
         }
@@ -128,7 +135,10 @@ class HandValidator {
       if (passed) {
         Object.keys(copyRemainingTiles).forEach((key) => {
           if (copyRemainingTiles[key] === this.TRIPLET_SIZE) {
-            const meld = [key, key, key];
+            const meld = {
+              tiles: [key, key, key],
+              type: MeldTypes.TRIPLET,
+            };
             copyRemainingTiles[key] -= this.TRIPLET_SIZE;
             melds.push(meld);
           }
