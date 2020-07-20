@@ -4,7 +4,7 @@
  */
 
 import Tile from './Tile';
-import SimpleTileType from './types/SimpleTileTypes';
+import SimpleTileType from '../enums/SimpleTileEnums';
 
 class SimpleTile extends Tile {
   private type: SimpleTileType;

@@ -4,7 +4,7 @@
  */
 
 import Tile from './Tile';
-import HonorTileType from './types/HonorTileTypes';
+import HonorTileType from '../enums/HonorTileEnums';
 
 class HonorTile extends Tile {
   private type: HonorTileType;

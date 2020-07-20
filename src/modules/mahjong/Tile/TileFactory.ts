@@ -8,9 +8,9 @@ import HonorTile from './HonorTile';
 import Tile from './Tile';
 import TileMapper from './map/TileMapper';
 
-import SimpleTileTypes from './types/SimpleTileTypes';
-import BonusTileTypes from './types/BonusTileTypes';
-import HonorTileTypes from './types/HonorTileTypes';
+import SimpleTileTypes from '../enums/SimpleTileEnums';
+import BonusTileTypes from '../enums/BonusTileEnums';
+import HonorTileTypes from '../enums/HonorTileEnums';
 
 import { TileDefinition } from '../types/MahjongTypes';
 

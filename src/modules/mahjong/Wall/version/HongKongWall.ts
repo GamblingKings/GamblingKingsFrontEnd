@@ -6,7 +6,7 @@
 import Wall from '../Wall';
 import Tile from '../../Tile/Tile';
 import BonusTile from '../../Tile/BonusTile';
-import MahjongVersion from './Versions';
+import MahjongVersion from '../../enums/VersionsEnum';
 
 import BonusTileInit from '../init/Bonus';
 

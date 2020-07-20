@@ -2,9 +2,9 @@
  * File to store types used in Mahjong classes
  */
 
-import SimpleTileTypes from '../Tile/types/SimpleTileTypes';
-import HonorTileTypes from '../Tile/types/HonorTileTypes';
-import BonusTileTypes from '../Tile/types/BonusTileTypes';
+import SimpleTileTypes from '../enums/SimpleTileEnums';
+import HonorTileTypes from '../enums/HonorTileEnums';
+import BonusTileTypes from '../enums/BonusTileEnums';
 import MeldTypes from '../enums/MeldEnums';
 
 export interface TileDefinition {
@@ -24,4 +24,9 @@ export interface ValidPair {
 export interface Meld {
   tiles: string[];
   type: MeldTypes;
+}
+
+export interface HandStructureResults {
+  valid: ValidPair[];
+  invalid: ValidPair[];
 }

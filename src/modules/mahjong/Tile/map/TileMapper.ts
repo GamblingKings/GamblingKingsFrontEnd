@@ -2,9 +2,9 @@
  * Tile Mapping used to create a tile given a string value
  */
 
-import SimpleTileTypes from '../types/SimpleTileTypes';
-import BonusTileTypes from '../types/BonusTileTypes';
-import HonorTileTypes from '../types/HonorTileTypes';
+import SimpleTileTypes from '../../enums/SimpleTileEnums';
+import BonusTileTypes from '../../enums/BonusTileEnums';
+import HonorTileTypes from '../../enums/HonorTileEnums';
 import { TileDefinition } from '../../types/MahjongTypes';
 
 const TileMapper: { [index: string]: TileDefinition } = {

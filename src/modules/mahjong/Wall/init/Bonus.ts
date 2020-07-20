@@ -2,7 +2,7 @@
  * Object used to initialize Bonus Tiles in the wall class
  */
 
-import BonusTileTypes from '../../Tile/types/BonusTileTypes';
+import BonusTileTypes from '../../enums/BonusTileEnums';
 
 type BonusTileInitObject = {
   flowers: {

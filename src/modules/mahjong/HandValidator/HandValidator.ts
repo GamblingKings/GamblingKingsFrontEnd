@@ -2,9 +2,9 @@
  * Class to store logic related to validating a Mahjong Hand
  */
 import Tile from '../Tile/Tile';
-import { ValidPair, Meld } from '../types/MahjongTypes';
+import { ValidPair, Meld, HandStructureResults } from '../types/MahjongTypes';
 import TileMapper from '../Tile/map/TileMapper';
-import SimpleTileTypes from '../Tile/types/SimpleTileTypes';
+import SimpleTileTypes from '../enums/SimpleTileEnums';
 import MeldTypes from '../enums/MeldEnums';
 
 class HandValidator {
@@ -69,8 +69,8 @@ class HandValidator {
    * Determines all possible valid hands and invalid hands
    * @param validPairs an array of ValidPairs
    */
-  public static validiateValidHandStructure(validPairs: ValidPair[]): { [index: string]: ValidPair[] } {
-    const results: { [index: string]: ValidPair[] } = {
+  public static validiateValidHandStructure(validPairs: ValidPair[]): HandStructureResults {
+    const results: HandStructureResults = {
       valid: [],
       invalid: [],
     };
@@ -157,6 +157,35 @@ class HandValidator {
 
     return results;
   }
+
+  // /**
+  // TO BE DONE AT A LATER PR
+  //  * Given a hand, determine how many points the hand is able to get based on
+  //  * what valid hands are possible to create
+  //  * ex: All triplets, all consec, purity, semi-pure
+  //  * @param validPair
+  //  * @returns an number representing the point value
+  //  */
+  // public static determineHandPoints(validPair: ValidPair): number {
+  //   console.log(validPair);
+  //   return 37;
+  // }
+
+  // /**
+  //  * Given a hand, determine how many extra points the hand is able to get
+  //  * ex: dragons, winds, flowers
+  //  * @param validPair
+  //  */
+  // public static determineExtraPoints(validPair: ValidPair): number {
+  //   console.log(validPair);
+  //   return 37;
+  // }
+
+  // /**
+  //  * Given HandStructureResults, calculate the total number of points for each valid hand
+  //  * @param handStructureResults
+  //  */
+  // public static evaluatePoints(handStructureResults: HandStructureResults) {}
 
   /**
    * Validates the Length of the hand must be 14

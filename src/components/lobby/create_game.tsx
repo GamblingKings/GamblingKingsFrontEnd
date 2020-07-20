@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { WebSocketConnection, OutgoingAction, PayloadCreator } from '../../modules/ws';
 import GameTypes from '../../modules/game/gameTypes';
-import MahjongVersions from '../../modules/mahjong/Wall/version/Versions';
+import MahjongVersions from '../../modules/mahjong/enums/VersionsEnum';
 import BigTwoVersions from '../../modules/bigtwo/versions';
 
 type CreateGameFormProps = {

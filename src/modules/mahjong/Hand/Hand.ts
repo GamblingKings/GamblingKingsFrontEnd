@@ -8,9 +8,9 @@
 import Tile from '../Tile/Tile';
 import Wall from '../Wall/Wall';
 import DeadPile from '../DeadPile/DeadPile';
-import SimpleTileTypes from '../Tile/types/SimpleTileTypes';
-import HonorTileTypes from '../Tile/types/HonorTileTypes';
-import BonusTileTypes from '../Tile/types/BonusTileTypes';
+import SimpleTileTypes from '../enums/SimpleTileEnums';
+import HonorTileTypes from '../enums/HonorTileEnums';
+import BonusTileTypes from '../enums/BonusTileEnums';
 
 interface SortHandWeights {
   [SimpleTileTypes.DOT]: number;
