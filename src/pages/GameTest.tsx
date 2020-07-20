@@ -47,6 +47,8 @@ const h1 = new Hand(w, DEFAULT_WEIGHTS);
  * ********************************************************
  */
 
+let redrawPending = false;
+
 let pixiApplication: PIXI.Application;
 let stage: PIXI.Container;
 let pixiLoader: PIXI.Loader;
@@ -99,6 +101,10 @@ const containersInit = () => {
   stage.addChild(opponentThreeContainer);
 };
 
+/**
+ * Place the containers relative to how big the canvas is
+ * @param canvasRef reference to the canvas element
+ */
 const placeContainers = (canvasRef: HTMLCanvasElement) => {
   // Hardcoded placements, will fix
   playerContainer.x = 100;
@@ -109,6 +115,14 @@ const placeContainers = (canvasRef: HTMLCanvasElement) => {
   opponentTwoContainer.y = 80;
   opponentThreeContainer.x = canvasRef.clientWidth - 120;
   opponentThreeContainer.y = 80;
+};
+
+/**
+ * Allows animate to redraw the game if there is a state change.
+ */
+const requestRedraw = () => {
+  redrawPending = false;
+  console.log(redrawPending);
 };
 
 /**
@@ -141,33 +155,35 @@ const GameTestPage = (): JSX.Element => {
      * Main animation loop
      */
     function animate() {
-      opponentOneContainer.removeChildren(0, opponentOneContainer.children.length);
-      opponentTwoContainer.removeChildren(0, opponentTwoContainer.children.length);
-      opponentThreeContainer.removeChildren(0, opponentThreeContainer.children.length);
-      playerContainer.removeChildren(0, playerContainer.children.length);
-      placeContainers(pixiApplication.view);
+      if (!redrawPending) {
+        redrawPending = true;
+        opponentOneContainer.removeChildren(0, opponentOneContainer.children.length);
+        opponentTwoContainer.removeChildren(0, opponentTwoContainer.children.length);
+        opponentThreeContainer.removeChildren(0, opponentThreeContainer.children.length);
+        playerContainer.removeChildren(0, playerContainer.children.length);
 
-      Renderer.renderPlayerMahjong(spriteFactory, playerContainer, player as MahjongPlayer);
-      Renderer.renderOpponentMahjong(
-        spriteFactory,
-        opponentOneContainer,
-        opponentOne as MahjongOpponent,
-        RenderDirection.LEFT,
-      );
-      Renderer.renderOpponentMahjong(
-        spriteFactory,
-        opponentTwoContainer,
-        opponentTwo as MahjongOpponent,
-        RenderDirection.TOP,
-      );
-      Renderer.renderOpponentMahjong(
-        spriteFactory,
-        opponentThreeContainer,
-        opponentThree as MahjongOpponent,
-        RenderDirection.RIGHT,
-      );
+        Renderer.renderPlayerMahjong(spriteFactory, playerContainer, player as MahjongPlayer, requestRedraw);
+        Renderer.renderOpponentMahjong(
+          spriteFactory,
+          opponentOneContainer,
+          opponentOne as MahjongOpponent,
+          RenderDirection.LEFT,
+        );
+        Renderer.renderOpponentMahjong(
+          spriteFactory,
+          opponentTwoContainer,
+          opponentTwo as MahjongOpponent,
+          RenderDirection.TOP,
+        );
+        Renderer.renderOpponentMahjong(
+          spriteFactory,
+          opponentThreeContainer,
+          opponentThree as MahjongOpponent,
+          RenderDirection.RIGHT,
+        );
 
-      pixiApplication.render();
+        pixiApplication.render();
+      }
       requestAnimationFrame(animate);
     }
 
@@ -186,11 +202,22 @@ const GameTestPage = (): JSX.Element => {
     pixiLoader.add(images).load(setup);
   }, []);
 
-  return (
-    <div>
-      <div ref={canvasRef} />
-    </div>
-  );
+  /**
+   * Listens for
+   */
+  useEffect(() => {
+    function handleResize() {
+      placeContainers(pixiApplication.view);
+      redrawPending = false;
+    }
+    window.addEventListener('resize', handleResize);
+
+    return function cleanup() {
+      window.removeEventListener('resize', handleResize);
+    };
+  });
+
+  return <div ref={canvasRef} />;
 };
 
 export default GameTestPage;

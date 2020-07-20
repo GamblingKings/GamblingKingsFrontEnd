@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import Hand from '../modules/mahjong/Hand/Hand';
+// import Hand from '../modules/mahjong/Hand/Hand';
 import SpriteFactory from './SpriteFactory';
 import Interactions from './Interactions';
 import MahjongOpponent from '../modules/mahjong/MahjongOpponent/MahjongOpponent';
@@ -13,7 +13,14 @@ const DISTANCE_FROM_TILES = 2;
 const PIXI_TEXT_STYLE = { fill: '#FCFF00' };
 
 class Renderer {
-  static renderMahjongHand(spriteFactory: SpriteFactory, container: PIXI.Container, hand: Hand): void {
+  static renderMahjongHand(
+    spriteFactory: SpriteFactory,
+    container: PIXI.Container,
+    player: MahjongPlayer,
+    requestRedraw: () => void,
+  ): void {
+    const hand = player.getHand();
+    const selectedTile = hand.getSelectedTile();
     const tiles = hand.getHand();
     tiles.forEach((tile, index) => {
       const frontSprite = spriteFactory.generateSprite('Front');
@@ -27,7 +34,14 @@ class Renderer {
       sprite.height = DEFAULT_MAHJONG_HEIGHT;
       sprite.x = index * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
 
+      if (index === selectedTile) {
+        sprite.y = -10;
+        frontSprite.y = -10;
+      }
+
       Interactions.addMouseInteraction(sprite, (event: PIXI.InteractionEvent) => {
+        requestRedraw();
+        hand.setSelectedTile(index);
         console.log(event.target);
       });
 
@@ -35,10 +49,13 @@ class Renderer {
     });
   }
 
-  static renderPlayerMahjong(spriteFactory: SpriteFactory, container: PIXI.Container, player: MahjongPlayer): void {
-    const hand = player.getHand();
-
-    Renderer.renderMahjongHand(spriteFactory, container, hand);
+  static renderPlayerMahjong(
+    spriteFactory: SpriteFactory,
+    container: PIXI.Container,
+    player: MahjongPlayer,
+    requestRedraw: () => void,
+  ): void {
+    Renderer.renderMahjongHand(spriteFactory, container, player, requestRedraw);
     const text = new PIXI.Text(player.getName(), PIXI_TEXT_STYLE);
     text.x = -100;
     container.addChild(text);
