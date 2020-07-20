@@ -113,7 +113,7 @@ const GameLobby = ({ ws, game, gameRef, setGame }: GameLobbyProps): JSX.Element 
   const startGame = (payload: unknown): void => {
     const { success, error } = payload as StartGameJSON;
     if (success) {
-      history.push('/game');
+      history.push({ pathname: '/game', state: { game: gameRef.current } });
     } else {
       console.log(`Error in starting game: ${error}`);
     }

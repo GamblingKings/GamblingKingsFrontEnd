@@ -131,7 +131,6 @@ const requestRedraw = () => {
  */
 const GameTestPage = (): JSX.Element => {
   const canvasRef = useRef<HTMLDivElement>(null);
-  console.log(canvasRef);
   // Set up PIXI Application
   useEffect(() => {
     pixiApplication = new PIXI.Application({
