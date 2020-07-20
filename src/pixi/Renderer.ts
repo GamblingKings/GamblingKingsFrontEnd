@@ -10,6 +10,8 @@ const DEFAULT_MAHJONG_WIDTH = 54;
 const DEFAULT_MAHJONG_HEIGHT = 72;
 const DISTANCE_FROM_TILES = 2;
 
+const PIXI_TEXT_STYLE = { fill: '#FCFF00' };
+
 class Renderer {
   static renderMahjongHand(spriteFactory: SpriteFactory, container: PIXI.Container, hand: Hand): void {
     const tiles = hand.getHand();
@@ -37,7 +39,8 @@ class Renderer {
     const hand = player.getHand();
 
     Renderer.renderMahjongHand(spriteFactory, container, hand);
-    const text = new PIXI.Text(player.getName(), {});
+    const text = new PIXI.Text(player.getName(), PIXI_TEXT_STYLE);
+    text.x = -100;
     container.addChild(text);
   }
 
@@ -74,11 +77,12 @@ class Renderer {
       hand.pivot.x = hand.width;
       hand.pivot.y = DEFAULT_MAHJONG_HEIGHT;
       hand.angle = 270;
+      hand.x = DEFAULT_MAHJONG_HEIGHT;
     }
 
     container.addChild(hand);
 
-    const text = new PIXI.Text(opponent.getName(), {});
+    const text = new PIXI.Text(opponent.getName(), PIXI_TEXT_STYLE);
     container.addChild(text);
   }
 }

@@ -97,12 +97,18 @@ const containersInit = () => {
   stage.addChild(opponentOneContainer);
   stage.addChild(opponentTwoContainer);
   stage.addChild(opponentThreeContainer);
-  playerContainer.y = 475;
-  opponentOneContainer.y = 100;
+};
+
+const placeContainers = (canvasRef: HTMLCanvasElement) => {
+  // Hardcoded placements, will fix
+  playerContainer.x = 100;
+  playerContainer.y = canvasRef.clientHeight - 120;
+  opponentOneContainer.x = 50;
+  opponentOneContainer.y = 80;
   opponentTwoContainer.x = 200;
-  opponentTwoContainer.y = 100;
-  opponentThreeContainer.x = 800;
-  opponentThreeContainer.y = 100;
+  opponentTwoContainer.y = 80;
+  opponentThreeContainer.x = canvasRef.clientWidth - 120;
+  opponentThreeContainer.y = 80;
 };
 
 /**
@@ -111,12 +117,12 @@ const containersInit = () => {
  */
 const GameTestPage = (): JSX.Element => {
   const canvasRef = useRef<HTMLDivElement>(null);
-
+  console.log(canvasRef);
   // Set up PIXI Application
   useEffect(() => {
     pixiApplication = new PIXI.Application({
-      width: window.innerWidth,
-      height: window.innerHeight,
+      width: canvasRef.current?.clientWidth,
+      height: canvasRef.current?.clientHeight,
       antialias: true,
       transparent: false,
       resolution: 1,
@@ -131,11 +137,15 @@ const GameTestPage = (): JSX.Element => {
     console.log(interactionManager);
     stage = pixiApplication.stage;
 
+    /**
+     * Main animation loop
+     */
     function animate() {
       opponentOneContainer.removeChildren(0, opponentOneContainer.children.length);
       opponentTwoContainer.removeChildren(0, opponentTwoContainer.children.length);
       opponentThreeContainer.removeChildren(0, opponentThreeContainer.children.length);
       playerContainer.removeChildren(0, playerContainer.children.length);
+      placeContainers(pixiApplication.view);
 
       Renderer.renderPlayerMahjong(spriteFactory, playerContainer, player as MahjongPlayer);
       Renderer.renderOpponentMahjong(
@@ -166,6 +176,7 @@ const GameTestPage = (): JSX.Element => {
       spriteFactory = new SpriteFactory(resources);
 
       containersInit();
+      placeContainers(pixiApplication.view);
       playersInit(STARTING_GAME);
 
       animate();
@@ -175,7 +186,11 @@ const GameTestPage = (): JSX.Element => {
     pixiLoader.add(images).load(setup);
   }, []);
 
-  return <div ref={canvasRef} />;
+  return (
+    <div>
+      <div ref={canvasRef} />
+    </div>
+  );
 };
 
 export default GameTestPage;
