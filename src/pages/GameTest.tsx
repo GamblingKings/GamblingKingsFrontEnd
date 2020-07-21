@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as PIXI from 'pixi.js';
 import GameTypes from '../modules/game/gameTypes';
 import MahjongVersions from '../modules/mahjong/Wall/version/Versions';
@@ -46,8 +46,6 @@ const h1 = new Hand(w, DEFAULT_WEIGHTS);
  * ********************************************************
  */
 
-let redrawPending = false;
-
 let pixiApplication: PIXI.Application;
 let stage: PIXI.Container;
 let pixiLoader: PIXI.Loader;
@@ -87,12 +85,12 @@ const playersInit = (currentGame: Game, pixiStage: PIXI.Container) => {
   mahjongPlayer.setHand(h1);
 };
 
-/**
- * Allows animate to redraw the game if there is a state change.
- */
-const requestRedraw = () => {
-  redrawPending = false;
-};
+// /**
+//  * Allows animate to redraw the game if there is a state change.
+//  */
+// const requestRedraw = () => {
+//   redrawPending = false;
+// };
 
 /**
  * Testing page for the Game.
@@ -101,12 +99,18 @@ const requestRedraw = () => {
 const GameTestPage = (): JSX.Element => {
   const canvasRef = useRef<HTMLDivElement>(null);
 
+  const [redrawPending, setRedrawPending] = useState(false);
+
+  const requestRedraw = () => {
+    setRedrawPending(false);
+  };
+
   /**
    * Main Animation loop
    */
   function animate() {
     if (!redrawPending) {
-      redrawPending = true;
+      setRedrawPending(true);
       stage.removeChildren(0, stage.children.length);
 
       const mahjongPlayer = player as MahjongPlayer;
@@ -174,7 +178,7 @@ const GameTestPage = (): JSX.Element => {
     function handleResize() {
       opponentOne.reposition(pixiApplication.view);
 
-      redrawPending = false;
+      requestRedraw();
     }
     window.addEventListener('resize', handleResize);
 

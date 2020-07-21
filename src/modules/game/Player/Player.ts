@@ -1,5 +1,8 @@
 import * as PIXI from 'pixi.js';
 
+/**
+ * Player class that holds PIXI container (bottom of screen) reference
+ */
 abstract class Player {
   private name: string;
 
@@ -18,6 +21,10 @@ abstract class Player {
     return this.container;
   }
 
+  /**
+   * Repositions the container near the bottom of screen
+   * @param canvasRef HTMLCanvasElement
+   */
   public reposition(canvasRef: HTMLCanvasElement): void {
     this.container.x = 100;
     this.container.y = canvasRef.clientHeight - 120;

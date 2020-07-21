@@ -5,12 +5,17 @@ import Hand from '../Hand/Hand';
 import SpriteFactory from '../../../pixi/SpriteFactory';
 import Interactions from '../../../pixi/Interactions';
 
-const DEFAULT_MAHJONG_WIDTH = 54;
-const DEFAULT_MAHJONG_HEIGHT = 72;
-const DISTANCE_FROM_TILES = 2;
+import {
+  DEFAULT_MAHJONG_WIDTH,
+  DEFAULT_MAHJONG_HEIGHT,
+  DISTANCE_FROM_TILES,
+  PIXI_TEXT_STYLE,
+  FRONT_TILE,
+} from '../../../pixi/mahjongConstants';
 
-const PIXI_TEXT_STYLE = { fill: '#FCFF00' };
-
+/**
+ * Mahjong player that holds information about current hand (tiles) and render methods
+ */
 class MahjongPlayer extends Player {
   private hand: Hand | undefined;
 
@@ -26,11 +31,20 @@ class MahjongPlayer extends Player {
     this.hand = hand;
   }
 
+  /**
+   * Removes all children from the container in super class.
+   */
   public removeAllAssets(): void {
     const container = super.getContainer();
     container.removeChildren(0, container.children.length);
   }
 
+  /**
+   * Return a PIXI.container containing all the tile sprites
+   * TODO: render played tiles
+   * @param spriteFactory SpriteFactory
+   * @param requestRedraw function that requests a redraw of canvas if there are state changes
+   */
   public renderHand(spriteFactory: SpriteFactory, requestRedraw: () => void): PIXI.Container {
     const container = new PIXI.Container();
     if (this.hand !== undefined) {
@@ -38,7 +52,7 @@ class MahjongPlayer extends Player {
       const tiles = this.hand.getHand();
 
       tiles.forEach((tile, index) => {
-        const frontSprite = spriteFactory.generateSprite('Front');
+        const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
         frontSprite.width = DEFAULT_MAHJONG_WIDTH;
         frontSprite.height = DEFAULT_MAHJONG_HEIGHT;
         frontSprite.x = index * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
@@ -66,18 +80,29 @@ class MahjongPlayer extends Player {
     return container;
   }
 
+  /**
+   * Returns a PIXI.Text containing the Player's name
+   */
   public renderName(): PIXI.Text {
     const name = super.getName();
     const text = new PIXI.Text(name, PIXI_TEXT_STYLE);
     return text;
   }
 
+  /**
+   * Create assets and appends assets to the container in super class, and attaches to the application stage.
+   * @param spriteFactory SpriteFactory
+   * @param pixiStage PIXI.Container
+   * @param requestRedraw function that requests a redraw of canvas if there are state changes
+   */
   public render(spriteFactory: SpriteFactory, pixiStage: PIXI.Container, requestRedraw: () => void): void {
     const playerContainer = super.getContainer();
 
     const playerHand = this.renderHand(spriteFactory, requestRedraw);
+    const name = this.renderName();
 
     playerContainer.addChild(playerHand);
+    playerContainer.addChild(name);
 
     pixiStage.addChild(playerContainer);
   }

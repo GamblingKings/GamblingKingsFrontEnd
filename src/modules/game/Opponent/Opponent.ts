@@ -2,6 +2,11 @@ import * as PIXI from 'pixi.js';
 
 import RenderDirection from '../../../pixi/directions';
 
+/**
+ * Returns the x, y coordinate of where the opponent container should be
+ * @param direction RenderDirection
+ * @param canvasRef HTMLCanvasElement
+ */
 const CONTAINER_POSITIONS = (direction: RenderDirection, canvasRef: HTMLCanvasElement): { x: number; y: number } => {
   const positions = {
     [RenderDirection.LEFT]: {
@@ -20,6 +25,9 @@ const CONTAINER_POSITIONS = (direction: RenderDirection, canvasRef: HTMLCanvasEl
   return positions[direction];
 };
 
+/**
+ * Opponent class that holds container reference based on where opponent is.
+ */
 abstract class Opponent {
   private name: string;
 
@@ -45,6 +53,10 @@ abstract class Opponent {
     return this.location;
   }
 
+  /**
+   * Repositions the container based on its location
+   * @param canvasRef HTMLCanvasElement
+   */
   public reposition(canvasRef: HTMLCanvasElement): void {
     const { x, y } = CONTAINER_POSITIONS(this.location, canvasRef);
     this.container.x = x;
