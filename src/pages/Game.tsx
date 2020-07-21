@@ -3,8 +3,11 @@ import * as PIXI from 'pixi.js';
 import { useHistory } from 'react-router-dom';
 import imageInit from '../pixi/imageLoader';
 import SpriteFactory from '../pixi/SpriteFactory';
+import RenderDirection from '../pixi/directions';
 import { WebSocketConnection, OutgoingAction, IncomingAction } from '../modules/ws';
-import { GamePageLoadJSON, GameStartJSON, Game } from '../types';
+// can't satisfy eslint and prettier at the same time here
+// eslint-disable-next-line object-curly-newline
+import { GamePageLoadJSON, GameStartJSON, Game, CurrentUser, User } from '../types';
 import GameTypes from '../modules/game/gameTypes';
 import Player from '../modules/game/Player/Player';
 import Opponent from '../modules/game/Opponent/Opponent';
@@ -30,12 +33,38 @@ let opponentThree: Opponent;
 
 type GameProps = {
   ws: WebSocketConnection | null;
+  currentUser: CurrentUser;
+};
+
+/**
+ * Initialize the Player and Opponent Classes based on the users from currentGame
+ * @param currentGame Game
+ */
+const playersInit = (currentGame: Game, pixiStage: PIXI.Container, currentUser: CurrentUser) => {
+  const { users } = currentGame;
+
+  const indexOfCurrentUser = users.findIndex((user: User) => user.username === currentUser.username);
+  const opponents = [];
+  const directions = [RenderDirection.LEFT, RenderDirection.TOP, RenderDirection.RIGHT];
+  let currentIndex = indexOfCurrentUser + 1;
+  for (let i = 0; i < users.length - 1; i += 1) {
+    if (currentIndex >= users.length) {
+      currentIndex = 0;
+    }
+    const opponent = new MahjongOpponent(users[currentIndex].username, directions[i]);
+    opponents.push(opponent);
+    const opponentContainer = opponent.getContainer();
+    pixiStage.addChild(opponentContainer);
+    currentIndex += 1;
+  }
+  [opponentOne, opponentTwo, opponentThree] = [opponents[0], opponents[1], opponents[2]];
+  player = new MahjongPlayer(currentUser.username);
 };
 
 /**
  * Game Page for main game
  */
-const GamePage = ({ ws }: GameProps): JSX.Element => {
+const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const [redrawPending, setRedrawPending] = useState(false);
@@ -152,7 +181,7 @@ const GamePage = ({ ws }: GameProps): JSX.Element => {
       if (ws) {
         ws.sendMessage(OutgoingAction.GAME_PAGE_LOAD, { success: true });
       }
-
+      playersInit(game, stage, currentUser);
       /**
        * Load resources (images) into Sprite Factory
        */

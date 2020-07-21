@@ -21,7 +21,7 @@ function App(): JSX.Element {
         <Route exact path="/" component={() => <Main setWs={setWs} setCurrentUser={setCurrentUser} ws={ws} />} />
         <Route exact path="/aboutUs" component={About} />
         <Route exact path="/lobby" component={() => <Lobby ws={ws} currentUser={currentUser} />} />
-        <Route exact path="/game" component={() => <Game ws={ws} />} />
+        <Route exact path="/game" component={() => <Game ws={ws} currentUser={currentUser} />} />
         <Route exact path="/gametest" component={() => <GameTest />} />
       </Switch>
     </Router>
