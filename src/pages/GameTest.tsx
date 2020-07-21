@@ -7,7 +7,6 @@ import imageInit from '../pixi/imageLoader';
 import SpriteFactory from '../pixi/SpriteFactory';
 import HongKongWall from '../modules/mahjong/Wall/version/HongKongWall';
 import Hand from '../modules/mahjong/Hand/Hand';
-import Renderer from '../pixi/Renderer';
 import Opponent from '../modules/game/Opponent/Opponent';
 import MahjongOpponent from '../modules/mahjong/MahjongOpponent/MahjongOpponent';
 import { User, Game } from '../types';
@@ -55,10 +54,6 @@ let pixiLoader: PIXI.Loader;
 let interactionManager: PIXI.InteractionManager;
 
 let spriteFactory: SpriteFactory;
-let playerContainer: PIXI.Container;
-let opponentOneContainer: PIXI.Container;
-let opponentTwoContainer: PIXI.Container;
-let opponentThreeContainer: PIXI.Container;
 
 let player: Player;
 let opponentOne: Opponent;
@@ -69,52 +64,27 @@ let opponentThree: Opponent;
  * Initialize the Player and Opponent Classes based on the users from currentGame
  * @param currentGame Game
  */
-const playersInit = (currentGame: Game) => {
+const playersInit = (currentGame: Game, pixiStage: PIXI.Container) => {
   const { users } = currentGame;
 
   const indexOfCurrentUser = users.findIndex((user: User) => user.username === CURRENT_USER.username);
   const opponents = [];
+  const directions = [RenderDirection.LEFT, RenderDirection.TOP, RenderDirection.RIGHT];
   let currentIndex = indexOfCurrentUser + 1;
   for (let i = 0; i < users.length - 1; i += 1) {
     if (currentIndex >= users.length) {
       currentIndex = 0;
     }
-    opponents.push(new MahjongOpponent(users[currentIndex].username));
+    const opponent = new MahjongOpponent(users[currentIndex].username, directions[i]);
+    opponents.push(opponent);
+    const opponentContainer = opponent.getContainer();
+    pixiStage.addChild(opponentContainer);
     currentIndex += 1;
   }
   [opponentOne, opponentTwo, opponentThree] = [opponents[0], opponents[1], opponents[2]];
-  player = new MahjongPlayer(CURRENT_USER.username, h1);
-};
-
-/**
- * Initialize the Containers containing assets related to Player and Opponent
- */
-const containersInit = () => {
-  playerContainer = new PIXI.Container();
-  opponentOneContainer = new PIXI.Container();
-  opponentTwoContainer = new PIXI.Container();
-  opponentThreeContainer = new PIXI.Container();
-
-  stage.addChild(playerContainer);
-  stage.addChild(opponentOneContainer);
-  stage.addChild(opponentTwoContainer);
-  stage.addChild(opponentThreeContainer);
-};
-
-/**
- * Place the containers relative to how big the canvas is
- * @param canvasRef reference to the canvas element
- */
-const placeContainers = (canvasRef: HTMLCanvasElement) => {
-  // Hardcoded placements, will fix
-  playerContainer.x = 100;
-  playerContainer.y = canvasRef.clientHeight - 120;
-  opponentOneContainer.x = 50;
-  opponentOneContainer.y = 80;
-  opponentTwoContainer.x = 200;
-  opponentTwoContainer.y = 80;
-  opponentThreeContainer.x = canvasRef.clientWidth - 120;
-  opponentThreeContainer.y = 80;
+  player = new MahjongPlayer(CURRENT_USER.username);
+  const mahjongPlayer = player as MahjongPlayer;
+  mahjongPlayer.setHand(h1);
 };
 
 /**
@@ -122,7 +92,6 @@ const placeContainers = (canvasRef: HTMLCanvasElement) => {
  */
 const requestRedraw = () => {
   redrawPending = false;
-  console.log(redrawPending);
 };
 
 /**
@@ -131,6 +100,40 @@ const requestRedraw = () => {
  */
 const GameTestPage = (): JSX.Element => {
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * Main Animation loop
+   */
+  function animate() {
+    if (!redrawPending) {
+      redrawPending = true;
+      stage.removeChildren(0, stage.children.length);
+
+      const mahjongPlayer = player as MahjongPlayer;
+      mahjongPlayer.removeAllAssets();
+      mahjongPlayer.render(spriteFactory, stage, requestRedraw);
+      mahjongPlayer.reposition(pixiApplication.view);
+
+      const mahjongOpponentOne = opponentOne as MahjongOpponent;
+      mahjongOpponentOne.removeAllAssets();
+      mahjongOpponentOne.render(spriteFactory, stage);
+      mahjongOpponentOne.reposition(pixiApplication.view);
+
+      const mahjongOpponentTwo = opponentTwo as MahjongOpponent;
+      mahjongOpponentTwo.removeAllAssets();
+      mahjongOpponentTwo.render(spriteFactory, stage);
+      mahjongOpponentTwo.reposition(pixiApplication.view);
+
+      const mahjongOpponentThree = opponentThree as MahjongOpponent;
+      mahjongOpponentThree.removeAllAssets();
+      mahjongOpponentThree.render(spriteFactory, stage);
+      mahjongOpponentThree.reposition(pixiApplication.view);
+
+      pixiApplication.render();
+    }
+    requestAnimationFrame(animate);
+  }
+
   // Set up PIXI Application
   useEffect(() => {
     pixiApplication = new PIXI.Application({
@@ -150,63 +153,27 @@ const GameTestPage = (): JSX.Element => {
     console.log(interactionManager);
     stage = pixiApplication.stage;
 
-    /**
-     * Main animation loop
-     */
-    function animate() {
-      if (!redrawPending) {
-        redrawPending = true;
-        opponentOneContainer.removeChildren(0, opponentOneContainer.children.length);
-        opponentTwoContainer.removeChildren(0, opponentTwoContainer.children.length);
-        opponentThreeContainer.removeChildren(0, opponentThreeContainer.children.length);
-        playerContainer.removeChildren(0, playerContainer.children.length);
-
-        Renderer.renderPlayerMahjong(spriteFactory, playerContainer, player as MahjongPlayer, requestRedraw);
-        Renderer.renderOpponentMahjong(
-          spriteFactory,
-          opponentOneContainer,
-          opponentOne as MahjongOpponent,
-          RenderDirection.LEFT,
-        );
-        Renderer.renderOpponentMahjong(
-          spriteFactory,
-          opponentTwoContainer,
-          opponentTwo as MahjongOpponent,
-          RenderDirection.TOP,
-        );
-        Renderer.renderOpponentMahjong(
-          spriteFactory,
-          opponentThreeContainer,
-          opponentThree as MahjongOpponent,
-          RenderDirection.RIGHT,
-        );
-
-        pixiApplication.render();
-      }
-      requestAnimationFrame(animate);
-    }
-
     function setup(loader: PIXI.Loader, resources: Partial<Record<string, PIXI.LoaderResource>>) {
       console.log(loader);
       spriteFactory = new SpriteFactory(resources);
 
-      containersInit();
-      placeContainers(pixiApplication.view);
-      playersInit(STARTING_GAME);
+      playersInit(STARTING_GAME, stage);
 
       animate();
     }
 
     const images = imageInit(STARTING_GAME.gameType as GameTypes);
     pixiLoader.add(images).load(setup);
+    // eslint-disable-next-line
   }, []);
 
   /**
-   * Listens for
+   * Listens for resizing of window
    */
   useEffect(() => {
     function handleResize() {
-      placeContainers(pixiApplication.view);
+      opponentOne.reposition(pixiApplication.view);
+
       redrawPending = false;
     }
     window.addEventListener('resize', handleResize);

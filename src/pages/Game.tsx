@@ -6,6 +6,10 @@ import SpriteFactory from '../pixi/SpriteFactory';
 import { WebSocketConnection, OutgoingAction, IncomingAction } from '../modules/ws';
 import { GamePageLoadJSON, GameStartJSON, Game } from '../types';
 import GameTypes from '../modules/game/gameTypes';
+import Player from '../modules/game/Player/Player';
+import Opponent from '../modules/game/Opponent/Opponent';
+import MahjongOpponent from '../modules/mahjong/MahjongOpponent/MahjongOpponent';
+import MahjongPlayer from '../modules/mahjong/MahjongPlayer/MahjongPlayer';
 
 let pixiApplication: PIXI.Application;
 let stage: PIXI.Container;
@@ -13,44 +17,23 @@ let pixiLoader: PIXI.Loader;
 let interactionManager: PIXI.InteractionManager;
 
 let spriteFactory: SpriteFactory;
-let playerContainer: PIXI.Container;
-let opponentOneContainer: PIXI.Container;
-let opponentTwoContainer: PIXI.Container;
-let opponentThreeContainer: PIXI.Container;
+
+let redrawPending = false;
+
+let player: Player;
+let opponentOne: Opponent;
+let opponentTwo: Opponent;
+let opponentThree: Opponent;
 
 type GameProps = {
   ws: WebSocketConnection | null;
 };
 
 /**
- * Initialize the Containers containing assets related to Player and Opponent
+ * Allows animate to redraw the game if there is a state change.
  */
-const containersInit = () => {
-  playerContainer = new PIXI.Container();
-  opponentOneContainer = new PIXI.Container();
-  opponentTwoContainer = new PIXI.Container();
-  opponentThreeContainer = new PIXI.Container();
-
-  stage.addChild(playerContainer);
-  stage.addChild(opponentOneContainer);
-  stage.addChild(opponentTwoContainer);
-  stage.addChild(opponentThreeContainer);
-};
-
-/**
- * Place the containers relative to how big the canvas is
- * @param canvasRef reference to the canvas element
- */
-const placeContainers = (canvasRef: HTMLCanvasElement) => {
-  // Hardcoded placements, will fix
-  playerContainer.x = 100;
-  playerContainer.y = canvasRef.clientHeight - 120;
-  opponentOneContainer.x = 50;
-  opponentOneContainer.y = 80;
-  opponentTwoContainer.x = 200;
-  opponentTwoContainer.y = 80;
-  opponentThreeContainer.x = canvasRef.clientWidth - 120;
-  opponentThreeContainer.y = 80;
+const requestRedraw = () => {
+  redrawPending = false;
 };
 
 const GamePage = ({ ws }: GameProps): JSX.Element => {
@@ -58,6 +41,40 @@ const GamePage = ({ ws }: GameProps): JSX.Element => {
   const history = useHistory();
   const { state } = history.location;
   const { game } = state as { game: Game };
+
+  /**
+   * Main Animation loop
+   */
+  function animate() {
+    if (!redrawPending) {
+      redrawPending = true;
+      stage.removeChildren(0, stage.children.length);
+
+      const mahjongPlayer = player as MahjongPlayer;
+      mahjongPlayer.removeAllAssets();
+      mahjongPlayer.render(spriteFactory, stage, requestRedraw);
+      mahjongPlayer.reposition(pixiApplication.view);
+
+      const mahjongOpponentOne = opponentOne as MahjongOpponent;
+      mahjongOpponentOne.removeAllAssets();
+      mahjongOpponentOne.render(spriteFactory, stage);
+      mahjongOpponentOne.reposition(pixiApplication.view);
+
+      const mahjongOpponentTwo = opponentTwo as MahjongOpponent;
+      mahjongOpponentTwo.removeAllAssets();
+      mahjongOpponentTwo.render(spriteFactory, stage);
+      mahjongOpponentTwo.reposition(pixiApplication.view);
+
+      const mahjongOpponentThree = opponentThree as MahjongOpponent;
+      mahjongOpponentThree.removeAllAssets();
+      mahjongOpponentThree.render(spriteFactory, stage);
+      mahjongOpponentThree.reposition(pixiApplication.view);
+
+      pixiApplication.render();
+    }
+    requestAnimationFrame(animate);
+  }
+
   /**
    * Listener Callbacks
    */
@@ -84,6 +101,8 @@ const GamePage = ({ ws }: GameProps): JSX.Element => {
   const gameStartInit = (payload: unknown): void => {
     const data = payload as GameStartJSON;
     console.log(data);
+
+    animate();
   };
 
   // Set up PIXI application.
@@ -123,9 +142,6 @@ const GamePage = ({ ws }: GameProps): JSX.Element => {
        * Load resources (images) into Sprite Factory
        */
       spriteFactory = new SpriteFactory(resources);
-      console.log(spriteFactory);
-      containersInit();
-      placeContainers(pixiApplication.view);
     }
     const images = imageInit(game.gameType as GameTypes);
     pixiLoader.add(images).load(setup);
