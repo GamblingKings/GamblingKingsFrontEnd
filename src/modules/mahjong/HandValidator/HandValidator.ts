@@ -6,6 +6,8 @@ import { ValidPair, Meld, HandStructureResults } from '../types/MahjongTypes';
 import TileMapper from '../Tile/map/TileMapper';
 import SimpleTileTypes from '../enums/SimpleTileEnums';
 import MeldTypes from '../enums/MeldEnums';
+import sortHandUtils from '../utils/functions/sortHand';
+import Hand from '../Hand/Hand';
 
 class HandValidator {
   public static TRIPLET_SIZE = 3;
@@ -25,7 +27,8 @@ class HandValidator {
    */
   public static createTileMapping(tiles: Tile[]): { [index: string]: number } {
     const mapping: { [index: string]: number } = {};
-    tiles.forEach((t) => {
+    const sortedTiles = sortHandUtils(tiles, Hand.generateHandWeights());
+    sortedTiles.forEach((t) => {
       if (Object.prototype.hasOwnProperty.call(mapping, t.toString())) mapping[t.toString()] += 1;
       else mapping[t.toString()] = 1;
     });

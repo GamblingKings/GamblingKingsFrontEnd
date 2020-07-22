@@ -30,3 +30,18 @@ export interface HandStructureResults {
   valid: ValidPair[];
   invalid: ValidPair[];
 }
+
+export interface SortHandWeights {
+  [SimpleTileTypes.DOT]: number;
+  [SimpleTileTypes.BAMBOO]: number;
+  [SimpleTileTypes.CHARACTER]: number;
+  [HonorTileTypes.EAST]: number;
+  [HonorTileTypes.SOUTH]: number;
+  [HonorTileTypes.WEST]: number;
+  [HonorTileTypes.NORTH]: number;
+  [HonorTileTypes.GREENDRAGON]: number;
+  [HonorTileTypes.REDDRAGON]: number;
+  [HonorTileTypes.WHITEDRAGON]: number;
+  [BonusTileTypes.FLOWER]: number;
+  [BonusTileTypes.SEASON]: number;
+}

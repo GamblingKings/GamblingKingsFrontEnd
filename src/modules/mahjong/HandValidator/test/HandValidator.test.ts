@@ -123,6 +123,23 @@ const invalidHand = [
   'REDDRAGON',
 ];
 
+const validHandWithPurity = [
+  '1_CHARACTER',
+  '1_CHARACTER',
+  '9_CHARACTER',
+  '9_CHARACTER',
+  '9_CHARACTER',
+  '4_CHARACTER',
+  '4_CHARACTER',
+  '4_CHARACTER',
+  '3_CHARACTER',
+  '5_CHARACTER',
+  '5_CHARACTER',
+  '5_CHARACTER',
+  '6_CHARACTER',
+  '6_CHARACTER',
+];
+
 /**
  * Create Tile Mapping Tests
  */
@@ -192,6 +209,14 @@ test('invalidHand should not have a valid hand structure', () => {
   const pairs = HandValidator.determineAllPossiblePairs(tiles);
   const result = HandValidator.validiateValidHandStructure(pairs);
   expect(result.valid).toHaveLength(0);
+});
+
+test('purityHand should have a valid hand structure', () => {
+  const tiles: Tile[] = [];
+  validHandWithPurity.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
+  const pairs = HandValidator.determineAllPossiblePairs(tiles);
+  const result = HandValidator.validiateValidHandStructure(pairs);
+  expect(result.valid.length).toBeGreaterThanOrEqual(1);
 });
 
 /**
