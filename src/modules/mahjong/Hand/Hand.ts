@@ -8,27 +8,17 @@
 import Tile from '../Tile/Tile';
 import Wall from '../Wall/Wall';
 import DeadPile from '../DeadPile/DeadPile';
-import SimpleTileTypes from '../Tile/types/SimpleTileTypes';
-import HonorTileTypes from '../Tile/types/HonorTileTypes';
-import BonusTileTypes from '../Tile/types/BonusTileTypes';
+import SimpleTileTypes from '../enums/SimpleTileEnums';
+import HonorTileTypes from '../enums/HonorTileEnums';
+import BonusTileTypes from '../enums/BonusTileEnums';
+import { SortHandWeights } from '../types/MahjongTypes';
 
-interface SortHandWeights {
-  [SimpleTileTypes.DOT]: number;
-  [SimpleTileTypes.BAMBOO]: number;
-  [SimpleTileTypes.CHARACTER]: number;
-  [HonorTileTypes.EAST]: number;
-  [HonorTileTypes.SOUTH]: number;
-  [HonorTileTypes.WEST]: number;
-  [HonorTileTypes.NORTH]: number;
-  [HonorTileTypes.GREENDRAGON]: number;
-  [HonorTileTypes.REDDRAGON]: number;
-  [HonorTileTypes.WHITEDRAGON]: number;
-  [BonusTileTypes.FLOWER]: number;
-  [BonusTileTypes.SEASON]: number;
-}
+import sortHandUtils from '../utils/functions/sortHand';
 
 class Hand {
   private hand: Tile[];
+
+  private playedTiles: Tile[][];
 
   /**
    * Public constructor. Generates a hand from a wall and sorts to the hand
@@ -37,7 +27,8 @@ class Hand {
    */
   constructor(wall: Wall, weights: SortHandWeights) {
     this.hand = wall.generateHand();
-    this.sort_hand(weights);
+    this.playedTiles = [];
+    this.sortHand(weights);
   }
 
   /**
@@ -125,20 +116,23 @@ class Hand {
    * Sorts the hand based on given weights
    * @param weights SortHandWeights, an object that stores tile weights
    */
-  public sort_hand(weights: SortHandWeights): void {
-    this.hand.sort((t1, t2) => {
-      const t1Type = t1.getType();
-      const t2Type = t2.getType();
+  public sortHand(weights: SortHandWeights): void {
+    this.hand = sortHandUtils(this.hand, weights);
+  }
 
-      if (t1Type === t2Type && t1Type in SimpleTileTypes) {
-        const v1 = t1.getValue();
-        const v2 = t2.getValue();
+  /**
+   * Adds a meld to the played tiles
+   * @param meld an array of tiles
+   */
+  public addPlayedTiles(meld: Tile[]): void {
+    this.playedTiles.push(meld);
+  }
 
-        return v1 - v2;
-      }
-
-      return weights[t1Type] - weights[t2Type];
-    });
+  /**
+   * Gets the played tiles
+   */
+  public getPlayedTiles(): Tile[][] {
+    return this.playedTiles;
   }
 }
 

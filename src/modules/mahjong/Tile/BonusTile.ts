@@ -4,7 +4,7 @@
  */
 
 import Tile from './Tile';
-import BonusTileType from './types/BonusTileTypes';
+import BonusTileType from '../enums/BonusTileEnums';
 
 class BonusTile extends Tile {
   private type: BonusTileType;

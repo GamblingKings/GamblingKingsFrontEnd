@@ -1,5 +1,5 @@
 import BonusTile from '../BonusTile';
-import BonusTileTypes from '../types/BonusTileTypes';
+import BonusTileTypes from '../../enums/BonusTileEnums';
 
 test('BonusTile fails to initialize is range is not between 1 - 4', () => {
   const t = () => {

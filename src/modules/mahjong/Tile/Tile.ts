@@ -4,9 +4,9 @@
  * as simple (dots, bamboo, characters), honors (dragons and winds), and bonus (flowers, seasons)
  */
 
-import BonusTileType from './types/BonusTileTypes';
-import SimpleTileType from './types/SimpleTileTypes';
-import HonorTileType from './types/HonorTileTypes';
+import BonusTileType from '../enums/BonusTileEnums';
+import SimpleTileType from '../enums/SimpleTileEnums';
+import HonorTileType from '../enums/HonorTileEnums';
 
 abstract class Tile {
   static DELIMITER = '_';

@@ -2,7 +2,7 @@
  * Object used to initialize Simple Tiles in the wall class
  */
 
-import SimpleTileTypes from '../../Tile/types/SimpleTileTypes';
+import SimpleTileTypes from '../../enums/SimpleTileEnums';
 
 type SimpleTileInitObject = {
   dots: {
