@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import * as PIXI from 'pixi.js';
+
 import GameTypes from '../modules/game/gameTypes';
 import MahjongVersions from '../modules/mahjong/enums/VersionsEnum';
-
 import imageInit from '../pixi/imageLoader';
 import SpriteFactory from '../pixi/SpriteFactory';
 import HongKongWall from '../modules/mahjong/Wall/version/HongKongWall';
