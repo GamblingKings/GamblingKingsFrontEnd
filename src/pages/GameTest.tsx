@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as PIXI from 'pixi.js';
 import GameTypes from '../modules/game/gameTypes';
 import MahjongVersions from '../modules/mahjong/Wall/version/Versions';
@@ -58,6 +58,8 @@ let opponentOne: Opponent;
 let opponentTwo: Opponent;
 let opponentThree: Opponent;
 
+let redrawPending = false;
+
 /**
  * Initialize the Player and Opponent Classes based on the users from currentGame
  * @param currentGame Game
@@ -99,18 +101,19 @@ const playersInit = (currentGame: Game, pixiStage: PIXI.Container) => {
 const GameTestPage = (): JSX.Element => {
   const canvasRef = useRef<HTMLDivElement>(null);
 
-  const [redrawPending, setRedrawPending] = useState(false);
+  // const [redrawPending, setRedrawPending] = useState(false);
 
   const requestRedraw = () => {
-    setRedrawPending(false);
+    redrawPending = true;
   };
 
   /**
    * Main Animation loop
    */
   function animate() {
+    console.log(redrawPending);
     if (!redrawPending) {
-      setRedrawPending(true);
+      redrawPending = true;
       stage.removeChildren(0, stage.children.length);
 
       const mahjongPlayer = player as MahjongPlayer;
@@ -157,7 +160,7 @@ const GameTestPage = (): JSX.Element => {
     console.log(interactionManager);
     stage = pixiApplication.stage;
 
-    function setup(loader: PIXI.Loader, resources: Partial<Record<string, PIXI.LoaderResource>>) {
+    function setup(loader: PIXI.Loader, resources: Partial<Record<string, PIXI.LoaderResource>>): void {
       console.log(loader);
       spriteFactory = new SpriteFactory(resources);
 

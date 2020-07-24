@@ -11,6 +11,7 @@ import {
   DISTANCE_FROM_TILES,
   PIXI_TEXT_STYLE,
   FRONT_TILE,
+  PLAYER_HAND_SPRITE_X,
 } from '../../../pixi/mahjongConstants';
 
 /**
@@ -37,6 +38,7 @@ class MahjongPlayer extends Player {
   public removeAllAssets(): void {
     const container = super.getContainer();
     container.removeChildren(0, container.children.length);
+    console.log(container.children);
   }
 
   /**
@@ -55,13 +57,13 @@ class MahjongPlayer extends Player {
         const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
         frontSprite.width = DEFAULT_MAHJONG_WIDTH;
         frontSprite.height = DEFAULT_MAHJONG_HEIGHT;
-        frontSprite.x = index * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
+        frontSprite.x = PLAYER_HAND_SPRITE_X + index * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
         container.addChild(frontSprite);
 
         const sprite = spriteFactory.generateSprite(tile.toString());
         sprite.width = DEFAULT_MAHJONG_WIDTH;
         sprite.height = DEFAULT_MAHJONG_HEIGHT;
-        sprite.x = index * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
+        sprite.x = PLAYER_HAND_SPRITE_X + index * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
 
         if (index === selectedTile) {
           sprite.y = -10;

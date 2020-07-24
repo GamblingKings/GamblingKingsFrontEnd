@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import * as PIXI from 'pixi.js';
 import { useHistory } from 'react-router-dom';
 import imageInit from '../pixi/imageLoader';
@@ -30,6 +30,11 @@ let player: Player;
 let opponentOne: Opponent;
 let opponentTwo: Opponent;
 let opponentThree: Opponent;
+
+/**
+ * Game States
+ */
+let redrawPending = false;
 
 type GameProps = {
   ws: WebSocketConnection | null;
@@ -67,13 +72,11 @@ const playersInit = (currentGame: Game, pixiStage: PIXI.Container, currentUser: 
 const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
   const canvasRef = useRef<HTMLDivElement>(null);
 
-  const [redrawPending, setRedrawPending] = useState(false);
-
   /**
    * Allows animate to redraw the canvas if there is a state change.
    */
   const requestRedraw = () => {
-    setRedrawPending(false);
+    redrawPending = false;
   };
 
   /**
@@ -88,7 +91,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
    */
   function animate() {
     if (!redrawPending) {
-      setRedrawPending(true);
+      redrawPending = true;
       stage.removeChildren(0, stage.children.length);
 
       const mahjongPlayer = player as MahjongPlayer;
@@ -176,7 +179,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     /**
      * Function setup invoked when assets are done loading
      */
-    function setup(loader: PIXI.Loader, resources: Partial<Record<string, PIXI.LoaderResource>>) {
+    function setup(loader: PIXI.Loader, resources: Partial<Record<string, PIXI.LoaderResource>>): void {
       console.log(loader);
       if (ws) {
         ws.sendMessage(OutgoingAction.GAME_PAGE_LOAD, { success: true });
