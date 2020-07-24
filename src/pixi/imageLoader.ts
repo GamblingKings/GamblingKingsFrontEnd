@@ -1,6 +1,6 @@
-import SimpleTileTypes from '../modules/mahjong/Tile/types/SimpleTileTypes';
-import HonorTileTypes from '../modules/mahjong/Tile/types/HonorTileTypes';
-import BonusTileTypes from '../modules/mahjong/Tile/types/BonusTileTypes';
+import SimpleTileTypes from '../modules/mahjong/enums/SimpleTileEnums';
+import HonorTileTypes from '../modules/mahjong/enums/HonorTileEnums';
+import BonusTileTypes from '../modules/mahjong/enums/BonusTileEnums';
 import GameTypes from '../modules/game/gameTypes';
 
 import RED_X from '../assets/Red_X.svg';
