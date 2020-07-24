@@ -104,14 +104,13 @@ const GameTestPage = (): JSX.Element => {
   // const [redrawPending, setRedrawPending] = useState(false);
 
   const requestRedraw = () => {
-    redrawPending = true;
+    redrawPending = false;
   };
 
   /**
    * Main Animation loop
    */
   function animate() {
-    console.log(redrawPending);
     if (!redrawPending) {
       redrawPending = true;
       stage.removeChildren(0, stage.children.length);
