@@ -64,3 +64,17 @@ test('Can throw a specific tile', () => {
   h1.throw(index, d);
   expect(d.getLastThrown()).toBe(tile);
 });
+
+test('Hand - getSelectedTile()', () => {
+  const [h1, h2, h3, h4] = initHands();
+  h2.draw(w);
+  h3.draw(w);
+  h4.draw(w);
+  expect(h1.getSelectedTile()).toBe(-1);
+  h1.setSelectedTile(2);
+  expect(h1.getSelectedTile()).toBe(2);
+  h1.setSelectedTile(2);
+  expect(h1.getSelectedTile()).toBe(-1);
+  h1.setSelectedTile(2);
+  expect(h1.getSelectedTile()).toBe(2);
+});
