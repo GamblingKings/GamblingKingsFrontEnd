@@ -22,9 +22,15 @@ export default class SpriteGenerator {
       sprite.name = resourceName;
       return sprite;
     }
-    const resource = this.resources.RED_X as PIXI.LoaderResource;
-    const sprite = new PIXI.Sprite(resource.texture);
-    sprite.name = resourceName;
-    return sprite;
+    try {
+      const resource = this.resources.RED_X as PIXI.LoaderResource;
+      const sprite = new PIXI.Sprite(resource.texture);
+      sprite.name = resourceName;
+      return sprite;
+    } catch (err) {
+      const undefinedSprite = new PIXI.Sprite();
+      undefinedSprite.name = 'undefined';
+      return undefinedSprite;
+    }
   }
 }

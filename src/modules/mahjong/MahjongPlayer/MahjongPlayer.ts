@@ -38,7 +38,6 @@ class MahjongPlayer extends Player {
   public removeAllAssets(): void {
     const container = super.getContainer();
     container.removeChildren(0, container.children.length);
-    console.log(container.children);
   }
 
   /**
