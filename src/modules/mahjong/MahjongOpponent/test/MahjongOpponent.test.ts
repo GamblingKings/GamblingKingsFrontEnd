@@ -3,15 +3,24 @@ import * as PIXI from 'pixi.js';
 import MahjongOpponent from '../MahjongOpponent';
 import RenderDirection from '../../../../pixi/directions';
 import SpriteFactory from '../../../../pixi/SpriteFactory';
+import TileFactory from '../../Tile/TileFactory';
 
 let mjOpponent: MahjongOpponent;
 const spriteFactory = new SpriteFactory({});
 const NAME = 'Bowser';
-const LOCATION = RenderDirection.LEFT;
+const LOCATION_LEFT = RenderDirection.LEFT;
+const LOCATION_RIGHT = RenderDirection.RIGHT;
+const LOCATION_TOP = RenderDirection.TOP;
 let pixiStage: PIXI.Container;
 
+const SAMPLE_TILE_ARRAY = [
+  TileFactory.createTileFromStringDef('2_DOT'),
+  TileFactory.createTileFromStringDef('3_DOT'),
+  TileFactory.createTileFromStringDef('4_DOT'),
+];
+
 beforeEach(() => {
-  mjOpponent = new MahjongOpponent(NAME, LOCATION);
+  mjOpponent = new MahjongOpponent(NAME, LOCATION_LEFT);
   pixiStage = new PIXI.Container();
 });
 
@@ -24,7 +33,13 @@ test('MahjongOpponent - getContainer() - Init to be empty', () => {
 });
 
 test('MahjongOpponent - getLocation()', () => {
-  expect(mjOpponent.getLocation()).toBe(LOCATION);
+  expect(mjOpponent.getLocation()).toBe(LOCATION_LEFT);
+
+  mjOpponent = new MahjongOpponent(NAME, LOCATION_RIGHT);
+  expect(mjOpponent.getLocation()).toBe(LOCATION_RIGHT);
+
+  mjOpponent = new MahjongOpponent(NAME, LOCATION_TOP);
+  expect(mjOpponent.getLocation()).toBe(LOCATION_TOP);
 });
 
 test('MahjongOpponent - getNumberOfTiles()', () => {
@@ -56,4 +71,15 @@ test('MahjongOpponent - removeAllAssets()', () => {
   mjOpponent.render(spriteFactory, pixiStage);
   mjOpponent.removeAllAssets();
   expect(mjOpponent.getContainer().children).toHaveLength(0);
+});
+
+test('MahjongOpponent - getPlayedTiles()', () => {
+  const emptyPlayedTiles = mjOpponent.getPlayedTiles();
+  expect(emptyPlayedTiles).toHaveLength(0);
+});
+
+test('MahjongOpponent - addPlayedTiles()', () => {
+  mjOpponent.addPlayedTiles(SAMPLE_TILE_ARRAY);
+  const playedTiles = mjOpponent.getPlayedTiles();
+  expect(playedTiles).toHaveLength(1);
 });

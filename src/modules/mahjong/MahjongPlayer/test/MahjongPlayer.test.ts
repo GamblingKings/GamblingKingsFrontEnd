@@ -65,6 +65,11 @@ test('MahjongPlayer - render() - full hand', () => {
   mjPlayer.setHand(h1);
   mjPlayer.render(spriteFactory, pixiStage, placeholderFunction);
   expect(pixiStage.children).toHaveLength(1);
+
+  mjPlayer.getHand()?.setSelectedTile(2);
+  mjPlayer.removeAllAssets();
+  mjPlayer.render(spriteFactory, pixiStage, placeholderFunction);
+  expect(pixiStage.children).toHaveLength(1);
 });
 
 test('MahjongPlayer - removeAllAssets()', () => {
