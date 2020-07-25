@@ -134,7 +134,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       ws?.removeListener(IncomingAction.GAME_PAGE_LOAD);
     } else {
       console.log(`Error processing GAME_PAGE_LOAD: ${error}`);
-      ws?.sendMessage(OutgoingAction.GAME_PAGE_LOAD, { success: true });
+      ws?.sendMessage(OutgoingAction.GAME_PAGE_LOAD, { gameId: game.gameId });
     }
   };
 
@@ -182,7 +182,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     function setup(loader: PIXI.Loader, resources: Partial<Record<string, PIXI.LoaderResource>>): void {
       console.log(loader);
       if (ws) {
-        ws.sendMessage(OutgoingAction.GAME_PAGE_LOAD, { success: true });
+        ws.sendMessage(OutgoingAction.GAME_PAGE_LOAD, { gameId: game.gameId });
       }
       playersInit(game, stage, currentUser);
       /**

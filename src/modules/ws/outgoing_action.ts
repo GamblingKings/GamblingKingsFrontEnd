@@ -8,6 +8,8 @@ enum OutgoingAction {
   START_GAME = 'START_GAME',
   JOIN_GAME = 'JOIN_GAME',
   GAME_PAGE_LOAD = 'GAME_PAGE_LOAD',
+  DRAW_TILE = 'DRAW_TILE',
+  PLAY_TILE = 'PLAY_TILE',
 }
 
 export default OutgoingAction;
