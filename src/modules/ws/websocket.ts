@@ -3,7 +3,8 @@ import { ReceivedJSON } from '../../types';
 import OutgoingAction from './outgoing_action';
 import IncomingAction from './incoming_action';
 
-const WEBSOCKET_URL = process.env.REACT_APP_WEBSOCKETURL || '';
+const { NODE_ENV, REACT_APP_PROD_WEBSOCKETURL, REACT_APP_DEV_WEBSOCKETURL } = process.env;
+const WEBSOCKET_URL = NODE_ENV === 'production' ? REACT_APP_PROD_WEBSOCKETURL || '' : REACT_APP_DEV_WEBSOCKETURL || '';
 
 /**
  * Interface that the client can use for Websocket Connection.
