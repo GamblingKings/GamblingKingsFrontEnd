@@ -1,9 +1,15 @@
 import 'jest-webgl-canvas-mock';
 import * as PIXI from 'pixi.js';
+import jsdom from 'jsdom';
+
 import MahjongPlayer from '../MahjongPlayer';
 import HongKongWall from '../../Wall/version/HongKongWall';
 import Hand from '../../Hand/Hand';
 import SpriteFactory from '../../../../pixi/SpriteFactory';
+
+const { JSDOM } = jsdom;
+const dom = new JSDOM();
+const canvas = dom.window.document.createElement('canvas');
 
 const w = new HongKongWall();
 const DEFAULT_WEIGHTS = Hand.generateHandWeights();
@@ -81,4 +87,12 @@ test('MahjongPlayer - removeAllAssets()', () => {
   mjPlayer.render(spriteFactory, pixiStage, placeholderFunction);
   mjPlayer.removeAllAssets();
   expect(mjPlayer.getContainer().children).toHaveLength(0);
+});
+
+test('MahjongPlayer - reposition()', () => {
+  // canvas width and height are both 0
+  mjPlayer.reposition(canvas);
+
+  expect(mjPlayer.getContainer().x).toBe(100);
+  expect(mjPlayer.getContainer().y).toBe(-120);
 });

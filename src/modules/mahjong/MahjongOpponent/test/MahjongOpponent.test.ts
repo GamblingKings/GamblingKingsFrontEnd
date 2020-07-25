@@ -1,9 +1,14 @@
 import 'jest-webgl-canvas-mock';
+import jsdom from 'jsdom';
 import * as PIXI from 'pixi.js';
 import MahjongOpponent from '../MahjongOpponent';
 import RenderDirection from '../../../../pixi/directions';
 import SpriteFactory from '../../../../pixi/SpriteFactory';
 import TileFactory from '../../Tile/TileFactory';
+
+const { JSDOM } = jsdom;
+const dom = new JSDOM();
+const canvas = dom.window.document.createElement('canvas');
 
 let mjOpponent: MahjongOpponent;
 const spriteFactory = new SpriteFactory({});
@@ -82,4 +87,22 @@ test('MahjongOpponent - addPlayedTiles()', () => {
   mjOpponent.addPlayedTiles(SAMPLE_TILE_ARRAY);
   const playedTiles = mjOpponent.getPlayedTiles();
   expect(playedTiles).toHaveLength(1);
+});
+
+test('MahjongOpponent - reposition()', () => {
+  // canvas width and height are both 0
+  mjOpponent.reposition(canvas);
+
+  expect(mjOpponent.getContainer().x).toBe(50);
+  expect(mjOpponent.getContainer().y).toBe(80);
+
+  mjOpponent = new MahjongOpponent(NAME, LOCATION_RIGHT);
+  mjOpponent.reposition(canvas);
+  expect(mjOpponent.getContainer().x).toBe(-120);
+  expect(mjOpponent.getContainer().y).toBe(80);
+
+  mjOpponent = new MahjongOpponent(NAME, LOCATION_TOP);
+  mjOpponent.reposition(canvas);
+  expect(mjOpponent.getContainer().x).toBe(200);
+  expect(mjOpponent.getContainer().y).toBe(80);
 });

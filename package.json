@@ -72,6 +72,7 @@
     "husky": "^4.2.5",
     "jest-webgl-canvas-mock": "^0.2.3",
     "jest-websocket-mock": "^2.0.2",
+    "jsdom": "^16.3.0",
     "lint-staged": "^10.2.7",
     "mock-socket": "^9.0.3",
     "prettier": "^2.0.5"
