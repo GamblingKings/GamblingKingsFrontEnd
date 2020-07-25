@@ -105,3 +105,18 @@ export interface StartGameJSON {
   success: boolean;
   error?: string;
 }
+
+/**
+ * Interface for GAME_PAGE_LOAD payload received
+ */
+export interface GamePageLoadJSON {
+  success: boolean;
+  error?: string;
+}
+
+/**
+ * Interface for GAME_START payload received
+ */
+export interface GameStartJSON {
+  tiles: string[];
+}

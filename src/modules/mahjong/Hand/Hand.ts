@@ -20,6 +20,8 @@ class Hand {
 
   private playedTiles: Tile[][];
 
+  private selectedTile = -1;
+
   /**
    * Public constructor. Generates a hand from a wall and sorts to the hand
    * @param wall A child of the Wall class
@@ -82,6 +84,18 @@ class Hand {
    */
   public getHand(): Tile[] {
     return this.hand;
+  }
+
+  public getSelectedTile(): number {
+    return this.selectedTile;
+  }
+
+  public setSelectedTile(index: number): void {
+    if (index === this.selectedTile) {
+      this.selectedTile = -1;
+    } else {
+      this.selectedTile = index;
+    }
   }
 
   /**
