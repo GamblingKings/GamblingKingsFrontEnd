@@ -1,4 +1,4 @@
-import SendMessageValidator from '../modules/ws/message_validator';
+import SendMessageValidator from '../message_validator';
 
 test('Valid Test Message', () => {
   const key = 'TEST_MESSAGE';

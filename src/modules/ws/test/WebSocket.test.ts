@@ -1,6 +1,6 @@
 import WS from 'jest-websocket-mock';
 
-import WebSocketConnection from '../modules/ws/websocket';
+import WebSocketConnection from '../websocket';
 
 const key = 'TEST_MESSAGE';
 const invalidKey = 'INVALID_KEY';
