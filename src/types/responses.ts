@@ -118,6 +118,5 @@ export interface GamePageLoadJSON {
  * Interface for GAME_START payload received
  */
 export interface GameStartJSON {
-  placeholder: boolean;
-  // placeholder
+  tiles: string[];
 }

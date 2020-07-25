@@ -13,6 +13,7 @@ import Player from '../modules/game/Player/Player';
 import Opponent from '../modules/game/Opponent/Opponent';
 import MahjongOpponent from '../modules/mahjong/MahjongOpponent/MahjongOpponent';
 import MahjongPlayer from '../modules/mahjong/MahjongPlayer/MahjongPlayer';
+import TileFactory from '../modules/mahjong/Tile/TileFactory';
 
 /**
  * Pixi Application References
@@ -144,7 +145,12 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
    */
   const gameStartInit = (payload: unknown): void => {
     const data = payload as GameStartJSON;
-    console.log(data);
+
+    const tiles = [];
+    data.tiles.forEach((tile: string) => {
+      tiles.push(TileFactory.createTileFromStringDef(tile));
+    });
+    // TODO: add tiles to player's hand to render
 
     animate();
   };
