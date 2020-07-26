@@ -1,6 +1,7 @@
 import HandValidator from '../HandValidator';
 import TileFactory from '../../Tile/TileFactory';
 import Tile from '../../Tile/Tile';
+import validateHandStructure from '../../utils/functions/validateHandStructure';
 
 const validThirteenOrphansHand = [
   '1_DOT',
@@ -164,58 +165,37 @@ test('determineAllPossiblePairs should return an array of 5 objects when passed 
  * validate hand structure tests
  */
 test('allTripletHand should have a valid hand structure', () => {
-  const tiles: Tile[] = [];
-  allTripletsHand.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
-  const pairs = HandValidator.determineAllPossiblePairs(tiles);
-  const result = HandValidator.validiateValidHandStructure(pairs);
+  const result = validateHandStructure(allTripletsHand);
   expect(result.valid.length).toBeGreaterThanOrEqual(1);
 });
 
 test('allConsecutiveHand should have a valid hand structure', () => {
-  const tiles: Tile[] = [];
-  allConsecutiveHand.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
-  const pairs = HandValidator.determineAllPossiblePairs(tiles);
-  const result = HandValidator.validiateValidHandStructure(pairs);
+  const result = validateHandStructure(allConsecutiveHand);
   expect(result.valid.length).toBeGreaterThanOrEqual(1);
 });
 
 test('allConsecutiveHandWithLipeikou should have a valid hand structure', () => {
-  const tiles: Tile[] = [];
-  allConsecutiveWithLipeikou.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
-  const pairs = HandValidator.determineAllPossiblePairs(tiles);
-  const result = HandValidator.validiateValidHandStructure(pairs);
+  const result = validateHandStructure(allConsecutiveWithLipeikou);
   expect(result.valid.length).toBeGreaterThanOrEqual(1);
 });
 
 test('validHandWith4OfaKindNotBeingUsedAs4OfaKind should have a valid hand structure', () => {
-  const tiles: Tile[] = [];
-  validHandWith4OfaKindNotBeingUsedAs4OfaKind.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
-  const pairs = HandValidator.determineAllPossiblePairs(tiles);
-  const result = HandValidator.validiateValidHandStructure(pairs);
+  const result = validateHandStructure(validHandWith4OfaKindNotBeingUsedAs4OfaKind);
   expect(result.valid.length).toBeGreaterThanOrEqual(1);
 });
 
 test('validHandWith4OfaKind should have a valid hand structure', () => {
-  const tiles: Tile[] = [];
-  validHandWith4OfaKind.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
-  const pairs = HandValidator.determineAllPossiblePairs(tiles);
-  const result = HandValidator.validiateValidHandStructure(pairs);
+  const result = validateHandStructure(validHandWith4OfaKind);
   expect(result.valid.length).toBeGreaterThanOrEqual(1);
 });
 
 test('invalidHand should not have a valid hand structure', () => {
-  const tiles: Tile[] = [];
-  invalidHand.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
-  const pairs = HandValidator.determineAllPossiblePairs(tiles);
-  const result = HandValidator.validiateValidHandStructure(pairs);
+  const result = validateHandStructure(invalidHand);
   expect(result.valid).toHaveLength(0);
 });
 
 test('purityHand should have a valid hand structure', () => {
-  const tiles: Tile[] = [];
-  validHandWithPurity.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
-  const pairs = HandValidator.determineAllPossiblePairs(tiles);
-  const result = HandValidator.validiateValidHandStructure(pairs);
+  const result = validateHandStructure(validHandWithPurity);
   expect(result.valid.length).toBeGreaterThanOrEqual(1);
 });
 

@@ -10,6 +10,7 @@ export enum HKHandPoints {
   LARGE_WINDS = 13,
   THIRTEEN_ORPHANS = 13,
   ALL_KONGS = 13,
+  INVALID = 0,
 }
 
 export enum AdditionalPoints {

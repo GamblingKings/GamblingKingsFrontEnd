@@ -4,10 +4,10 @@
 import Tile from '../Tile/Tile';
 import { ValidPair, Meld, HandStructureResults } from '../types/MahjongTypes';
 import TileMapper from '../Tile/map/TileMapper';
-import SimpleTileTypes from '../enums/SimpleTileEnums';
 import MeldTypes from '../enums/MeldEnums';
 import sortHandUtils from '../utils/functions/sortHand';
 import Hand from '../Hand/Hand';
+import { isSimpleTile as isSimpleTileUtils } from '../utils/functions/checkTypes';
 
 class HandValidator {
   public static TRIPLET_SIZE = 3;
@@ -101,7 +101,7 @@ class HandValidator {
       // Start trying to create all consecutive melds
       // Cannot start with triplets as there is a chance we use the triplet for a consecutive
       Object.keys(copyRemainingTiles).forEach((key) => {
-        const isSimpleTile: boolean = Object.values(SimpleTileTypes).includes(<SimpleTileTypes>TileMapper[key].type);
+        const isSimpleTile: boolean = isSimpleTileUtils(key);
 
         // n = number that can be used to create a consecutive
         let n = copyRemainingTiles[key] < this.TRIPLET_SIZE || copyRemainingTiles[key] === this.KAN_SIZE;
@@ -160,35 +160,6 @@ class HandValidator {
 
     return results;
   }
-
-  // /**
-  // TO BE DONE AT A LATER PR
-  //  * Given a hand, determine how many points the hand is able to get based on
-  //  * what valid hands are possible to create
-  //  * ex: All triplets, all consec, purity, semi-pure
-  //  * @param validPair
-  //  * @returns an number representing the point value
-  //  */
-  // public static determineHandPoints(validPair: ValidPair): number {
-  //   console.log(validPair);
-  //   return 37;
-  // }
-
-  // /**
-  //  * Given a hand, determine how many extra points the hand is able to get
-  //  * ex: dragons, winds, flowers
-  //  * @param validPair
-  //  */
-  // public static determineExtraPoints(validPair: ValidPair): number {
-  //   console.log(validPair);
-  //   return 37;
-  // }
-
-  // /**
-  //  * Given HandStructureResults, calculate the total number of points for each valid hand
-  //  * @param handStructureResults
-  //  */
-  // public static evaluatePoints(handStructureResults: HandStructureResults) {}
 
   /**
    * Validates the Length of the hand must be 14
