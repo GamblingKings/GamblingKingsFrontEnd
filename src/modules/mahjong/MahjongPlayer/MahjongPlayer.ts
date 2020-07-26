@@ -1,7 +1,5 @@
 import * as PIXI from 'pixi.js';
 
-import Player from '../../game/Player/Player';
-import Hand from '../Hand/Hand';
 import SpriteFactory from '../../../pixi/SpriteFactory';
 import Interactions from '../../../pixi/Interactions';
 
@@ -13,23 +11,28 @@ import {
   FRONT_TILE,
   PLAYER_HAND_SPRITE_X,
 } from '../../../pixi/mahjongConstants';
+import RenderDirection from '../../../pixi/directions';
+import UserEntity from '../../game/UserEntity/UserEntity';
+import PlayerHand from '../Hand/PlayerHand';
+import Tile from '../Tile/Tile';
 
 /**
  * Mahjong player that holds information about current hand (tiles) and render methods
  */
-class MahjongPlayer extends Player {
-  private hand: Hand | undefined;
+class MahjongPlayer extends UserEntity {
+  private hand: PlayerHand;
 
-  // constructor(name: string) {
-  //   super(name);
-  // }
+  constructor(name: string) {
+    super(name, RenderDirection.BOTTOM);
+    this.hand = new PlayerHand();
+  }
 
-  public getHand(): Hand | undefined {
+  public getHand(): PlayerHand {
     return this.hand;
   }
 
-  public setHand(hand: Hand): void {
-    this.hand = hand;
+  public setHand(tiles: Tile[]): boolean {
+    return this.hand.setTiles(tiles);
   }
 
   /**
@@ -48,7 +51,7 @@ class MahjongPlayer extends Player {
    */
   public renderHand(spriteFactory: SpriteFactory, requestRedraw: () => void): PIXI.Container {
     const container = new PIXI.Container();
-    if (this.hand !== undefined) {
+    if (this.hand !== null) {
       const selectedTile = this.hand.getSelectedTile();
       const tiles = this.hand.getHand();
 
