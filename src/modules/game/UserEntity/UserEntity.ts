@@ -41,8 +41,6 @@ abstract class UserEntity {
 
   abstract removeAllAssets(): void;
 
-  abstract render(): void;
-
   /**
    * Returns the x, y coordinate of where the pixi container should be
    * @param direction RenderDirection

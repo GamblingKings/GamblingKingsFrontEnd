@@ -1,5 +1,6 @@
 import PlayerHand from '../PlayerHand';
 import TileFactory from '../../Tile/TileFactory';
+import Tile from '../../Tile/Tile';
 
 let emptyHand: PlayerHand;
 let fullHand: PlayerHand;
@@ -22,7 +23,7 @@ const tileStrings = [
 const tileStringsNot13 = ['EAST'];
 const tileStringMeld = ['NORTH', 'NORTH', 'NORTH'];
 
-let tiles: Tiles[];
+let tiles: Tile[];
 const tilesNot13 = tileStringsNot13.map((tile) => TileFactory.createTileFromStringDef(tile));
 const tileMeld = tileStringMeld.map((tile) => TileFactory.createTileFromStringDef(tile));
 

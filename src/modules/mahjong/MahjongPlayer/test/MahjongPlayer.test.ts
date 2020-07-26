@@ -1,98 +1,114 @@
-// import 'jest-webgl-canvas-mock';
-// import * as PIXI from 'pixi.js';
-// import jsdom from 'jsdom';
+import 'jest-webgl-canvas-mock';
+import * as PIXI from 'pixi.js';
+import jsdom from 'jsdom';
 
-// import MahjongPlayer from '../MahjongPlayer';
-// import HongKongWall from '../../Wall/version/HongKongWall';
-// import Hand from '../../Hand/Hand';
-// import SpriteFactory from '../../../../pixi/SpriteFactory';
+import MahjongPlayer from '../MahjongPlayer';
+import SpriteFactory from '../../../../pixi/SpriteFactory';
+import TileFactory from '../../Tile/TileFactory';
+import Tile from '../../Tile/Tile';
 
-// const { JSDOM } = jsdom;
-// const dom = new JSDOM();
-// const canvas = dom.window.document.createElement('canvas');
+const { JSDOM } = jsdom;
+const dom = new JSDOM();
+const canvas = dom.window.document.createElement('canvas');
 
-// const w = new HongKongWall();
-// const DEFAULT_WEIGHTS = Hand.generateHandWeights();
-// const h1 = new Hand(w, DEFAULT_WEIGHTS);
-// const spriteFactory = new SpriteFactory({});
-// let pixiStage: PIXI.Container;
-// const placeholderFunction = () => {};
+const tileStrings = [
+  '7_DOT',
+  '7_DOT',
+  '7_DOT',
+  '8_DOT',
+  '8_DOT',
+  '2_BAMBOO',
+  '5_BAMBOO',
+  '9_BAMBOO',
+  '9_CHARACTER',
+  'NORTH',
+  'EAST',
+  'REDDRAGON',
+  'WHITEDRAGON',
+];
 
-// const NAME = 'Jay Chou';
-// let mjPlayer: MahjongPlayer;
+let tiles: Tile[];
 
-// beforeEach(() => {
-//   mjPlayer = new MahjongPlayer(NAME);
-//   pixiStage = new PIXI.Container();
-// });
+const spriteFactory = new SpriteFactory({});
+let pixiStage: PIXI.Container;
+const placeholderFunction = () => {};
 
-// test('MahjongPlayer - getName()', () => {
-//   expect(mjPlayer.getName()).toEqual(NAME);
-// });
+const NAME = 'Jay Chou';
+let mjPlayer: MahjongPlayer;
 
-// test('MahjongPlayer - getContainer() - Init to be empty', () => {
-//   expect(mjPlayer.getContainer().children).toHaveLength(0);
-// });
+beforeEach(() => {
+  tiles = tileStrings.map((tile) => TileFactory.createTileFromStringDef(tile));
+  mjPlayer = new MahjongPlayer(NAME);
+  pixiStage = new PIXI.Container();
+});
 
-// test('MahjongPlayer - setHand() / getHand()', () => {
-//   expect(mjPlayer.getHand()).toBeUndefined();
-//   mjPlayer.setHand(h1);
-//   expect(mjPlayer.getHand()).toEqual(h1);
-// });
+test('MahjongPlayer - getName()', () => {
+  expect(mjPlayer.getName()).toEqual(NAME);
+});
 
-// test('MahjongPlayer - renderName()', () => {
-//   const pixiText = mjPlayer.renderName();
-//   expect(pixiText.text).toBe(NAME);
-// });
+test('MahjongPlayer - getContainer() - Init to be empty', () => {
+  expect(mjPlayer.getContainer().children).toHaveLength(0);
+});
 
-// test('MahjongPlayer - renderHand()', () => {
-//   // Empty hand
-//   const handContainerEmpty = mjPlayer.renderHand(spriteFactory, placeholderFunction);
+test('MahjongPlayer - setHand() / getHand()', () => {
+  expect(mjPlayer.getHand().getTiles()).toHaveLength(0);
+  mjPlayer.setHand(tiles);
+  expect(mjPlayer.getHand().getTiles()).toEqual(tiles);
+});
 
-//   expect(handContainerEmpty.children).toHaveLength(0);
+test('MahjongPlayer - renderName()', () => {
+  const pixiText = mjPlayer.renderName();
+  expect(pixiText.text).toBe(NAME);
+});
 
-//   // 13 tiles for front and 13 tiles for back
-//   mjPlayer.setHand(h1);
-//   const handContainerFull = mjPlayer.renderHand(spriteFactory, placeholderFunction);
-//   expect(handContainerFull.children).toHaveLength(26);
-// });
+test('MahjongPlayer - renderHand()', () => {
+  // Empty hand
+  const handContainerEmpty = mjPlayer.renderHand(spriteFactory, placeholderFunction);
 
-// test('MahjongPlayer - render() - empty hand', () => {
-//   mjPlayer.render(spriteFactory, pixiStage, placeholderFunction);
-//   expect(pixiStage.children).toHaveLength(1);
+  expect(handContainerEmpty.children).toHaveLength(0);
 
-//   mjPlayer.removeAllAssets();
-//   mjPlayer.setHand(h1);
-//   mjPlayer.render(spriteFactory, pixiStage, placeholderFunction);
-//   expect(pixiStage.children).toHaveLength(1);
-// });
+  // 13 tiles for front and 13 tiles for back
+  mjPlayer.setHand(tiles);
+  const handContainerFull = mjPlayer.renderHand(spriteFactory, placeholderFunction);
+  expect(handContainerFull.children).toHaveLength(26);
+});
 
-// test('MahjongPlayer - render() - full hand', () => {
-//   mjPlayer.setHand(h1);
-//   mjPlayer.render(spriteFactory, pixiStage, placeholderFunction);
-//   expect(pixiStage.children).toHaveLength(1);
+test('MahjongPlayer - render() - empty hand', () => {
+  mjPlayer.render(spriteFactory, pixiStage, placeholderFunction);
+  expect(pixiStage.children).toHaveLength(1);
 
-//   mjPlayer.getHand()?.setSelectedTile(2);
-//   mjPlayer.removeAllAssets();
-//   mjPlayer.render(spriteFactory, pixiStage, placeholderFunction);
-//   expect(pixiStage.children).toHaveLength(1);
-// });
+  mjPlayer.removeAllAssets();
+  mjPlayer.setHand(tiles);
+  mjPlayer.render(spriteFactory, pixiStage, placeholderFunction);
+  expect(pixiStage.children).toHaveLength(1);
+});
 
-// test('MahjongPlayer - removeAllAssets()', () => {
-//   mjPlayer.render(spriteFactory, pixiStage, placeholderFunction);
-//   mjPlayer.removeAllAssets();
-//   expect(mjPlayer.getContainer().children).toHaveLength(0);
+test('MahjongPlayer - render() - full hand', () => {
+  mjPlayer.setHand(tiles);
+  mjPlayer.render(spriteFactory, pixiStage, placeholderFunction);
+  expect(pixiStage.children).toHaveLength(1);
 
-//   mjPlayer.setHand(h1);
-//   mjPlayer.render(spriteFactory, pixiStage, placeholderFunction);
-//   mjPlayer.removeAllAssets();
-//   expect(mjPlayer.getContainer().children).toHaveLength(0);
-// });
+  mjPlayer.getHand()?.setSelectedTile(2);
+  mjPlayer.removeAllAssets();
+  mjPlayer.render(spriteFactory, pixiStage, placeholderFunction);
+  expect(pixiStage.children).toHaveLength(1);
+});
 
-// test('MahjongPlayer - reposition()', () => {
-//   // canvas width and height are both 0
-//   mjPlayer.reposition(canvas);
+test('MahjongPlayer - removeAllAssets()', () => {
+  mjPlayer.render(spriteFactory, pixiStage, placeholderFunction);
+  mjPlayer.removeAllAssets();
+  expect(mjPlayer.getContainer().children).toHaveLength(0);
 
-//   expect(mjPlayer.getContainer().x).toBe(100);
-//   expect(mjPlayer.getContainer().y).toBe(-120);
-// });
+  mjPlayer.setHand(tiles);
+  mjPlayer.render(spriteFactory, pixiStage, placeholderFunction);
+  mjPlayer.removeAllAssets();
+  expect(mjPlayer.getContainer().children).toHaveLength(0);
+});
+
+test('MahjongPlayer - reposition()', () => {
+  // canvas width and height are both 0
+  mjPlayer.reposition(canvas);
+
+  expect(mjPlayer.getContainer().x).toBe(100);
+  expect(mjPlayer.getContainer().y).toBe(-120);
+});

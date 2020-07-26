@@ -51,36 +51,36 @@ class MahjongPlayer extends UserEntity {
    */
   public renderHand(spriteFactory: SpriteFactory, requestRedraw: () => void): PIXI.Container {
     const container = new PIXI.Container();
-    if (this.hand !== null) {
-      const selectedTile = this.hand.getSelectedTile();
-      const tiles = this.hand.getHand();
 
-      tiles.forEach((tile, index) => {
-        const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
-        frontSprite.width = DEFAULT_MAHJONG_WIDTH;
-        frontSprite.height = DEFAULT_MAHJONG_HEIGHT;
-        frontSprite.x = PLAYER_HAND_SPRITE_X + index * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
-        container.addChild(frontSprite);
+    const selectedTile = this.hand.getSelectedTile();
+    const tiles = this.hand.getTiles();
 
-        const sprite = spriteFactory.generateSprite(tile.toString());
-        sprite.width = DEFAULT_MAHJONG_WIDTH;
-        sprite.height = DEFAULT_MAHJONG_HEIGHT;
-        sprite.x = PLAYER_HAND_SPRITE_X + index * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
+    tiles.forEach((tile: Tile, index: number) => {
+      const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
+      frontSprite.width = DEFAULT_MAHJONG_WIDTH;
+      frontSprite.height = DEFAULT_MAHJONG_HEIGHT;
+      frontSprite.x = PLAYER_HAND_SPRITE_X + index * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
+      container.addChild(frontSprite);
 
-        if (index === selectedTile) {
-          sprite.y = -10;
-          frontSprite.y = -10;
-        }
+      const sprite = spriteFactory.generateSprite(tile.toString());
+      sprite.width = DEFAULT_MAHJONG_WIDTH;
+      sprite.height = DEFAULT_MAHJONG_HEIGHT;
+      sprite.x = PLAYER_HAND_SPRITE_X + index * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
 
-        Interactions.addMouseInteraction(sprite, (event: PIXI.InteractionEvent) => {
-          requestRedraw();
-          this.hand?.setSelectedTile(index);
-          console.log(event.target);
-        });
+      if (index === selectedTile) {
+        sprite.y = -10;
+        frontSprite.y = -10;
+      }
 
-        container.addChild(sprite);
+      Interactions.addMouseInteraction(sprite, (event: PIXI.InteractionEvent) => {
+        requestRedraw();
+        this.hand?.setSelectedTile(index);
+        console.log(event.target);
       });
-    }
+
+      container.addChild(sprite);
+    });
+
     return container;
   }
 

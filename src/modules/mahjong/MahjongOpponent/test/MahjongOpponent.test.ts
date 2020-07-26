@@ -48,7 +48,7 @@ test('MahjongOpponent - getLocation()', () => {
 });
 
 test('MahjongOpponent - getNumberOfTiles()', () => {
-  expect(mjOpponent.getNumberOfTiles()).toBe(13);
+  expect(mjOpponent.getHand().getNumberOfTiles()).toBe(13);
 });
 
 test('MahjongOpponent - renderName()', () => {

@@ -12,30 +12,29 @@ import {
   PIXI_TEXT_STYLE,
   BACK_TILE,
 } from '../../../pixi/mahjongConstants';
+import OpponentHand from '../Hand/OpponentHand';
 
 /**
  * Mahjong Opponent that holds information about its tiles and render methods
  */
 class MahjongOpponent extends Opponent {
-  private numberOfTiles: number;
-
-  private playedTiles: Tile[][] = [];
+  private opponentHand: OpponentHand;
 
   constructor(name: string, location: RenderDirection) {
     super(name, location);
-    this.numberOfTiles = 13;
+    this.opponentHand = new OpponentHand();
   }
 
-  public getNumberOfTiles(): number {
-    return this.numberOfTiles;
-  }
-
-  public getPlayedTiles(): Tile[][] {
-    return this.playedTiles;
+  public getHand(): OpponentHand {
+    return this.opponentHand;
   }
 
   public addPlayedTiles(tiles: Tile[]): void {
-    this.playedTiles.push(tiles);
+    this.opponentHand.addPlayedTiles(tiles);
+  }
+
+  public getPlayedTiles(): Tile[][] {
+    return this.opponentHand.getPlayedTiles();
   }
 
   /**
@@ -53,7 +52,8 @@ class MahjongOpponent extends Opponent {
    */
   public renderMahjongHand(spriteFactory: SpriteFactory): PIXI.Container {
     const container = new PIXI.Container();
-    for (let i = 0; i < this.numberOfTiles; i += 1) {
+    const hand = this.opponentHand;
+    for (let i = 0; i < hand.getNumberOfTiles(); i += 1) {
       const backSprite = spriteFactory.generateSprite(BACK_TILE);
       backSprite.width = DEFAULT_MAHJONG_WIDTH;
       backSprite.height = DEFAULT_MAHJONG_HEIGHT;
