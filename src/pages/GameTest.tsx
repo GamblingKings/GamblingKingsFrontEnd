@@ -5,14 +5,12 @@ import GameTypes from '../modules/game/gameTypes';
 import MahjongVersions from '../modules/mahjong/enums/VersionsEnum';
 import imageInit from '../pixi/imageLoader';
 import SpriteFactory from '../pixi/SpriteFactory';
-import HongKongWall from '../modules/mahjong/Wall/version/HongKongWall';
-import Hand from '../modules/mahjong/Hand/Hand';
-import Opponent from '../modules/game/Opponent/Opponent';
 import MahjongOpponent from '../modules/mahjong/MahjongOpponent/MahjongOpponent';
 import { User, Game } from '../types';
-import Player from '../modules/game/Player/Player';
 import MahjongPlayer from '../modules/mahjong/MahjongPlayer/MahjongPlayer';
 import RenderDirection from '../pixi/directions';
+import TileFactory from '../modules/mahjong/Tile/TileFactory';
+import UserEntity from '../modules/game/UserEntity/UserEntity';
 
 /**
  * ********************************************************
@@ -35,10 +33,22 @@ const STARTING_GAME: Game = {
   gameVersion: MahjongVersions.HongKong,
   users: ALL_USERS,
 };
-
-const w = new HongKongWall();
-const DEFAULT_WEIGHTS = Hand.generateHandWeights();
-const h1 = new Hand(w, DEFAULT_WEIGHTS);
+const tileStrings = [
+  '7_DOT',
+  '7_DOT',
+  '7_DOT',
+  '8_DOT',
+  '8_DOT',
+  '2_BAMBOO',
+  '5_BAMBOO',
+  '9_BAMBOO',
+  '9_CHARACTER',
+  'NORTH',
+  'EAST',
+  'REDDRAGON',
+  'WHITEDRAGON',
+];
+const tiles = tileStrings.map((tile) => TileFactory.createTileFromStringDef(tile));
 
 /**
  * ********************************************************
@@ -53,10 +63,10 @@ let interactionManager: PIXI.InteractionManager;
 
 let spriteFactory: SpriteFactory;
 
-let player: Player;
-let opponentOne: Opponent;
-let opponentTwo: Opponent;
-let opponentThree: Opponent;
+let player: UserEntity;
+let opponentOne: UserEntity;
+let opponentTwo: UserEntity;
+let opponentThree: UserEntity;
 
 let redrawPending = false;
 
@@ -84,7 +94,7 @@ const playersInit = (currentGame: Game, pixiStage: PIXI.Container) => {
   [opponentOne, opponentTwo, opponentThree] = [opponents[0], opponents[1], opponents[2]];
   player = new MahjongPlayer(CURRENT_USER.username);
   const mahjongPlayer = player as MahjongPlayer;
-  mahjongPlayer.setHand(h1);
+  mahjongPlayer.setHand(tiles);
 };
 
 // /**

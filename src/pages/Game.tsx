@@ -9,11 +9,11 @@ import { WebSocketConnection, OutgoingAction, IncomingAction } from '../modules/
 // eslint-disable-next-line object-curly-newline
 import { GamePageLoadJSON, GameStartJSON, Game, CurrentUser, User } from '../types';
 import GameTypes from '../modules/game/gameTypes';
-import Player from '../modules/game/Player/Player';
-import Opponent from '../modules/game/Opponent/Opponent';
 import MahjongOpponent from '../modules/mahjong/MahjongOpponent/MahjongOpponent';
 import MahjongPlayer from '../modules/mahjong/MahjongPlayer/MahjongPlayer';
 import TileFactory from '../modules/mahjong/Tile/TileFactory';
+import UserEntity from '../modules/game/UserEntity/UserEntity';
+import Tile from '../modules/mahjong/Tile/Tile';
 
 /**
  * Pixi Application References
@@ -27,10 +27,10 @@ let spriteFactory: SpriteFactory;
 /**
  * Player States
  */
-let player: Player;
-let opponentOne: Opponent;
-let opponentTwo: Opponent;
-let opponentThree: Opponent;
+let player: UserEntity;
+let opponentOne: UserEntity;
+let opponentTwo: UserEntity;
+let opponentThree: UserEntity;
 
 /**
  * Game States
@@ -145,12 +145,14 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
    */
   const gameStartInit = (payload: unknown): void => {
     const data = payload as GameStartJSON;
-
-    const tiles = [];
-    data.tiles.forEach((tile: string) => {
+    const tileArray = JSON.parse(data.tiles);
+    const tiles: Tile[] = [];
+    tileArray.forEach((tile: string) => {
       tiles.push(TileFactory.createTileFromStringDef(tile));
     });
-    // TODO: add tiles to player's hand to render
+
+    const mjPlayer = player as MahjongPlayer;
+    mjPlayer.setHand(tiles);
 
     animate();
   };

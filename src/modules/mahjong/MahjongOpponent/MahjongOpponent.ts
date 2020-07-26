@@ -1,6 +1,5 @@
 import * as PIXI from 'pixi.js';
 
-import Opponent from '../../game/Opponent/Opponent';
 import Tile from '../Tile/Tile';
 import RenderDirection from '../../../pixi/directions';
 import SpriteFactory from '../../../pixi/SpriteFactory';
@@ -13,11 +12,12 @@ import {
   BACK_TILE,
 } from '../../../pixi/mahjongConstants';
 import OpponentHand from '../Hand/OpponentHand';
+import UserEntity from '../../game/UserEntity/UserEntity';
 
 /**
  * Mahjong Opponent that holds information about its tiles and render methods
  */
-class MahjongOpponent extends Opponent {
+class MahjongOpponent extends UserEntity {
   private opponentHand: OpponentHand;
 
   constructor(name: string, location: RenderDirection) {

@@ -118,5 +118,5 @@ export interface GamePageLoadJSON {
  * Interface for GAME_START payload received
  */
 export interface GameStartJSON {
-  tiles: string[];
+  tiles: string;
 }
