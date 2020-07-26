@@ -1,7 +1,11 @@
 import { ValidPair } from '../types/MahjongTypes';
 import MeldEnums from '../enums/MeldEnums';
 import TileMapper from '../Tile/map/TileMapper';
-import { isSimpleTile as isSimpleTileUtils, isHonorTile as isHonorTileUtils } from '../utils/functions/checkTypes';
+import {
+  isSimpleTile as isSimpleTileUtils,
+  isHonorTile as isHonorTileUtils,
+  isBonusTile as isBonusTileUtils,
+} from '../utils/functions/checkTypes';
 
 import SimpleTileTypes from '../enums/SimpleTileEnums';
 
