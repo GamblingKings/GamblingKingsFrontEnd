@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+import SpriteFactory from '../../../pixi/SpriteFactory';
 import RenderDirection from '../../../pixi/directions';
 
 /**
@@ -40,6 +41,8 @@ abstract class UserEntity {
   }
 
   abstract removeAllAssets(): void;
+
+  public abstract render(spriteFactory: SpriteFactory, pixiStage: PIXI.Container, requestRedraw: () => void): void;
 
   /**
    * Returns the x, y coordinate of where the pixi container should be
