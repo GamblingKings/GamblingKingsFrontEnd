@@ -122,6 +122,41 @@ class PointValidator {
     return PointValidator.INVALID_SCORE;
   };
 
+  /**
+   * Verfies whether a hand contains all honors
+   * @returns the corresponding score if valid, otherwise 0
+   */
+  public static validateAllHonors = (vp: ValidPair): number => {
+    const { pair, remainingTiles } = vp;
+    let isAllHonors = true;
+
+    if (!isHonorTileUtils(pair)) return PointValidator.INVALID_SCORE;
+    Object.keys(remainingTiles).forEach((key) => {
+      const isHonorTile = isHonorTileUtils(key);
+      if (!isHonorTile) isAllHonors = false;
+    });
+
+    if (isAllHonors) return PointValidator.ALL_HONORS_SCORE;
+    return PointValidator.INVALID_SCORE;
+  };
+
+  /**
+   * Verfies whether a hand contains small dragons
+   * @returns the corresponding score if valid, otherwise 0
+   */
+  public static validateSmallDragons = (vp: ValidPair): number => {
+    const dragons: { [index: string]: boolean } = {
+      REDDRAGON: false,
+      GREENDRAGON: false,
+      WHITEDRAGON: false,
+    };
+
+    const { pair } = vp;
+    if (Object.keys(dragons).includes(pair)) {
+      dragons[pair] = true;
+    }
+  };
+
   // Validate points of a hand
   /**
    * Determine how many points comes from valid hands such as all triplets, all consecutives, purity, etc..

@@ -69,58 +69,23 @@ const allConsecutiveHand = [
 //   '4_CHARACTER',
 // ];
 
-// const validHandWith4OfaKindNotBeingUsedAs4OfaKind = [
-//   'EAST',
-//   'EAST',
-//   '1_CHARACTER',
-//   '1_CHARACTER',
-//   '1_CHARACTER',
-//   '1_CHARACTER',
-//   '2_CHARACTER',
-//   '3_CHARACTER',
-//   '1_BAMBOO',
-//   '2_BAMBOO',
-//   '3_BAMBOO',
-//   'REDDRAGON',
-//   'REDDRAGON',
-//   'REDDRAGON',
-// ];
-
-// const validHandWith4OfaKind = [
-//   'EAST',
-//   'EAST',
-//   '1_CHARACTER',
-//   '1_CHARACTER',
-//   '1_CHARACTER',
-//   '1_CHARACTER',
-//   '2_CHARACTER',
-//   '3_CHARACTER',
-//   '4_CHARACTER',
-//   '1_BAMBOO',
-//   '2_BAMBOO',
-//   '3_BAMBOO',
-//   'REDDRAGON',
-//   'REDDRAGON',
-//   'REDDRAGON',
-// ];
-
-// const invalidHand = [
-//   'EAST',
-//   'EAST',
-//   '1_CHARACTER',
-//   '1_CHARACTER',
-//   '1_CHARACTER',
-//   'WEST',
-//   '2_CHARACTER',
-//   '9_CHARACTER',
-//   '4_CHARACTER',
-//   '1_BAMBOO',
-//   '2_BAMBOO',
-//   '6_BAMBOO',
-//   'REDDRAGON',
-//   'REDDRAGON',
-//   'REDDRAGON',
-// ];
+const validHandWith4OfaKind = [
+  'EAST',
+  'EAST',
+  '1_CHARACTER',
+  '1_CHARACTER',
+  '1_CHARACTER',
+  '1_CHARACTER',
+  '2_BAMBOO',
+  '2_BAMBOO',
+  '2_BAMBOO',
+  '3_BAMBOO',
+  '3_BAMBOO',
+  '3_BAMBOO',
+  'REDDRAGON',
+  'REDDRAGON',
+  'REDDRAGON',
+];
 
 const validHandWithSemiPurity = [
   'REDDRAGON',
@@ -173,6 +138,23 @@ const validHandWithPurity = [
   '6_CHARACTER',
 ];
 
+const validHandWithAllHonors = [
+  'REDDRAGON',
+  'REDDRAGON',
+  'REDDRAGON',
+  'EAST',
+  'EAST',
+  'GREENDRAGON',
+  'GREENDRAGON',
+  'GREENDRAGON',
+  'WEST',
+  'WEST',
+  'WEST',
+  'NORTH',
+  'NORTH',
+  'NORTH',
+];
+
 // ####################### validateAllConsecutives ################################
 test('Verfies a valid case for validateAllConsecutives', () => {
   const result = validateHandStructure(allConsecutiveHand);
@@ -204,6 +186,15 @@ test('Verifies an invalid case for validateAllConsecutives using mixedConsecutiv
 // ####################### validateAllTriplets ################################
 test('Verfies a valid case for validateAllTriplets', () => {
   const result = validateHandStructure(allTripletsHand);
+  const vp = result.valid[0];
+  if (vp) {
+    const point = PointValidator.validateAllTriplets(vp);
+    expect(point).toEqual(PointValidator.ALL_TRIPLET_SCORE);
+  }
+});
+
+test('Verfies a valid case for validateAllTriplets using a hand with 4 of a kind', () => {
+  const result = validateHandStructure(validHandWith4OfaKind);
   const vp = result.valid[0];
   if (vp) {
     const point = PointValidator.validateAllTriplets(vp);
@@ -265,6 +256,25 @@ test('Verifies an invalid case for validatePurity with SemiPurity hand', () => {
   const vp = result.valid[0];
   if (vp) {
     const point = PointValidator.validatePurity(vp);
+    expect(point).toEqual(PointValidator.INVALID_SCORE);
+  }
+});
+
+// ####################### validateAllHonors ################################
+test('Verfies a valid case for validateAllHonors with validHandWithAllHonors', () => {
+  const result = validateHandStructure(validHandWithAllHonors);
+  const vp = result.valid[0];
+  if (vp) {
+    const point = PointValidator.validateAllHonors(vp);
+    expect(point).toEqual(PointValidator.ALL_HONORS_SCORE);
+  }
+});
+
+test('Verifies an invalid case for validateAllHonors with SemiPurity hand', () => {
+  const result = validateHandStructure(validHandWithSemiPurity);
+  const vp = result.valid[0];
+  if (vp) {
+    const point = PointValidator.validateAllHonors(vp);
     expect(point).toEqual(PointValidator.INVALID_SCORE);
   }
 });
