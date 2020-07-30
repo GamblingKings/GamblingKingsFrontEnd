@@ -1,5 +1,6 @@
 import PointValidator from '../PointValidator';
 import validateHandStructure from '../../utils/functions/validateHandStructure';
+import HKHandMapper from '../../Hand/map/HKHandMapper';
 
 const mixedConsecutiveAndTripletHand = [
   '1_DOT',
@@ -19,6 +20,23 @@ const mixedConsecutiveAndTripletHand = [
 ];
 
 const allTripletsHand = [
+  '1_DOT',
+  '1_DOT',
+  '2_DOT',
+  '2_DOT',
+  '2_DOT',
+  '3_DOT',
+  '3_DOT',
+  '3_DOT',
+  '4_DOT',
+  '4_DOT',
+  '4_DOT',
+  '7_CHARACTER',
+  '7_CHARACTER',
+  '7_CHARACTER',
+];
+
+const allTripletsHandWithPurity = [
   '1_DOT',
   '1_DOT',
   '2_DOT',
@@ -51,23 +69,6 @@ const allConsecutiveHand = [
   '8_BAMBOO',
   '9_BAMBOO',
 ];
-
-// const allConsecutiveWithLipeikou = [
-//   '1_DOT',
-//   '1_DOT',
-//   '2_CHARACTER',
-//   '3_CHARACTER',
-//   '4_CHARACTER',
-//   '5_CHARACTER',
-//   '6_CHARACTER',
-//   '7_CHARACTER',
-//   '1_BAMBOO',
-//   '2_BAMBOO',
-//   '3_BAMBOO',
-//   '2_CHARACTER',
-//   '3_CHARACTER',
-//   '4_CHARACTER',
-// ];
 
 const validHandWith4OfaKind = [
   'EAST',
@@ -247,8 +248,8 @@ test('Verfies a valid case for validateAllConsecutives', () => {
   const result = validateHandStructure(allConsecutiveHand);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateAllConsecutives(vp);
-    expect(point).toEqual(PointValidator.ALL_CONSECUTIVE_SCORE);
+    const point = PointValidator.validateAllConsecutives(vp).points;
+    expect(point).toEqual(HKHandMapper.ALL_CONSECUTIVE.points);
   }
 });
 
@@ -256,8 +257,8 @@ test('Verifies an invalid case for validateAllConsecutives using allTriplets', (
   const result = validateHandStructure(allTripletsHand);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateAllConsecutives(vp);
-    expect(point).toEqual(PointValidator.INVALID_SCORE);
+    const point = PointValidator.validateAllConsecutives(vp).points;
+    expect(point).toEqual(HKHandMapper.INVALID.points);
   }
 });
 
@@ -265,8 +266,8 @@ test('Verifies an invalid case for validateAllConsecutives using mixedConsecutiv
   const result = validateHandStructure(mixedConsecutiveAndTripletHand);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateAllConsecutives(vp);
-    expect(point).toEqual(PointValidator.INVALID_SCORE);
+    const point = PointValidator.validateAllConsecutives(vp).points;
+    expect(point).toEqual(HKHandMapper.INVALID.points);
   }
 });
 
@@ -275,8 +276,8 @@ test('Verfies a valid case for validateAllTriplets', () => {
   const result = validateHandStructure(allTripletsHand);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateAllTriplets(vp);
-    expect(point).toEqual(PointValidator.ALL_TRIPLET_SCORE);
+    const point = PointValidator.validateAllTriplets(vp).points;
+    expect(point).toEqual(HKHandMapper.ALL_TRIPLET.points);
   }
 });
 
@@ -284,8 +285,8 @@ test('Verfies a valid case for validateAllTriplets using a hand with 4 of a kind
   const result = validateHandStructure(validHandWith4OfaKind);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateAllTriplets(vp);
-    expect(point).toEqual(PointValidator.ALL_TRIPLET_SCORE);
+    const point = PointValidator.validateAllTriplets(vp).points;
+    expect(point).toEqual(HKHandMapper.ALL_TRIPLET.points);
   }
 });
 
@@ -293,8 +294,8 @@ test('Verifies an invalid case for validateAllTriplets using mixedConsecutiveesA
   const result = validateHandStructure(mixedConsecutiveAndTripletHand);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateAllTriplets(vp);
-    expect(point).toEqual(PointValidator.INVALID_SCORE);
+    const point = PointValidator.validateAllTriplets(vp).points;
+    expect(point).toEqual(HKHandMapper.INVALID.points);
   }
 });
 
@@ -304,8 +305,8 @@ test('Verifies a valid case for validateSemiPurity', () => {
   const result = validateHandStructure(validHandWithSemiPurity);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateSemiPurity(vp);
-    expect(point).toEqual(PointValidator.SEMI_PURITY_SCORE);
+    const point = PointValidator.validateSemiPurity(vp).points;
+    expect(point).toEqual(HKHandMapper.SEMI_PURITY.points);
   }
 });
 
@@ -313,8 +314,8 @@ test('Verifies a valid case for validateSemiPurity using example 2', () => {
   const result = validateHandStructure(validHandWithSemiPurityExample2);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateSemiPurity(vp);
-    expect(point).toEqual(PointValidator.SEMI_PURITY_SCORE);
+    const point = PointValidator.validateSemiPurity(vp).points;
+    expect(point).toEqual(HKHandMapper.SEMI_PURITY.points);
   }
 });
 
@@ -322,8 +323,8 @@ test('Verifies an invalid case for validateSemiPurity using allConsecutiveHand',
   const result = validateHandStructure(allConsecutiveHand);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateSemiPurity(vp);
-    expect(point).toEqual(PointValidator.INVALID_SCORE);
+    const point = PointValidator.validateSemiPurity(vp).points;
+    expect(point).toEqual(HKHandMapper.INVALID.points);
   }
 });
 
@@ -333,8 +334,8 @@ test('Verifies a valid case for validatePurity', () => {
   const result = validateHandStructure(validHandWithPurity);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validatePurity(vp);
-    expect(point).toEqual(PointValidator.PURITY_SCORE);
+    const point = PointValidator.validatePurity(vp).points;
+    expect(point).toEqual(HKHandMapper.PURITY.points);
   }
 });
 
@@ -342,8 +343,8 @@ test('Verifies an invalid case for validatePurity with SemiPurity hand', () => {
   const result = validateHandStructure(validHandWithSemiPurity);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validatePurity(vp);
-    expect(point).toEqual(PointValidator.INVALID_SCORE);
+    const point = PointValidator.validatePurity(vp).points;
+    expect(point).toEqual(HKHandMapper.INVALID.points);
   }
 });
 
@@ -352,8 +353,8 @@ test('Verfies a valid case for validateAllHonors with validHandWithAllHonors', (
   const result = validateHandStructure(validHandWithAllHonors);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateAllHonors(vp);
-    expect(point).toEqual(PointValidator.ALL_HONORS_SCORE);
+    const point = PointValidator.validateAllHonors(vp).points;
+    expect(point).toEqual(HKHandMapper.ALL_HONORS.points);
   }
 });
 
@@ -361,8 +362,8 @@ test('Verifies an invalid case for validateAllHonors with SemiPurity hand', () =
   const result = validateHandStructure(validHandWithSemiPurity);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateAllHonors(vp);
-    expect(point).toEqual(PointValidator.INVALID_SCORE);
+    const point = PointValidator.validateAllHonors(vp).points;
+    expect(point).toEqual(HKHandMapper.INVALID.points);
   }
 });
 
@@ -371,8 +372,8 @@ test('Verifies a valid case for validate small dragons', () => {
   const result = validateHandStructure(validHandWithSmallDragons);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateSmallAndLargeDragons(vp);
-    expect(point).toEqual(PointValidator.SMALL_DRAGONS_SCORE);
+    const point = PointValidator.validateSmallAndLargeDragons(vp).points;
+    expect(point).toEqual(HKHandMapper.SMALL_DRAGONS.points);
   }
 });
 
@@ -380,8 +381,8 @@ test('Verifies a valid case for validate large dragons', () => {
   const result = validateHandStructure(validHandWithLargeDragons);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateSmallAndLargeDragons(vp);
-    expect(point).toEqual(PointValidator.LARGE_DRAGONS_SCORE);
+    const point = PointValidator.validateSmallAndLargeDragons(vp).points;
+    expect(point).toEqual(HKHandMapper.LARGE_DRAGONS.points);
   }
 });
 
@@ -389,8 +390,8 @@ test('Verifies an invalid case for validateDragons using allHonors hand', () => 
   const result = validateHandStructure(validHandWithAllHonors);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateSmallAndLargeDragons(vp);
-    expect(point).toEqual(PointValidator.INVALID_SCORE);
+    const point = PointValidator.validateSmallAndLargeDragons(vp).points;
+    expect(point).toEqual(HKHandMapper.INVALID.points);
   }
 });
 
@@ -399,8 +400,8 @@ test('Verifies a valid case for validate small winds', () => {
   const result = validateHandStructure(validHandWithSmallWinds);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateSmallAndLargeWinds(vp);
-    expect(point).toEqual(PointValidator.SMALL_WINDS_SCORE);
+    const point = PointValidator.validateSmallAndLargeWinds(vp).points;
+    expect(point).toEqual(HKHandMapper.SMALL_WINDS.points);
   }
 });
 
@@ -408,8 +409,8 @@ test('Verifies a valid case for validate large winds', () => {
   const result = validateHandStructure(validHandWithLargeWinds);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateSmallAndLargeWinds(vp);
-    expect(point).toEqual(PointValidator.LARGE_WINDS_SCORE);
+    const point = PointValidator.validateSmallAndLargeWinds(vp).points;
+    expect(point).toEqual(HKHandMapper.LARGE_WINDS.points);
   }
 });
 
@@ -417,8 +418,8 @@ test('Verifies an invalid case for validateWinds using allHonors hand', () => {
   const result = validateHandStructure(validHandWithAllHonors);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateSmallAndLargeWinds(vp);
-    expect(point).toEqual(PointValidator.INVALID_SCORE);
+    const point = PointValidator.validateSmallAndLargeWinds(vp).points;
+    expect(point).toEqual(HKHandMapper.INVALID.points);
   }
 });
 
@@ -427,8 +428,8 @@ test('Verifies a valid case for validateAllKongs', () => {
   const result = validateHandStructure(validHandWithAllKongs);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateAllKongs(vp);
-    expect(point).toEqual(PointValidator.ALL_KONGS_SCORE);
+    const point = PointValidator.validateAllKongs(vp).points;
+    expect(point).toEqual(HKHandMapper.ALL_KONGS.points);
   }
 });
 
@@ -436,7 +437,23 @@ test('Verfies an invalid case for validateAllKongs using allTriplets hand', () =
   const result = validateHandStructure(allTripletsHand);
   const vp = result.valid[0];
   if (vp) {
-    const point = PointValidator.validateAllKongs(vp);
-    expect(point).toEqual(PointValidator.INVALID_SCORE);
+    const point = PointValidator.validateAllKongs(vp).points;
+    expect(point).toEqual(HKHandMapper.INVALID.points);
   }
+});
+
+// ####################### validateHandPoints ################################
+test('Verifies that given the allTripletsHand, the function returns the corresponding points', () => {
+  const result = validateHandStructure(allTripletsHand);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  expect(largestHand.points).toEqual(HKHandMapper.ALL_TRIPLET.points);
+});
+
+test('Verifies that given the allTripletsHandWithPurity, the function returns the corresponding points', () => {
+  const result = validateHandStructure(allTripletsHandWithPurity);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.ALL_TRIPLET.points + HKHandMapper.PURITY.points;
+  expect(largestHand.points).toEqual(expected);
 });

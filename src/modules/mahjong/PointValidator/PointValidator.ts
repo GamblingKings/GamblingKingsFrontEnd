@@ -1,6 +1,13 @@
-import { ValidPair } from '../types/MahjongTypes';
+import {
+  ValidPair,
+  HandStructureResults,
+  HandDefinition,
+  HandPointResults,
+  PointValidationResults,
+} from '../types/MahjongTypes';
 import MeldEnums from '../enums/MeldEnums';
 import TileMapper from '../Tile/map/TileMapper';
+import HKHandMapper from '../Hand/map/hkHandMapper';
 import {
   isSimpleTile as isSimpleTileUtils,
   isHonorTile as isHonorTileUtils,
@@ -10,38 +17,17 @@ import {
 import SimpleTileTypes from '../enums/SimpleTileEnums';
 
 class PointValidator {
+  static MAX_POINTS = 13;
+
+  static MIN_POINTS = 3;
   // Validate each hand; assume that each validPair has been validated by the HandValidator as
   // a valid hand and contains an array of melds, otherwise assume the argument is invalid
-
-  static INVALID_SCORE = 0;
-
-  static ALL_CONSECUTIVE_SCORE = 1;
-
-  static ALL_TRIPLET_SCORE = 3;
-
-  static SEMI_PURITY_SCORE = 3;
-
-  static PURITY_SCORE = 7;
-
-  static ALL_HONORS_SCORE = 10;
-
-  static SMALL_DRAGONS_SCORE = 5;
-
-  static LARGE_DRAGONS_SCORE = 8;
-
-  static SMALL_WINDS_SCORE = 10;
-
-  static LARGE_WINDS_SCORE = 13;
-
-  static THIRTEEN_ORPHANS_SCORE = 13;
-
-  static ALL_KONGS_SCORE = 13;
 
   /**
    * Verfies whether a hand contains all consecutives
    * @returns the corresponding score if valid, otherwise 0
    */
-  public static validateAllConsecutives = (vp: ValidPair): number => {
+  public static validateAllConsecutives = (vp: ValidPair): HandDefinition => {
     const { melds } = vp;
     let allConsecutives = true;
     if (melds) {
@@ -49,17 +35,17 @@ class PointValidator {
         if (meld.type !== MeldEnums.CONSECUTIVE) allConsecutives = false;
       });
 
-      if (allConsecutives) return PointValidator.ALL_CONSECUTIVE_SCORE;
+      if (allConsecutives) return HKHandMapper.ALL_CONSECUTIVE;
     }
 
-    return PointValidator.INVALID_SCORE;
+    return HKHandMapper.INVALID;
   };
 
   /**
    * Verfies whether a hand contains all triplets
    * @returns the corresponding score if valid, otherwise 0
    */
-  public static validateAllTriplets = (vp: ValidPair): number => {
+  public static validateAllTriplets = (vp: ValidPair): HandDefinition => {
     const { melds } = vp;
     let allTriplets = true;
     if (melds) {
@@ -67,16 +53,16 @@ class PointValidator {
         if (meld.type !== MeldEnums.TRIPLET && meld.type !== MeldEnums.QUAD) allTriplets = false;
       });
 
-      if (allTriplets) return PointValidator.ALL_TRIPLET_SCORE;
+      if (allTriplets) return HKHandMapper.ALL_TRIPLET;
     }
-    return PointValidator.INVALID_SCORE;
+    return HKHandMapper.INVALID;
   };
 
   /**
    * Verfies whether a hand contains semi-purity
    * @returns the corresponding score if valid, otherwise 0
    */
-  public static validateSemiPurity = (vp: ValidPair): number => {
+  public static validateSemiPurity = (vp: ValidPair): HandDefinition => {
     const { pair, remainingTiles } = vp;
     let isSemiPure = true;
     let type: SimpleTileTypes;
@@ -84,7 +70,7 @@ class PointValidator {
     // Evaluate the pair first
     if (pair) {
       if (isSimpleTileUtils(pair)) type = <SimpleTileTypes>TileMapper[pair].type;
-      else if (isBonusTileUtils(pair)) return PointValidator.INVALID_SCORE;
+      else if (isBonusTileUtils(pair)) return HKHandMapper.INVALID;
     }
 
     Object.keys(remainingTiles).forEach((key) => {
@@ -98,17 +84,17 @@ class PointValidator {
     });
 
     if (isSemiPure) {
-      return PointValidator.SEMI_PURITY_SCORE;
+      return HKHandMapper.SEMI_PURITY;
     }
 
-    return PointValidator.INVALID_SCORE;
+    return HKHandMapper.INVALID;
   };
 
   /**
    * Verfies whether a hand contains semi-purity
    * @returns the corresponding score if valid, otherwise 0
    */
-  public static validatePurity = (vp: ValidPair): number => {
+  public static validatePurity = (vp: ValidPair): HandDefinition => {
     const { pair, remainingTiles } = vp;
     const { type } = TileMapper[pair];
     let isPurity = true;
@@ -118,33 +104,33 @@ class PointValidator {
       if (keyType !== type) isPurity = false;
     });
 
-    if (isPurity) return PointValidator.PURITY_SCORE;
-    return PointValidator.INVALID_SCORE;
+    if (isPurity) return HKHandMapper.PURITY;
+    return HKHandMapper.INVALID;
   };
 
   /**
    * Verfies whether a hand contains all honors
    * @returns the corresponding score if valid, otherwise 0
    */
-  public static validateAllHonors = (vp: ValidPair): number => {
+  public static validateAllHonors = (vp: ValidPair): HandDefinition => {
     const { pair, remainingTiles } = vp;
     let isAllHonors = true;
 
-    if (!isHonorTileUtils(pair)) return PointValidator.INVALID_SCORE;
+    if (!isHonorTileUtils(pair)) return HKHandMapper.INVALID;
     Object.keys(remainingTiles).forEach((key) => {
       const isHonorTile = isHonorTileUtils(key);
       if (!isHonorTile) isAllHonors = false;
     });
 
-    if (isAllHonors) return PointValidator.ALL_HONORS_SCORE;
-    return PointValidator.INVALID_SCORE;
+    if (isAllHonors) return HKHandMapper.ALL_HONORS;
+    return HKHandMapper.INVALID;
   };
 
   /**
    * Verfies whether a hand contains small dragons or large
    * @returns the corresponding score if valid, otherwise 0
    */
-  public static validateSmallAndLargeDragons = (vp: ValidPair): number => {
+  public static validateSmallAndLargeDragons = (vp: ValidPair): HandDefinition => {
     const dragons: { [index: string]: boolean } = {
       REDDRAGON: false,
       GREENDRAGON: false,
@@ -172,17 +158,17 @@ class PointValidator {
 
     const allDragonsPresent = Object.values(dragons).every((value) => value);
     if (allDragonsPresent) {
-      if (pairIsDragon) return PointValidator.SMALL_DRAGONS_SCORE;
-      return PointValidator.LARGE_DRAGONS_SCORE;
+      if (pairIsDragon) return HKHandMapper.SMALL_DRAGONS;
+      return HKHandMapper.LARGE_DRAGONS;
     }
-    return PointValidator.INVALID_SCORE;
+    return HKHandMapper.INVALID;
   };
 
   /**
    * Verfies whether a hand contains small dragons or large
    * @returns the corresponding score if valid, otherwise 0
    */
-  public static validateSmallAndLargeWinds = (vp: ValidPair): number => {
+  public static validateSmallAndLargeWinds = (vp: ValidPair): HandDefinition => {
     const winds: { [index: string]: boolean } = {
       EAST: false,
       SOUTH: false,
@@ -211,25 +197,120 @@ class PointValidator {
 
     const allWindsPresent = Object.values(winds).every((value) => value);
     if (allWindsPresent) {
-      if (pairIsWind) return PointValidator.SMALL_WINDS_SCORE;
-      return PointValidator.LARGE_WINDS_SCORE;
+      if (pairIsWind) return HKHandMapper.SMALL_WINDS;
+      return HKHandMapper.LARGE_WINDS;
     }
-    return PointValidator.INVALID_SCORE;
+    return HKHandMapper.INVALID;
   };
 
-  public static validateAllKongs = (vp: ValidPair): number => {
+  public static validateAllKongs = (vp: ValidPair): HandDefinition => {
     const { melds } = vp;
     let allKongs = false;
     if (melds) allKongs = melds.every((meld) => meld.type === MeldEnums.QUAD);
-    if (allKongs) return PointValidator.ALL_KONGS_SCORE;
-    return PointValidator.INVALID_SCORE;
+    if (allKongs) return HKHandMapper.ALL_KONGS;
+    return HKHandMapper.INVALID;
   };
 
   // Validate points of a hand
   /**
    * Determine how many points comes from valid hands such as all triplets, all consecutives, purity, etc..
    */
-  public static validateHandPoints = (): void => {};
+  public static validateHandPoints = (handStructureResults: HandStructureResults): PointValidationResults => {
+    const { valid } = handStructureResults;
+    const result: PointValidationResults = {
+      largestHand: {
+        melds: [],
+        points: 0,
+        handNames: [],
+      },
+      allHands: [],
+    };
+
+    let largestHand: HandPointResults = {
+      melds: [],
+      points: 0,
+      handNames: [],
+    };
+
+    valid.forEach((vp) => {
+      let points = 0;
+      const handNames: string[] = [];
+
+      const consecutive: HandDefinition = PointValidator.validateAllConsecutives(vp);
+      let triplets = {
+        points: 0,
+        name: '',
+      }; // placeholder
+      let kongs = {
+        points: 0,
+        name: '',
+      };
+
+      // Check first if the hand is allConsecutives or allTriplets as these are common hands
+      if (consecutive.points > 0) {
+        points += consecutive.points;
+        handNames.push(consecutive.name);
+      } else {
+        // Need to check Kong before Triplets as validate all triplets will yield correct for all Kong
+        kongs = PointValidator.validateAllKongs(vp);
+        if (kongs.points > 0) {
+          points += kongs.points;
+          handNames.push(kongs.name);
+        } else {
+          triplets = PointValidator.validateAllTriplets(vp);
+          if (triplets.points > 0) {
+            points += triplets.points;
+            handNames.push(triplets.name);
+          }
+        }
+      }
+
+      // If it's none of these, check weird hands
+      if (consecutive.points === 0 && triplets.points === 0 && kongs.points === 0) {
+        const handsToCheck = [
+          PointValidator.validateAllHonors,
+          PointValidator.validateSmallAndLargeDragons,
+          PointValidator.validateSmallAndLargeWinds,
+        ];
+
+        handsToCheck.forEach((fn) => {
+          const resultOfFn = fn(vp);
+          if (resultOfFn.points > 0) {
+            points += resultOfFn.points;
+            handNames.push(resultOfFn.name);
+          }
+        });
+      }
+
+      // always check for purity/semi-pure as they can stack with allConsecutives/allTriplets or be standalone
+      const purity = PointValidator.validatePurity(vp);
+      if (purity.points > 0) {
+        points += purity.points;
+        handNames.push(purity.name);
+      }
+
+      if (purity.points === 0) {
+        const semiPure = PointValidator.validateSemiPurity(vp);
+        if (semiPure.points > 0) {
+          points += semiPure.points;
+          handNames.push(semiPure.name);
+        }
+      }
+
+      const resultOfThisVP = {
+        points,
+        melds: vp.melds,
+        handNames,
+      };
+
+      if (resultOfThisVP.points > largestHand.points) largestHand = resultOfThisVP;
+      result.allHands.push(resultOfThisVP);
+    });
+
+    result.largestHand = largestHand;
+    if (result.largestHand.points > PointValidator.MAX_POINTS) result.largestHand.points = PointValidator.MAX_POINTS;
+    return result;
+  };
 
   /**
    * Determine how many points comes from extra points such as winds, dragons, flowers

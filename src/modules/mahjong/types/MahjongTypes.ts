@@ -45,3 +45,19 @@ export interface SortHandWeights {
   [BonusTileTypes.FLOWER]: number;
   [BonusTileTypes.SEASON]: number;
 }
+
+export interface HandPointResults {
+  melds?: Meld[];
+  points: number;
+  handNames: string[];
+}
+
+export interface PointValidationResults {
+  largestHand: HandPointResults;
+  allHands: HandPointResults[];
+}
+
+export interface HandDefinition {
+  points: number;
+  name: string;
+}
