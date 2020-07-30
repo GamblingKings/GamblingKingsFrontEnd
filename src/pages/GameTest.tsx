@@ -91,6 +91,11 @@ const gameStateInit = (currentGame: Game) => {
   allUserEntities[indexOfCurrentUser] = mahjongPlayer;
 
   gameState = new MahjongGameState(allUserEntities);
+
+  // // test add to dead pile
+  // const mjGameState = gameState as MahjongGameState;
+  // const tile = TileFactory.createTileFromStringDef('1_DOT');
+  // mjGameState.getDeadPile().add(tile);
   console.log(gameState);
 };
 

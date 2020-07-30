@@ -22,9 +22,12 @@ import Tile from '../Tile/Tile';
 class MahjongPlayer extends UserEntity {
   private hand: PlayerHand;
 
+  private interactionContainer: PIXI.Container;
+
   constructor(name: string, connectionId: string) {
     super(name, connectionId, RenderDirection.BOTTOM);
     this.hand = new PlayerHand();
+    this.interactionContainer = new PIXI.Container();
   }
 
   public getHand(): PlayerHand {
@@ -35,12 +38,18 @@ class MahjongPlayer extends UserEntity {
     return this.hand.setTiles(tiles);
   }
 
+  public getInteractionContainer(): PIXI.Container {
+    return this.interactionContainer;
+  }
+
   /**
    * Removes all children from the container in super class.
    */
   public removeAllAssets(): void {
     const container = super.getContainer();
     container.removeChildren(0, container.children.length);
+
+    this.interactionContainer.removeChildren(0, this.interactionContainer.children.length);
   }
 
   /**
@@ -92,6 +101,18 @@ class MahjongPlayer extends UserEntity {
     return text;
   }
 
+  public renderInteractions(spriteFactory: SpriteFactory): void {
+    const container = new PIXI.Container();
+    // Prototyping how to do this...
+    const drawTile = spriteFactory.generateSprite(FRONT_TILE);
+    drawTile.height = DEFAULT_MAHJONG_HEIGHT;
+    drawTile.width = DEFAULT_MAHJONG_WIDTH;
+    container.addChild(drawTile);
+    container.x = 200 + this.hand.getTiles().length * DEFAULT_MAHJONG_WIDTH;
+
+    this.interactionContainer.addChild(container);
+  }
+
   /**
    * Create assets and appends assets to the container in super class, and attaches to the application stage.
    * @param spriteFactory SpriteFactory
@@ -103,9 +124,11 @@ class MahjongPlayer extends UserEntity {
 
     const playerHand = this.renderHand(spriteFactory, requestRedraw);
     const name = this.renderName();
+    this.renderInteractions(spriteFactory);
 
     playerContainer.addChild(playerHand);
     playerContainer.addChild(name);
+    playerContainer.addChild(this.interactionContainer);
 
     pixiStage.addChild(playerContainer);
   }
