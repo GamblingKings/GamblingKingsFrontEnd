@@ -57,14 +57,14 @@ const playersInit = (currentGame: Game, pixiStage: PIXI.Container, currentUser: 
     if (currentIndex >= users.length) {
       currentIndex = 0;
     }
-    const opponent = new MahjongOpponent(users[currentIndex].username, directions[i]);
+    const opponent = new MahjongOpponent(users[currentIndex].username, users[currentIndex].connectionId, directions[i]);
     opponents.push(opponent);
     const opponentContainer = opponent.getContainer();
     pixiStage.addChild(opponentContainer);
     currentIndex += 1;
   }
   [opponentOne, opponentTwo, opponentThree] = [opponents[0], opponents[1], opponents[2]];
-  player = new MahjongPlayer(currentUser.username);
+  player = new MahjongPlayer(currentUser.username, users[indexOfCurrentUser].connectionId);
 };
 
 /**

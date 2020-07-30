@@ -79,12 +79,12 @@ const gameStateInit = (currentGame: Game) => {
     if (currentIndex >= users.length) {
       currentIndex = 0;
     }
-    const opponent = new MahjongOpponent(users[currentIndex].username, directions[i]);
+    const opponent = new MahjongOpponent(users[currentIndex].username, users[currentIndex].connectionId, directions[i]);
     allUserEntities[currentIndex] = opponent;
     currentIndex += 1;
   }
 
-  const player = new MahjongPlayer(CURRENT_USER.username);
+  const player = new MahjongPlayer(CURRENT_USER.username, CURRENT_USER.connectionId);
   const mahjongPlayer = player as MahjongPlayer;
   mahjongPlayer.setHand(tiles);
 

@@ -16,10 +16,10 @@ let gameState: MahjongGameState;
 let users: UserEntity[];
 
 beforeEach(() => {
-  mjPlayer = new MahjongPlayer('Player');
-  mjOpponent1 = new MahjongOpponent('Opp Left', RenderDirection.LEFT);
-  mjOpponent2 = new MahjongOpponent('Opp Top', RenderDirection.TOP);
-  mjOpponent3 = new MahjongOpponent('Opp Right', RenderDirection.RIGHT);
+  mjPlayer = new MahjongPlayer('Player', 'connectionId');
+  mjOpponent1 = new MahjongOpponent('Opp Left', 'connectionId', RenderDirection.LEFT);
+  mjOpponent2 = new MahjongOpponent('Opp Top', 'connectionId', RenderDirection.TOP);
+  mjOpponent3 = new MahjongOpponent('Opp Right', 'connectionId', RenderDirection.RIGHT);
   users = [mjPlayer, mjOpponent1, mjOpponent2, mjOpponent3];
 
   gameState = new MahjongGameState(users);

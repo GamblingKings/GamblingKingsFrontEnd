@@ -22,8 +22,8 @@ import Tile from '../Tile/Tile';
 class MahjongPlayer extends UserEntity {
   private hand: PlayerHand;
 
-  constructor(name: string) {
-    super(name, RenderDirection.BOTTOM);
+  constructor(name: string, connectionId: string) {
+    super(name, connectionId, RenderDirection.BOTTOM);
     this.hand = new PlayerHand();
   }
 

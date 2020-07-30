@@ -8,18 +8,25 @@ import RenderDirection from '../../../pixi/directions';
 abstract class UserEntity {
   private name: string;
 
+  private connectionId: string;
+
   private container: PIXI.Container;
 
   private location: RenderDirection;
 
-  constructor(name: string, location: RenderDirection) {
+  constructor(name: string, connectionId: string, location: RenderDirection) {
     this.name = name;
+    this.connectionId = connectionId;
     this.container = new PIXI.Container();
     this.location = location;
   }
 
   public getName(): string {
     return this.name;
+  }
+
+  public getConnectionId(): string {
+    return this.connectionId;
   }
 
   public getContainer(): PIXI.Container {

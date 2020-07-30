@@ -20,8 +20,8 @@ import UserEntity from '../../game/UserEntity/UserEntity';
 class MahjongOpponent extends UserEntity {
   private opponentHand: OpponentHand;
 
-  constructor(name: string, location: RenderDirection) {
-    super(name, location);
+  constructor(name: string, connectionId: string, location: RenderDirection) {
+    super(name, connectionId, location);
     this.opponentHand = new OpponentHand();
   }
 
