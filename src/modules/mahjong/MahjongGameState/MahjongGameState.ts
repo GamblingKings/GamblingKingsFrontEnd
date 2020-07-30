@@ -88,8 +88,12 @@ class MahjongGameState extends GameState {
         user.render(spriteFactory, stage, this.requestRedraw);
         user.reposition(view);
       });
+      // Render Wall
       this.wallCounter.removeAllAssets();
       this.wallCounter.render(spriteFactory, stage);
+      // Render DeadPile
+      this.deadPile.removeAllAssets();
+      this.deadPile.render(spriteFactory, stage);
     }
   }
 }
