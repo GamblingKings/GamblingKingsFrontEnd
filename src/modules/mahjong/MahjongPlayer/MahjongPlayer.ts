@@ -71,7 +71,6 @@ class MahjongPlayer extends UserEntity {
         sprite.y = -10;
         frontSprite.y = -10;
       }
-
       Interactions.addMouseInteraction(sprite, (event: PIXI.InteractionEvent) => {
         requestRedraw();
         this.hand?.setSelectedTile(index);

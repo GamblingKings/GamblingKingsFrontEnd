@@ -6,6 +6,7 @@ import MahjongOpponent from '../../MahjongOpponent/MahjongOpponent';
 import RenderDirection from '../../../../pixi/directions';
 import MahjongGameState from '../MahjongGameState';
 import UserEntity from '../../../game/UserEntity/UserEntity';
+import WindEnums from '../../enums/WindEnums';
 
 let mjPlayer: MahjongPlayer;
 let mjOpponent1: MahjongOpponent;
@@ -34,4 +35,33 @@ test('MahjongGameState - getCurrentTurn() / goToNextTurn()', () => {
   expect(gameState.goToNextTurn()).toBe(2);
   expect(gameState.goToNextTurn()).toBe(3);
   expect(gameState.goToNextTurn()).toBe(0);
+});
+
+test('MahjongGameState - getDealer() / changeDealer()', () => {
+  expect(gameState.getDealer()).toBe(0);
+  expect(gameState.getCurrentWind()).toBe(WindEnums.EAST);
+  gameState.changeDealer();
+  expect(gameState.getDealer()).toBe(1);
+  expect(gameState.getCurrentWind()).toBe(WindEnums.EAST);
+  gameState.changeDealer();
+  expect(gameState.getDealer()).toBe(2);
+  expect(gameState.getCurrentWind()).toBe(WindEnums.EAST);
+  gameState.changeDealer();
+  expect(gameState.getDealer()).toBe(3);
+  expect(gameState.getCurrentWind()).toBe(WindEnums.EAST);
+  gameState.changeDealer();
+  expect(gameState.getDealer()).toBe(0);
+  expect(gameState.getCurrentWind()).toBe(WindEnums.SOUTH);
+});
+
+test('MahjongGameState - getCurrentWind(), changeWind()', () => {
+  expect(gameState.getCurrentWind()).toBe(WindEnums.EAST);
+  gameState.changeWind();
+  expect(gameState.getCurrentWind()).toBe(WindEnums.SOUTH);
+  gameState.changeWind();
+  expect(gameState.getCurrentWind()).toBe(WindEnums.WEST);
+  gameState.changeWind();
+  expect(gameState.getCurrentWind()).toBe(WindEnums.NORTH);
+  gameState.changeWind();
+  expect(gameState.getCurrentWind()).toBe(WindEnums.EAST);
 });
