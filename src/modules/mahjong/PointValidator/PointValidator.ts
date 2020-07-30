@@ -141,20 +141,88 @@ class PointValidator {
   };
 
   /**
-   * Verfies whether a hand contains small dragons
+   * Verfies whether a hand contains small dragons or large
    * @returns the corresponding score if valid, otherwise 0
    */
-  public static validateSmallDragons = (vp: ValidPair): number => {
+  public static validateSmallAndLargeDragons = (vp: ValidPair): number => {
     const dragons: { [index: string]: boolean } = {
       REDDRAGON: false,
       GREENDRAGON: false,
       WHITEDRAGON: false,
     };
 
-    const { pair } = vp;
+    let pairIsDragon = false;
+
+    const { pair, melds } = vp;
     if (Object.keys(dragons).includes(pair)) {
       dragons[pair] = true;
+      pairIsDragon = true;
     }
+
+    if (melds) {
+      melds.forEach((meld) => {
+        if (meld.type === MeldEnums.TRIPLET || meld.type === MeldEnums.QUAD) {
+          const tileDef = meld.tiles[0];
+          if (Object.keys(dragons).includes(tileDef)) {
+            dragons[tileDef] = true;
+          }
+        }
+      });
+    }
+
+    const allDragonsPresent = Object.values(dragons).every((value) => value);
+    if (allDragonsPresent) {
+      if (pairIsDragon) return PointValidator.SMALL_DRAGONS_SCORE;
+      return PointValidator.LARGE_DRAGONS_SCORE;
+    }
+    return PointValidator.INVALID_SCORE;
+  };
+
+  /**
+   * Verfies whether a hand contains small dragons or large
+   * @returns the corresponding score if valid, otherwise 0
+   */
+  public static validateSmallAndLargeWinds = (vp: ValidPair): number => {
+    const winds: { [index: string]: boolean } = {
+      EAST: false,
+      SOUTH: false,
+      WEST: false,
+      NORTH: false,
+    };
+
+    let pairIsWind = false;
+
+    const { pair, melds } = vp;
+    if (Object.keys(winds).includes(pair)) {
+      winds[pair] = true;
+      pairIsWind = true;
+    }
+
+    if (melds) {
+      melds.forEach((meld) => {
+        if (meld.type === MeldEnums.TRIPLET || meld.type === MeldEnums.QUAD) {
+          const tileDef = meld.tiles[0];
+          if (Object.keys(winds).includes(tileDef)) {
+            winds[tileDef] = true;
+          }
+        }
+      });
+    }
+
+    const allWindsPresent = Object.values(winds).every((value) => value);
+    if (allWindsPresent) {
+      if (pairIsWind) return PointValidator.SMALL_WINDS_SCORE;
+      return PointValidator.LARGE_WINDS_SCORE;
+    }
+    return PointValidator.INVALID_SCORE;
+  };
+
+  public static validateAllKongs = (vp: ValidPair): number => {
+    const { melds } = vp;
+    let allKongs = false;
+    if (melds) allKongs = melds.every((meld) => meld.type === MeldEnums.QUAD);
+    if (allKongs) return PointValidator.ALL_KONGS_SCORE;
+    return PointValidator.INVALID_SCORE;
   };
 
   // Validate points of a hand

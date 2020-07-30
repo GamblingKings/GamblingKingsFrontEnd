@@ -155,6 +155,93 @@ const validHandWithAllHonors = [
   'NORTH',
 ];
 
+const validHandWithSmallDragons = [
+  'REDDRAGON',
+  'REDDRAGON',
+  'GREENDRAGON',
+  'GREENDRAGON',
+  'GREENDRAGON',
+  'WHITEDRAGON',
+  'WHITEDRAGON',
+  'WHITEDRAGON',
+  '1_CHARACTER',
+  '2_CHARACTER',
+  '3_CHARACTER',
+];
+
+const validHandWithLargeDragons = [
+  'REDDRAGON',
+  'REDDRAGON',
+  'REDDRAGON',
+  'GREENDRAGON',
+  'GREENDRAGON',
+  'GREENDRAGON',
+  'WHITEDRAGON',
+  'WHITEDRAGON',
+  'WHITEDRAGON',
+  '1_CHARACTER',
+  '1_CHARACTER',
+  '1_DOT',
+  '2_DOT',
+  '3_DOT',
+];
+
+const validHandWithSmallWinds = [
+  'EAST',
+  'EAST',
+  'WEST',
+  'SOUTH',
+  'NORTH',
+  'WEST',
+  'SOUTH',
+  'NORTH',
+  'WEST',
+  'SOUTH',
+  'NORTH',
+  '1_DOT',
+  '1_DOT',
+  '1_DOT',
+];
+
+const validHandWithLargeWinds = [
+  'EAST',
+  'EAST',
+  'EAST',
+  'EAST',
+  'WEST',
+  'SOUTH',
+  'NORTH',
+  'WEST',
+  'SOUTH',
+  'NORTH',
+  'WEST',
+  'SOUTH',
+  'NORTH',
+  '1_DOT',
+  '1_DOT',
+];
+
+const validHandWithAllKongs = [
+  '1_CHARACTER',
+  '1_CHARACTER',
+  '9_CHARACTER',
+  '9_CHARACTER',
+  '9_CHARACTER',
+  '9_CHARACTER',
+  '1_DOT',
+  '1_DOT',
+  '1_DOT',
+  '1_DOT',
+  '9_DOT',
+  '9_DOT',
+  '9_DOT',
+  '9_DOT',
+  '1_BAMBOO',
+  '1_BAMBOO',
+  '1_BAMBOO',
+  '1_BAMBOO',
+];
+
 // ####################### validateAllConsecutives ################################
 test('Verfies a valid case for validateAllConsecutives', () => {
   const result = validateHandStructure(allConsecutiveHand);
@@ -275,6 +362,81 @@ test('Verifies an invalid case for validateAllHonors with SemiPurity hand', () =
   const vp = result.valid[0];
   if (vp) {
     const point = PointValidator.validateAllHonors(vp);
+    expect(point).toEqual(PointValidator.INVALID_SCORE);
+  }
+});
+
+// ####################### validateSmallAndLargeDragons ################################
+test('Verifies a valid case for validate small dragons', () => {
+  const result = validateHandStructure(validHandWithSmallDragons);
+  const vp = result.valid[0];
+  if (vp) {
+    const point = PointValidator.validateSmallAndLargeDragons(vp);
+    expect(point).toEqual(PointValidator.SMALL_DRAGONS_SCORE);
+  }
+});
+
+test('Verifies a valid case for validate large dragons', () => {
+  const result = validateHandStructure(validHandWithLargeDragons);
+  const vp = result.valid[0];
+  if (vp) {
+    const point = PointValidator.validateSmallAndLargeDragons(vp);
+    expect(point).toEqual(PointValidator.LARGE_DRAGONS_SCORE);
+  }
+});
+
+test('Verifies an invalid case for validateDragons using allHonors hand', () => {
+  const result = validateHandStructure(validHandWithAllHonors);
+  const vp = result.valid[0];
+  if (vp) {
+    const point = PointValidator.validateSmallAndLargeDragons(vp);
+    expect(point).toEqual(PointValidator.INVALID_SCORE);
+  }
+});
+
+// ####################### validateSmallAndLargeWinds ################################
+test('Verifies a valid case for validate small winds', () => {
+  const result = validateHandStructure(validHandWithSmallWinds);
+  const vp = result.valid[0];
+  if (vp) {
+    const point = PointValidator.validateSmallAndLargeWinds(vp);
+    expect(point).toEqual(PointValidator.SMALL_WINDS_SCORE);
+  }
+});
+
+test('Verifies a valid case for validate large winds', () => {
+  const result = validateHandStructure(validHandWithLargeWinds);
+  const vp = result.valid[0];
+  if (vp) {
+    const point = PointValidator.validateSmallAndLargeWinds(vp);
+    expect(point).toEqual(PointValidator.LARGE_WINDS_SCORE);
+  }
+});
+
+test('Verifies an invalid case for validateWinds using allHonors hand', () => {
+  const result = validateHandStructure(validHandWithAllHonors);
+  const vp = result.valid[0];
+  if (vp) {
+    const point = PointValidator.validateSmallAndLargeWinds(vp);
+    expect(point).toEqual(PointValidator.INVALID_SCORE);
+  }
+});
+
+// ####################### validateAllKongs ################################
+test('Verifies a valid case for validateAllKongs', () => {
+  const result = validateHandStructure(validHandWithAllKongs);
+  const vp = result.valid[0];
+  if (vp) {
+    const point = PointValidator.validateAllKongs(vp);
+    expect(point).toEqual(PointValidator.ALL_KONGS_SCORE);
+  }
+});
+
+test('Verfies an invalid case for validateAllKongs using allTriplets hand', () => {
+  const result = validateHandStructure(allTripletsHand);
+  const vp = result.valid[0];
+  if (vp) {
+    const point = PointValidator.validateAllKongs(vp);
     expect(point).toEqual(PointValidator.INVALID_SCORE);
   }
 });
