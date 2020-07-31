@@ -99,34 +99,7 @@ const gameStateInit = (currentGame: Game) => {
   allUserEntities[indexOfCurrentUser] = mahjongPlayer;
 
   gameState = new MahjongGameState(allUserEntities);
-
-  // // test add to dead pile
-  // const mjGameState = gameState as MahjongGameState;
-  // const tile = TileFactory.createTileFromStringDef('1_DOT');
-  // mjGameState.getDeadPile().add(tile);
   console.log(gameState);
-};
-
-const forGameTesting = () => {
-  const mjGameState = gameState as MahjongGameState;
-  const mjPlayer = player as MahjongPlayer;
-  const { stage } = pixiApplication;
-  const drawText = new PIXI.Text('Draw Tile', PIXI_TEXT_STYLE);
-  Interactions.addMouseInteraction(drawText, (event: PIXI.InteractionEvent) => {
-    const tile = wall.draw() as Tile;
-    mjPlayer.addTileToHand(tile);
-    console.log(event);
-    mjGameState.requestRedraw();
-  });
-  const nextTurnText = new PIXI.Text('Next turn', PIXI_TEXT_STYLE);
-  nextTurnText.x = 200;
-  Interactions.addMouseInteraction(nextTurnText, (event: PIXI.InteractionEvent) => {
-    console.log(event);
-    mjGameState.goToNextTurn();
-    mjGameState.requestRedraw();
-  });
-  stage.addChild(drawText);
-  stage.addChild(nextTurnText);
 };
 
 /**
@@ -136,12 +109,52 @@ const forGameTesting = () => {
 const GameTestPage = (): JSX.Element => {
   const canvasRef = useRef<HTMLDivElement>(null);
 
+  const mockWSCallbacks: Record<string, (...args: unknown[]) => void> = {
+    DRAW_TILE: () => {
+      console.log(gameState);
+    },
+    PLAY_TILE: (tile: unknown) => {
+      const mjGameState = gameState as MahjongGameState;
+      const tileStr = tile as string;
+      const tileInstance = TileFactory.createTileFromStringDef(tileStr);
+      mjGameState.getDeadPile().add(tileInstance);
+      mjGameState.requestRedraw();
+    },
+    REQUEST_REDRAW: () => {
+      const mjGameState = gameState as MahjongGameState;
+      mjGameState.requestRedraw();
+    },
+  };
+
+  const forGameTesting = () => {
+    const mjGameState = gameState as MahjongGameState;
+    const mjPlayer = player as MahjongPlayer;
+    const { stage } = pixiApplication;
+    const drawText = new PIXI.Text('Draw Tile', PIXI_TEXT_STYLE);
+    Interactions.addMouseInteraction(drawText, (event: PIXI.InteractionEvent) => {
+      const tile = wall.draw() as Tile;
+      mjPlayer.addTileToHand(tile);
+      console.log(event);
+      mjGameState.requestRedraw();
+    });
+    const nextTurnText = new PIXI.Text('Next turn', PIXI_TEXT_STYLE);
+    nextTurnText.x = 200;
+    Interactions.addMouseInteraction(nextTurnText, (event: PIXI.InteractionEvent) => {
+      console.log(event);
+      mjGameState.goToNextTurn();
+      mjGameState.requestRedraw();
+      console.log(mockWSCallbacks.DRAW_TILE());
+    });
+    stage.addChild(drawText);
+    stage.addChild(nextTurnText);
+  };
+
   /**
    * Main Animation loop
    */
   function animate() {
     const mjGameState = gameState as MahjongGameState;
-    mjGameState.renderCanvas(spriteFactory, pixiApplication);
+    mjGameState.renderCanvas(spriteFactory, mockWSCallbacks, pixiApplication);
     forGameTesting();
     requestAnimationFrame(animate);
   }

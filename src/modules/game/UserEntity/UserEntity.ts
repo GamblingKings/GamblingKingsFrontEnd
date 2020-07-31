@@ -53,7 +53,7 @@ abstract class UserEntity {
     spriteFactory: SpriteFactory,
     pixiStage: PIXI.Container,
     isUserTurn: boolean,
-    requestRedraw: () => void,
+    callbacks: Record<string, (...args: unknown[]) => void>,
   ): void;
 
   /**

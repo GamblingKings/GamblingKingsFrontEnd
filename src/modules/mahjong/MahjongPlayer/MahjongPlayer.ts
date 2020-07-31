@@ -15,6 +15,7 @@ import RenderDirection from '../../../pixi/directions';
 import UserEntity from '../../game/UserEntity/UserEntity';
 import PlayerHand from '../Hand/PlayerHand';
 import Tile from '../Tile/Tile';
+import { OutgoingAction } from '../../ws';
 
 /**
  * Mahjong player that holds information about current hand (tiles) and render methods
@@ -62,7 +63,10 @@ class MahjongPlayer extends UserEntity {
    * @param spriteFactory SpriteFactory
    * @param requestRedraw function that requests a redraw of canvas if there are state changes
    */
-  public renderHand(spriteFactory: SpriteFactory, requestRedraw: () => void): PIXI.Container {
+  public renderHand(
+    spriteFactory: SpriteFactory,
+    callbacks: Record<string, (...args: unknown[]) => void>,
+  ): PIXI.Container {
     const container = new PIXI.Container();
 
     const selectedTile = this.hand.getSelectedTile();
@@ -91,9 +95,9 @@ class MahjongPlayer extends UserEntity {
         frontSprite.x += DISTANCE_FROM_TILES * 3;
       }
       Interactions.addMouseInteraction(sprite, (event: PIXI.InteractionEvent) => {
-        requestRedraw();
         this.hand?.setSelectedTile(index);
         console.log(event.target);
+        callbacks.REQUEST_REDRAW();
       });
 
       container.addChild(sprite);
@@ -111,7 +115,10 @@ class MahjongPlayer extends UserEntity {
     return text;
   }
 
-  public renderInteractions(spriteFactory: SpriteFactory, requestRedraw: () => void): void {
+  public renderInteractions(
+    spriteFactory: SpriteFactory,
+    callbacks: Record<string, (...args: unknown[]) => void>,
+  ): void {
     const container = new PIXI.Container();
     // Prototyping how to do this...
     const drawTile = spriteFactory.generateSprite(FRONT_TILE);
@@ -120,9 +127,11 @@ class MahjongPlayer extends UserEntity {
     container.addChild(drawTile);
     container.x = 200 + this.hand.getTiles().length * DEFAULT_MAHJONG_WIDTH;
     Interactions.addMouseInteraction(drawTile, (event: PIXI.InteractionEvent) => {
-      console.log(event);
-      this.hand.throw();
-      requestRedraw();
+      console.log(event.target);
+      const tile = this.hand.throw();
+      if (tile !== null) {
+        callbacks[OutgoingAction.PLAY_TILE](tile.toString());
+      }
     });
 
     this.interactionContainer.addChild(container);
@@ -138,7 +147,7 @@ class MahjongPlayer extends UserEntity {
     spriteFactory: SpriteFactory,
     pixiStage: PIXI.Container,
     isUserTurn: boolean,
-    requestRedraw: () => void,
+    callbacks: Record<string, () => void>,
   ): void {
     const playerContainer = super.getContainer();
     if (isUserTurn) {
@@ -147,9 +156,9 @@ class MahjongPlayer extends UserEntity {
       graphics.drawCircle(0, 0, 20);
       playerContainer.addChild(graphics);
     }
-    const playerHand = this.renderHand(spriteFactory, requestRedraw);
+    const playerHand = this.renderHand(spriteFactory, callbacks);
     const name = this.renderName();
-    this.renderInteractions(spriteFactory, requestRedraw);
+    this.renderInteractions(spriteFactory, callbacks);
 
     playerContainer.addChild(playerHand);
     playerContainer.addChild(name);

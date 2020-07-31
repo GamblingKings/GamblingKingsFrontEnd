@@ -77,7 +77,11 @@ class MahjongGameState extends GameState {
     }
   }
 
-  public renderCanvas(spriteFactory: SpriteFactory, pixiApp: PIXI.Application): void {
+  public renderCanvas(
+    spriteFactory: SpriteFactory,
+    callbacks: Record<string, (...args: unknown[]) => void>,
+    pixiApp: PIXI.Application,
+  ): void {
     const { view, stage } = pixiApp;
     const currentTurn = super.getCurrentTurn();
     if (!this.redrawPending) {
@@ -86,7 +90,7 @@ class MahjongGameState extends GameState {
       this.getUsers().forEach((user: UserEntity, index: number) => {
         const isUserTurn = index === currentTurn;
         user.removeAllAssets();
-        user.render(spriteFactory, stage, isUserTurn, this.requestRedraw);
+        user.render(spriteFactory, stage, isUserTurn, callbacks);
         user.reposition(view);
       });
       // Render Wall

@@ -120,3 +120,18 @@ export interface GamePageLoadJSON {
 export interface GameStartJSON {
   tiles: string;
 }
+
+/**
+ * Interface for DRAW_TILE payload received
+ */
+export interface DrawTileJSON {
+  tile: string;
+}
+
+/**
+ * Interface for PLAY_TILE payload received
+ */
+export interface PlayTileJSON {
+  tile: string;
+  user: string;
+}
