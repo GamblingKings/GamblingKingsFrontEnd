@@ -86,6 +86,10 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       const mjGameState = gameState as MahjongGameState;
       mjGameState.requestRedraw();
     },
+    REQUEST_REDRAW: () => {
+      const mjGameState = gameState as MahjongGameState;
+      mjGameState.requestRedraw();
+    },
   };
 
   /**
@@ -201,7 +205,9 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     // eslint-disable-next-line
   }, []);
 
-  // Setup WS Listeners
+  /**
+   * Setup WS listeners
+   */
   useEffect(() => {
     if (ws) {
       ws.addListener(IncomingAction.GAME_PAGE_LOAD, confirmGamePageLoadReceived);

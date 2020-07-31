@@ -61,7 +61,7 @@ class MahjongPlayer extends UserEntity {
    * Return a PIXI.container containing all the tile sprites
    * TODO: render played tiles
    * @param spriteFactory SpriteFactory
-   * @param requestRedraw function that requests a redraw of canvas if there are state changes
+   * @param callbacks references to functions that so events can send to ws
    */
   public renderHand(
     spriteFactory: SpriteFactory,
@@ -95,8 +95,8 @@ class MahjongPlayer extends UserEntity {
         frontSprite.x += DISTANCE_FROM_TILES * 3;
       }
       Interactions.addMouseInteraction(sprite, (event: PIXI.InteractionEvent) => {
-        this.hand?.setSelectedTile(index);
         console.log(event.target);
+        this.hand?.setSelectedTile(index);
         callbacks.REQUEST_REDRAW();
       });
 
@@ -115,6 +115,11 @@ class MahjongPlayer extends UserEntity {
     return text;
   }
 
+  /**
+   * Adds assets with interactions for additional functionality (like pong and kong)
+   * @param spriteFactory SpriteFactory
+   * @param callbacks references to functions that so events can send to ws
+   */
   public renderInteractions(
     spriteFactory: SpriteFactory,
     callbacks: Record<string, (...args: unknown[]) => void>,
@@ -141,7 +146,8 @@ class MahjongPlayer extends UserEntity {
    * Create assets and appends assets to the container in super class, and attaches to the application stage.
    * @param spriteFactory SpriteFactory
    * @param pixiStage PIXI.Container
-   * @param requestRedraw function that requests a redraw of canvas if there are state changes
+   * @param isUserTurn boolean indicating if it is current user's turn
+   * @param callbacks references to functions that so events can send to ws
    */
   public render(
     spriteFactory: SpriteFactory,

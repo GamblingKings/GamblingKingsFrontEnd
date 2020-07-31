@@ -85,6 +85,7 @@ class PlayerHand {
       return false;
     }
     this.tiles = tiles;
+    this.sortHand(PlayerHand.generateHandWeights());
     return true;
   }
 
