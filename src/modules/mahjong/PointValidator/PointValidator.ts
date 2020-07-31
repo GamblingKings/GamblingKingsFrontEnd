@@ -7,7 +7,7 @@ import {
 } from '../types/MahjongTypes';
 import MeldEnums from '../enums/MeldEnums';
 import TileMapper from '../Tile/map/TileMapper';
-import HKHandMapper from '../Hand/map/hkHandMapper';
+import HKHandMapper from '../Hand/map/HKHandMapper';
 import {
   isSimpleTile as isSimpleTileUtils,
   isHonorTile as isHonorTileUtils,
