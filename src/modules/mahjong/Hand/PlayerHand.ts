@@ -16,9 +16,12 @@ class PlayerHand {
 
   private selectedTile = -1;
 
+  private hasDrawnTile: boolean;
+
   constructor(tiles: Tile[] = []) {
     this.tiles = tiles;
     this.playedTiles = [];
+    this.hasDrawnTile = false;
   }
 
   /**
@@ -89,6 +92,10 @@ class PlayerHand {
     return this.playedTiles;
   }
 
+  public getHasDrawnTile(): boolean {
+    return this.hasDrawnTile;
+  }
+
   public addPlayedTiles(tiles: Tile[]): boolean {
     // could add validation that this is valid meld
     this.playedTiles.push(tiles);
@@ -124,6 +131,8 @@ class PlayerHand {
 
   public draw(tile: Tile): boolean {
     this.tiles.push(tile);
+    this.hasDrawnTile = true;
+    this.setSelectedTile(this.tiles.length - 1);
     return true;
   }
 

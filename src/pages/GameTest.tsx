@@ -12,6 +12,11 @@ import RenderDirection from '../pixi/directions';
 import TileFactory from '../modules/mahjong/Tile/TileFactory';
 import GameState from '../modules/game/GameState/GameState';
 import MahjongGameState from '../modules/mahjong/MahjongGameState/MahjongGameState';
+import { PIXI_TEXT_STYLE } from '../pixi/mahjongConstants';
+import UserEntity from '../modules/game/UserEntity/UserEntity';
+import Interactions from '../pixi/Interactions';
+import HongKongWall from '../modules/mahjong/Wall/version/HongKongWall';
+import Tile from '../modules/mahjong/Tile/Tile';
 
 /**
  * ********************************************************
@@ -63,6 +68,9 @@ let interactionManager: PIXI.InteractionManager;
 
 let spriteFactory: SpriteFactory;
 let gameState: GameState;
+let player: UserEntity;
+
+const wall = new HongKongWall();
 
 /**
  * Initialize the GameState
@@ -84,7 +92,7 @@ const gameStateInit = (currentGame: Game) => {
     currentIndex += 1;
   }
 
-  const player = new MahjongPlayer(CURRENT_USER.username, CURRENT_USER.connectionId);
+  player = new MahjongPlayer(CURRENT_USER.username, CURRENT_USER.connectionId);
   const mahjongPlayer = player as MahjongPlayer;
   mahjongPlayer.setHand(tiles);
 
@@ -97,6 +105,20 @@ const gameStateInit = (currentGame: Game) => {
   // const tile = TileFactory.createTileFromStringDef('1_DOT');
   // mjGameState.getDeadPile().add(tile);
   console.log(gameState);
+};
+
+const forGameTesting = () => {
+  const mjGameState = gameState as MahjongGameState;
+  const mjPlayer = player as MahjongPlayer;
+  const { stage } = pixiApplication;
+  const drawText = new PIXI.Text('Draw Tile', PIXI_TEXT_STYLE);
+  Interactions.addMouseInteraction(drawText, (event) => {
+    const tile = wall.draw() as Tile;
+    mjPlayer.addTileToHand(tile);
+    console.log(event);
+    mjGameState.requestRedraw();
+  });
+  stage.addChild(drawText);
 };
 
 /**
@@ -112,6 +134,7 @@ const GameTestPage = (): JSX.Element => {
   function animate() {
     const mjGameState = gameState as MahjongGameState;
     mjGameState.renderCanvas(spriteFactory, pixiApplication);
+    forGameTesting();
     requestAnimationFrame(animate);
   }
 
@@ -138,7 +161,6 @@ const GameTestPage = (): JSX.Element => {
       spriteFactory = new SpriteFactory(resources);
 
       gameStateInit(STARTING_GAME);
-
       animate();
     }
 

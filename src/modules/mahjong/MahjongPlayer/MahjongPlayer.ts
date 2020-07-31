@@ -42,6 +42,10 @@ class MahjongPlayer extends UserEntity {
     return this.interactionContainer;
   }
 
+  public addTileToHand(tile: Tile): void {
+    this.hand.draw(tile);
+  }
+
   /**
    * Removes all children from the container in super class.
    */
@@ -63,6 +67,8 @@ class MahjongPlayer extends UserEntity {
 
     const selectedTile = this.hand.getSelectedTile();
     const tiles = this.hand.getTiles();
+    const hasDrawn = this.hand.getHasDrawnTile();
+    const lastTile = hasDrawn ? tiles.length - 1 : -1;
 
     tiles.forEach((tile: Tile, index: number) => {
       const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
@@ -79,6 +85,10 @@ class MahjongPlayer extends UserEntity {
       if (index === selectedTile) {
         sprite.y = -10;
         frontSprite.y = -10;
+      }
+      if (index === lastTile) {
+        sprite.x += DISTANCE_FROM_TILES * 3;
+        frontSprite.x += DISTANCE_FROM_TILES * 3;
       }
       Interactions.addMouseInteraction(sprite, (event: PIXI.InteractionEvent) => {
         requestRedraw();
