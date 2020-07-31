@@ -78,19 +78,18 @@ test('PlayerHand - setSelectedTile()', () => {
 });
 
 test('PlayerHand - throw()', () => {
-  fullHand.setSelectedTile(0);
+  fullHand.draw(TileFactory.createTileFromStringDef('7_DOT'));
   expect(fullHand.throw()).toStrictEqual(TileFactory.createTileFromStringDef('7_DOT'));
-  expect(fullHand.getTiles()).toHaveLength(12);
+  expect(fullHand.getTiles()).toHaveLength(13);
   expect(fullHand.getSelectedTile()).toBe(-1);
 
   expect(fullHand.throw()).toBeNull();
 });
 
 test('PlayerHand - draw()', () => {
+  fullHand.draw(TileFactory.createTileFromStringDef('7_DOT'));
   fullHand.setSelectedTile(0);
   fullHand.throw();
-  fullHand.draw(TileFactory.createTileFromStringDef('7_DOT'));
   expect(fullHand.getTiles()).toHaveLength(13);
-  fullHand.sortHand(PlayerHand.generateHandWeights());
   expect(fullHand.getTiles()).toStrictEqual(tiles);
 });

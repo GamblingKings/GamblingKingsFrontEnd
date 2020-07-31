@@ -1,3 +1,5 @@
+import 'jest-webgl-canvas-mock';
+
 import Hand from '../Hand';
 import DeadPile from '../../DeadPile/DeadPile';
 import HongKongWall from '../../Wall/version/HongKongWall';

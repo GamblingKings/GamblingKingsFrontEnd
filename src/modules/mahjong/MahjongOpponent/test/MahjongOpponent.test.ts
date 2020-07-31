@@ -63,18 +63,18 @@ test('MahjongOpponent - renderMahjongHand()', () => {
 });
 
 test('MahjongOpponent - render()', () => {
-  mjOpponent.render(spriteFactory, pixiStage);
+  mjOpponent.render(spriteFactory, pixiStage, false);
 
   expect(mjOpponent.getContainer().children).toHaveLength(2);
   expect(pixiStage.children).toHaveLength(1);
 });
 
 test('MahjongOpponent - removeAllAssets()', () => {
-  mjOpponent.render(spriteFactory, pixiStage);
+  mjOpponent.render(spriteFactory, pixiStage, false);
   mjOpponent.removeAllAssets();
   expect(mjOpponent.getContainer().children).toHaveLength(0);
 
-  mjOpponent.render(spriteFactory, pixiStage);
+  mjOpponent.render(spriteFactory, pixiStage, false);
   mjOpponent.removeAllAssets();
   expect(mjOpponent.getContainer().children).toHaveLength(0);
 });
@@ -90,7 +90,7 @@ test('MahjongOpponent - addPlayedTiles()', () => {
   expect(playedTiles).toHaveLength(1);
 });
 
-test('MahjongOpponent - reposition()', () => {
+test('MahjongOpponent - reposition() / render()', () => {
   // canvas width and height are both 0
   mjOpponent.reposition(canvas);
 
@@ -101,9 +101,13 @@ test('MahjongOpponent - reposition()', () => {
   mjOpponent.reposition(canvas);
   expect(mjOpponent.getContainer().x).toBe(-120);
   expect(mjOpponent.getContainer().y).toBe(80);
+  mjOpponent.render(spriteFactory, pixiStage, false);
+  expect(mjOpponent.getContainer().children).toHaveLength(2);
 
   mjOpponent = new MahjongOpponent(NAME, CONNECTION_ID, LOCATION_TOP);
   mjOpponent.reposition(canvas);
   expect(mjOpponent.getContainer().x).toBe(200);
   expect(mjOpponent.getContainer().y).toBe(80);
+  mjOpponent.render(spriteFactory, pixiStage, false);
+  expect(mjOpponent.getContainer().children).toHaveLength(2);
 });
