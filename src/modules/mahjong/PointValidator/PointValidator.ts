@@ -216,12 +216,12 @@ class PointValidator {
    * Determine how many points comes from valid hands such as all triplets, all consecutives, purity, etc..
    */
   public static validateHandPoints = (handStructureResults: HandStructureResults): PointValidationResults => {
-    const { valid } = handStructureResults;
     const result: PointValidationResults = {
       largestHand: {
         melds: [],
         points: 0,
-        handNames: [],
+        hands: [],
+        tiles: [],
       },
       allHands: [],
     };
@@ -229,12 +229,24 @@ class PointValidator {
     let largestHand: HandPointResults = {
       melds: [],
       points: 0,
-      handNames: [],
+      hands: [],
+      tiles: [],
     };
+
+    if (handStructureResults.isThirteenTerminals) {
+      largestHand.points = HKHandMapper.THIRTEEN_ORPHANS.points;
+      largestHand.tiles = handStructureResults.valid[0].originalTiles;
+
+      result.largestHand = largestHand;
+      result.allHands.push(largestHand);
+      return result;
+    }
+
+    const { valid } = handStructureResults;
 
     valid.forEach((vp) => {
       let points = 0;
-      const handNames: string[] = [];
+      const hands: HandDefinition[] = [];
 
       const consecutive: HandDefinition = PointValidator.validateAllConsecutives(vp);
       let triplets = {
@@ -249,24 +261,23 @@ class PointValidator {
       // Check first if the hand is allConsecutives or allTriplets as these are common hands
       if (consecutive.points > 0) {
         points += consecutive.points;
-        handNames.push(consecutive.name);
+        hands.push(consecutive);
       } else {
         // Need to check Kong before Triplets as validate all triplets will yield correct for all Kong
         kongs = PointValidator.validateAllKongs(vp);
         if (kongs.points > 0) {
           points += kongs.points;
-          handNames.push(kongs.name);
+          hands.push(kongs);
         } else {
           triplets = PointValidator.validateAllTriplets(vp);
           if (triplets.points > 0) {
             points += triplets.points;
-            handNames.push(triplets.name);
+            hands.push(triplets);
           }
         }
       }
 
-      // If it's none of these, check weird hands
-      if (consecutive.points === 0 && triplets.points === 0 && kongs.points === 0) {
+      if (consecutive.points === 0) {
         const handsToCheck = [
           PointValidator.validateAllHonors,
           PointValidator.validateSmallAndLargeDragons,
@@ -277,7 +288,7 @@ class PointValidator {
           const resultOfFn = fn(vp);
           if (resultOfFn.points > 0) {
             points += resultOfFn.points;
-            handNames.push(resultOfFn.name);
+            hands.push(resultOfFn);
           }
         });
       }
@@ -286,21 +297,22 @@ class PointValidator {
       const purity = PointValidator.validatePurity(vp);
       if (purity.points > 0) {
         points += purity.points;
-        handNames.push(purity.name);
+        hands.push(purity);
       }
 
       if (purity.points === 0) {
         const semiPure = PointValidator.validateSemiPurity(vp);
         if (semiPure.points > 0) {
           points += semiPure.points;
-          handNames.push(semiPure.name);
+          hands.push(semiPure);
         }
       }
 
       const resultOfThisVP = {
         points,
         melds: vp.melds,
-        handNames,
+        hands,
+        tiles: vp.originalTiles,
       };
 
       if (resultOfThisVP.points > largestHand.points) largestHand = resultOfThisVP;

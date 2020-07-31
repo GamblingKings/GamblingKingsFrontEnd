@@ -168,6 +168,9 @@ const validHandWithSmallDragons = [
   '1_CHARACTER',
   '2_CHARACTER',
   '3_CHARACTER',
+  '1_DOT',
+  '1_DOT',
+  '1_DOT',
 ];
 
 const validHandWithLargeDragons = [
@@ -241,6 +244,23 @@ const validHandWithAllKongs = [
   '1_BAMBOO',
   '1_BAMBOO',
   '1_BAMBOO',
+];
+
+const validHandWithThirteenOrphans = [
+  '1_DOT',
+  '9_DOT',
+  '1_CHARACTER',
+  '9_CHARACTER',
+  '1_BAMBOO',
+  '9_BAMBOO',
+  'EAST',
+  'SOUTH',
+  'WEST',
+  'NORTH',
+  'REDDRAGON',
+  'GREENDRAGON',
+  'WHITEDRAGON',
+  '1_DOT',
 ];
 
 // ####################### validateAllConsecutives ################################
@@ -455,5 +475,93 @@ test('Verifies that given the allTripletsHandWithPurity, the function returns th
   const pointResults = PointValidator.validateHandPoints(result);
   const { largestHand } = pointResults;
   const expected = HKHandMapper.ALL_TRIPLET.points + HKHandMapper.PURITY.points;
+  expect(largestHand.points).toEqual(expected);
+});
+
+test('Verifies that given the mixedConsecutiveAndTripletHand, the function returns the corresponding points', () => {
+  const result = validateHandStructure(mixedConsecutiveAndTripletHand);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.INVALID.points; // should be 0 points
+  expect(largestHand.points).toEqual(expected);
+});
+
+test('Verifies that given the allConsecutiveHand, the function returns the corresponding points', () => {
+  const result = validateHandStructure(allConsecutiveHand);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.ALL_CONSECUTIVE.points;
+  expect(largestHand.points).toEqual(expected);
+});
+
+test('Verifies that given the semiPurityHand, the function returns the corresponding points', () => {
+  const result = validateHandStructure(validHandWithSemiPurity);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.SEMI_PURITY.points;
+  expect(largestHand.points).toEqual(expected);
+});
+
+test('Verifies that given the purityHand, the function returns the corresponding points', () => {
+  const result = validateHandStructure(validHandWithPurity);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.PURITY.points;
+  expect(largestHand.points).toEqual(expected);
+});
+
+test('Verifies that given the validHandWithSmallDragons, the function returns the corresponding points', () => {
+  const result = validateHandStructure(validHandWithSmallDragons);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.SMALL_DRAGONS.points;
+  expect(largestHand.points).toEqual(expected);
+});
+
+test('Verifies that given the validHandWithLargeDragons, the function returns the corresponding points', () => {
+  const result = validateHandStructure(validHandWithLargeDragons);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.LARGE_DRAGONS.points;
+  expect(largestHand.points).toEqual(expected);
+});
+
+test('Verifies that given the validHandWithSmallWinds, the function returns the corresponding points', () => {
+  const result = validateHandStructure(validHandWithSmallWinds);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.SMALL_WINDS.points + HKHandMapper.SEMI_PURITY.points;
+  expect(largestHand.points).toEqual(expected);
+});
+
+test('Verifies that given the validHandWithLargeWinds, the function returns the corresponding points', () => {
+  const result = validateHandStructure(validHandWithLargeWinds);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.LARGE_WINDS.points;
+  expect(largestHand.points).toEqual(expected);
+});
+
+test('Verifies that given the validHandWith4OfaKind, the function returns the corresponding points', () => {
+  const result = validateHandStructure(validHandWith4OfaKind);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.ALL_TRIPLET.points;
+  expect(largestHand.points).toEqual(expected);
+});
+
+test('Verifies that given the validHandWithAllKongs, the function returns the corresponding points', () => {
+  const result = validateHandStructure(validHandWithAllKongs);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.ALL_KONGS.points;
+  expect(largestHand.points).toEqual(expected);
+});
+
+test('Verifies that given the validHandWithThirteenOrphans, the function returns the corresponding points', () => {
+  const result = validateHandStructure(validHandWithThirteenOrphans);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.THIRTEEN_ORPHANS.points;
   expect(largestHand.points).toEqual(expected);
 });

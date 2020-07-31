@@ -34,7 +34,7 @@ const HKHandMapper: { [index: string]: HandDefinition } = {
     name: 'LARGE_DRAGONS',
   },
   SMALL_WINDS: {
-    points: 0,
+    points: 10,
     name: 'SMALL_WINDS',
   },
   LARGE_WINDS: {
@@ -42,11 +42,11 @@ const HKHandMapper: { [index: string]: HandDefinition } = {
     name: 'LARGE_WINDS',
   },
   THIRTEEN_ORPHANS: {
-    points: 0,
+    points: 13,
     name: 'THIRTEEN_ORPHANS',
   },
   ALL_KONGS: {
-    points: 0,
+    points: 13,
     name: 'ALL_KONGS',
   },
 };

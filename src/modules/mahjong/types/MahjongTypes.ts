@@ -6,6 +6,7 @@ import SimpleTileTypes from '../enums/SimpleTileEnums';
 import HonorTileTypes from '../enums/HonorTileEnums';
 import BonusTileTypes from '../enums/BonusTileEnums';
 import MeldTypes from '../enums/MeldEnums';
+import Tile from '../Tile/Tile';
 
 export interface TileDefinition {
   type: SimpleTileTypes | HonorTileTypes | BonusTileTypes;
@@ -18,6 +19,7 @@ export interface ValidPair {
   pair: string;
   remainingTiles: { [index: string]: number };
   numTiles: number;
+  originalTiles: Tile[];
   melds?: Meld[];
 }
 
@@ -29,6 +31,7 @@ export interface Meld {
 export interface HandStructureResults {
   valid: ValidPair[];
   invalid: ValidPair[];
+  isThirteenTerminals: boolean;
 }
 
 export interface SortHandWeights {
@@ -49,7 +52,8 @@ export interface SortHandWeights {
 export interface HandPointResults {
   melds?: Meld[];
   points: number;
-  handNames: string[];
+  hands: HandDefinition[];
+  tiles: Tile[];
 }
 
 export interface PointValidationResults {
