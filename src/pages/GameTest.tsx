@@ -112,13 +112,21 @@ const forGameTesting = () => {
   const mjPlayer = player as MahjongPlayer;
   const { stage } = pixiApplication;
   const drawText = new PIXI.Text('Draw Tile', PIXI_TEXT_STYLE);
-  Interactions.addMouseInteraction(drawText, (event) => {
+  Interactions.addMouseInteraction(drawText, (event: PIXI.InteractionEvent) => {
     const tile = wall.draw() as Tile;
     mjPlayer.addTileToHand(tile);
     console.log(event);
     mjGameState.requestRedraw();
   });
+  const nextTurnText = new PIXI.Text('Next turn', PIXI_TEXT_STYLE);
+  nextTurnText.x = 200;
+  Interactions.addMouseInteraction(nextTurnText, (event: PIXI.InteractionEvent) => {
+    console.log(event);
+    mjGameState.goToNextTurn();
+    mjGameState.requestRedraw();
+  });
   stage.addChild(drawText);
+  stage.addChild(nextTurnText);
 };
 
 /**

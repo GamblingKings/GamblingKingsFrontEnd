@@ -119,17 +119,22 @@ class PlayerHand {
   }
 
   public throw(): Tile | null {
-    if (this.selectedTile >= 0 && this.selectedTile < this.tiles.length) {
+    if (this.selectedTile >= 0 && this.selectedTile < this.tiles.length && this.hasDrawnTile) {
       const index = this.selectedTile;
       const tile = this.tiles[index];
       this.tiles.splice(index, 1);
       this.selectedTile = -1;
+      this.hasDrawnTile = false;
+      this.sortHand(PlayerHand.generateHandWeights());
       return tile;
     }
     return null;
   }
 
   public draw(tile: Tile): boolean {
+    if (this.hasDrawnTile) {
+      return false;
+    }
     this.tiles.push(tile);
     this.hasDrawnTile = true;
     this.setSelectedTile(this.tiles.length - 1);

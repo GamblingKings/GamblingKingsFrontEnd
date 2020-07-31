@@ -97,22 +97,22 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
 
       const mahjongPlayer = player as MahjongPlayer;
       mahjongPlayer.removeAllAssets();
-      mahjongPlayer.render(spriteFactory, stage, requestRedraw);
+      mahjongPlayer.render(spriteFactory, stage, false, requestRedraw);
       mahjongPlayer.reposition(pixiApplication.view);
 
       const mahjongOpponentOne = opponentOne as MahjongOpponent;
       mahjongOpponentOne.removeAllAssets();
-      mahjongOpponentOne.render(spriteFactory, stage);
+      mahjongOpponentOne.render(spriteFactory, stage, false);
       mahjongOpponentOne.reposition(pixiApplication.view);
 
       const mahjongOpponentTwo = opponentTwo as MahjongOpponent;
       mahjongOpponentTwo.removeAllAssets();
-      mahjongOpponentTwo.render(spriteFactory, stage);
+      mahjongOpponentTwo.render(spriteFactory, stage, false);
       mahjongOpponentTwo.reposition(pixiApplication.view);
 
       const mahjongOpponentThree = opponentThree as MahjongOpponent;
       mahjongOpponentThree.removeAllAssets();
-      mahjongOpponentThree.render(spriteFactory, stage);
+      mahjongOpponentThree.render(spriteFactory, stage, false);
       mahjongOpponentThree.reposition(pixiApplication.view);
 
       pixiApplication.render();

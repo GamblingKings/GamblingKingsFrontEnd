@@ -49,7 +49,12 @@ abstract class UserEntity {
 
   abstract removeAllAssets(): void;
 
-  public abstract render(spriteFactory: SpriteFactory, pixiStage: PIXI.Container, requestRedraw: () => void): void;
+  public abstract render(
+    spriteFactory: SpriteFactory,
+    pixiStage: PIXI.Container,
+    isUserTurn: boolean,
+    requestRedraw: () => void,
+  ): void;
 
   /**
    * Returns the x, y coordinate of where the pixi container should be

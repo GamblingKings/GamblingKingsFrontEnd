@@ -77,9 +77,14 @@ class MahjongOpponent extends UserEntity {
    * @param spriteFactory SpriteFactory
    * @param pixiStage PIXI.Container
    */
-  public render(spriteFactory: SpriteFactory, pixiStage: PIXI.Container): void {
+  public render(spriteFactory: SpriteFactory, pixiStage: PIXI.Container, isUserTurn: boolean): void {
     const opponentContainer = super.getContainer();
-
+    if (isUserTurn) {
+      const graphics = new PIXI.Graphics();
+      graphics.beginFill(0x3498db);
+      graphics.drawCircle(0, 0, 20);
+      opponentContainer.addChild(graphics);
+    }
     const hand = this.renderMahjongHand(spriteFactory);
     const name = this.renderName();
 
