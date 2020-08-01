@@ -73,36 +73,6 @@ let player: UserEntity;
 const wall = new HongKongWall();
 
 /**
- * Initialize the GameState
- * @param currentGame Game
- */
-const gameStateInit = (currentGame: Game) => {
-  const { users } = currentGame;
-
-  const indexOfCurrentUser = users.findIndex((user: User) => user.username === CURRENT_USER.username);
-  const allUserEntities = [];
-  const directions = [RenderDirection.LEFT, RenderDirection.TOP, RenderDirection.RIGHT];
-  let currentIndex = indexOfCurrentUser + 1;
-  for (let i = 0; i < users.length - 1; i += 1) {
-    if (currentIndex >= users.length) {
-      currentIndex = 0;
-    }
-    const opponent = new MahjongOpponent(users[currentIndex].username, users[currentIndex].connectionId, directions[i]);
-    allUserEntities[currentIndex] = opponent;
-    currentIndex += 1;
-  }
-
-  player = new MahjongPlayer(CURRENT_USER.username, CURRENT_USER.connectionId);
-  const mahjongPlayer = player as MahjongPlayer;
-  mahjongPlayer.setHand(tiles);
-
-  allUserEntities[indexOfCurrentUser] = mahjongPlayer;
-
-  gameState = new MahjongGameState(allUserEntities);
-  console.log(gameState);
-};
-
-/**
  * Testing page for the Game.
  * Can only be accessed by /gametest
  */
@@ -124,6 +94,40 @@ const GameTestPage = (): JSX.Element => {
       const mjGameState = gameState as MahjongGameState;
       mjGameState.requestRedraw();
     },
+  };
+
+  /**
+   * Initialize the GameState
+   * @param currentGame Game
+   */
+  const gameStateInit = (currentGame: Game) => {
+    const { users } = currentGame;
+
+    const indexOfCurrentUser = users.findIndex((user: User) => user.username === CURRENT_USER.username);
+    const allUserEntities = [];
+    const directions = [RenderDirection.LEFT, RenderDirection.TOP, RenderDirection.RIGHT];
+    let currentIndex = indexOfCurrentUser + 1;
+    for (let i = 0; i < users.length - 1; i += 1) {
+      if (currentIndex >= users.length) {
+        currentIndex = 0;
+      }
+      const opponent = new MahjongOpponent(
+        users[currentIndex].username,
+        users[currentIndex].connectionId,
+        directions[i],
+      );
+      allUserEntities[currentIndex] = opponent;
+      currentIndex += 1;
+    }
+
+    player = new MahjongPlayer(CURRENT_USER.username, CURRENT_USER.connectionId);
+    const mahjongPlayer = player as MahjongPlayer;
+    mahjongPlayer.setHand(tiles);
+
+    allUserEntities[indexOfCurrentUser] = mahjongPlayer;
+
+    gameState = new MahjongGameState(allUserEntities, mockWSCallbacks);
+    console.log(gameState);
   };
 
   const forGameTesting = () => {
@@ -154,7 +158,7 @@ const GameTestPage = (): JSX.Element => {
    */
   function animate() {
     const mjGameState = gameState as MahjongGameState;
-    mjGameState.renderCanvas(spriteFactory, mockWSCallbacks, pixiApplication);
+    mjGameState.renderCanvas(spriteFactory, pixiApplication);
     forGameTesting();
     requestAnimationFrame(animate);
   }

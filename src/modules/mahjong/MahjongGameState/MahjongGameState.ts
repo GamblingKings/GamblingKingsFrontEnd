@@ -6,6 +6,7 @@ import UserEntity from '../../game/UserEntity/UserEntity';
 import SpriteFactory from '../../../pixi/SpriteFactory';
 import DeadPile from '../DeadPile/DeadPile';
 import WallCounter from '../WallCounter/WallCounter';
+import { OutgoingAction } from '../../ws';
 
 /**
  * Class that holds all the Mahjong game state for the Front-End Client.
@@ -15,19 +16,25 @@ class MahjongGameState extends GameState {
 
   private redrawPending: boolean;
 
+  private roundStarted: boolean;
+
+  private wsCallbacks: Record<string, (...args: unknown[]) => void>;
+
   private dealer: number;
 
   private deadPile: DeadPile;
 
   private wallCounter: WallCounter;
 
-  constructor(users: UserEntity[]) {
+  constructor(users: UserEntity[], wsCallbacks: Record<string, (...args: unknown[]) => void>) {
     super(users);
     this.currentWind = WindEnums.EAST;
     this.redrawPending = false;
+    this.roundStarted = false;
     this.dealer = 0;
     this.deadPile = new DeadPile();
     this.wallCounter = new WallCounter();
+    this.wsCallbacks = wsCallbacks;
   }
 
   /**
@@ -47,6 +54,24 @@ class MahjongGameState extends GameState {
 
   public getDeadPile(): DeadPile {
     return this.deadPile;
+  }
+
+  public startRound(player: UserEntity): void {
+    this.roundStarted = true;
+    const gameUsers = super.getUsers();
+    const indexOfUser = gameUsers.findIndex((user) => user.getConnectionId() === player.getConnectionId());
+    if (indexOfUser === this.dealer) {
+      this.wsCallbacks[OutgoingAction.DRAW_TILE]();
+    }
+    console.log(player);
+  }
+
+  public endRound(): void {
+    this.roundStarted = false;
+  }
+
+  public getRoundStarted(): boolean {
+    return this.roundStarted;
   }
 
   /**
@@ -77,11 +102,7 @@ class MahjongGameState extends GameState {
     }
   }
 
-  public renderCanvas(
-    spriteFactory: SpriteFactory,
-    callbacks: Record<string, (...args: unknown[]) => void>,
-    pixiApp: PIXI.Application,
-  ): void {
+  public renderCanvas(spriteFactory: SpriteFactory, pixiApp: PIXI.Application): void {
     const { view, stage } = pixiApp;
     const currentTurn = super.getCurrentTurn();
     if (!this.redrawPending) {
@@ -90,7 +111,7 @@ class MahjongGameState extends GameState {
       this.getUsers().forEach((user: UserEntity, index: number) => {
         const isUserTurn = index === currentTurn;
         user.removeAllAssets();
-        user.render(spriteFactory, stage, isUserTurn, callbacks);
+        user.render(spriteFactory, stage, isUserTurn, this.wsCallbacks);
         user.reposition(view);
       });
       // Render Wall

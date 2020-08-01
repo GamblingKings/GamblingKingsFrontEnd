@@ -133,5 +133,5 @@ export interface DrawTileJSON {
  */
 export interface PlayTileJSON {
   tile: string;
-  user: string;
+  connectionId: string;
 }

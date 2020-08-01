@@ -15,6 +15,11 @@ let mjOpponent3: MahjongOpponent;
 let gameState: MahjongGameState;
 let users: UserEntity[];
 
+const callbacks = {
+  DRAW_TILE: () => {},
+  PLAY_TILE: () => {},
+};
+
 beforeEach(() => {
   mjPlayer = new MahjongPlayer('Player', 'connectionId');
   mjOpponent1 = new MahjongOpponent('Opp Left', 'connectionId', RenderDirection.LEFT);
@@ -22,7 +27,7 @@ beforeEach(() => {
   mjOpponent3 = new MahjongOpponent('Opp Right', 'connectionId', RenderDirection.RIGHT);
   users = [mjPlayer, mjOpponent1, mjOpponent2, mjOpponent3];
 
-  gameState = new MahjongGameState(users);
+  gameState = new MahjongGameState(users, callbacks);
 });
 
 test('MahjongGameState - getUsers()', () => {
@@ -35,6 +40,14 @@ test('MahjongGameState - getCurrentTurn() / goToNextTurn()', () => {
   expect(gameState.goToNextTurn()).toBe(2);
   expect(gameState.goToNextTurn()).toBe(3);
   expect(gameState.goToNextTurn()).toBe(0);
+});
+
+test('MahjongGameState - roundStarted()', () => {
+  expect(gameState.getRoundStarted()).toBeFalsy();
+  gameState.startRound(mjPlayer);
+  expect(gameState.getRoundStarted()).toBeTruthy();
+  gameState.endRound();
+  expect(gameState.getRoundStarted()).toBeFalsy();
 });
 
 test('MahjongGameState - getDealer() / changeDealer()', () => {

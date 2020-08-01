@@ -41,30 +41,6 @@ type GameProps = {
 };
 
 /**
- * Initialize the GameState
- * @param currentGame Game
- */
-const gameStateInit = (currentGame: Game, currentUser: CurrentUser) => {
-  const { users } = currentGame;
-
-  const indexOfCurrentUser = users.findIndex((user: User) => user.username === currentUser.username);
-  const allUserEntities = [];
-  const directions = [RenderDirection.LEFT, RenderDirection.TOP, RenderDirection.RIGHT];
-  let currentIndex = indexOfCurrentUser + 1;
-  for (let i = 0; i < users.length - 1; i += 1) {
-    if (currentIndex >= users.length) {
-      currentIndex = 0;
-    }
-    const opponent = new MahjongOpponent(users[currentIndex].username, users[currentIndex].connectionId, directions[i]);
-    allUserEntities[currentIndex] = opponent;
-    currentIndex += 1;
-  }
-  player = new MahjongPlayer(currentUser.username, users[indexOfCurrentUser].connectionId);
-  allUserEntities[indexOfCurrentUser] = player;
-  gameState = new MahjongGameState(allUserEntities);
-};
-
-/**
  * Game Page for main game
  */
 const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
@@ -81,6 +57,9 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
    * Callbacks required for adding interaction to PIXI assets.
    */
   const wsCallbacks: Record<string, (...args: unknown[]) => void> = {
+    [OutgoingAction.DRAW_TILE]: () => {
+      ws?.sendMessage(OutgoingAction.DRAW_TILE, {});
+    },
     [OutgoingAction.PLAY_TILE]: (tile: unknown) => {
       ws?.sendMessage(OutgoingAction.PLAY_TILE, { game: game.gameId, tile });
       const mjGameState = gameState as MahjongGameState;
@@ -93,11 +72,39 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
   };
 
   /**
+   * Initialize the GameState
+   * @param currentGame Game
+   */
+  const gameStateInit = (currentGame: Game, current$User: CurrentUser) => {
+    const { users } = currentGame;
+
+    const indexOfCurrentUser = users.findIndex((user: User) => user.username === current$User.username);
+    const allUserEntities = [];
+    const directions = [RenderDirection.LEFT, RenderDirection.TOP, RenderDirection.RIGHT];
+    let currentIndex = indexOfCurrentUser + 1;
+    for (let i = 0; i < users.length - 1; i += 1) {
+      if (currentIndex >= users.length) {
+        currentIndex = 0;
+      }
+      const opponent = new MahjongOpponent(
+        users[currentIndex].username,
+        users[currentIndex].connectionId,
+        directions[i],
+      );
+      allUserEntities[currentIndex] = opponent;
+      currentIndex += 1;
+    }
+    player = new MahjongPlayer(current$User.username, users[indexOfCurrentUser].connectionId);
+    allUserEntities[indexOfCurrentUser] = player;
+    gameState = new MahjongGameState(allUserEntities, wsCallbacks);
+  };
+
+  /**
    * Main Animation loop
    */
   function animate() {
     const mjGameState = gameState as MahjongGameState;
-    mjGameState.renderCanvas(spriteFactory, wsCallbacks, pixiApplication);
+    mjGameState.renderCanvas(spriteFactory, pixiApplication);
     requestAnimationFrame(animate);
   }
 
@@ -135,6 +142,9 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     const mjPlayer = player as MahjongPlayer;
     mjPlayer.setHand(tiles);
 
+    const mjGameState = gameState as MahjongGameState;
+    mjGameState.startRound(player);
+
     animate();
   };
 
@@ -157,7 +167,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     // add validation of whether other players want to interact
     // for now, change turn
     mjGameState.goToNextTurn();
-    console.log(data.user); // connectionId
+    console.log(data.connectionId); // connectionId
   };
 
   // Set up PIXI application.
