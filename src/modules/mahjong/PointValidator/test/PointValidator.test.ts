@@ -53,6 +53,23 @@ const allTripletsHandWithPurity = [
   '5_DOT',
 ];
 
+const allTripletsHandWithSemiPurity = [
+  'REDDRAGON',
+  'REDDRAGON',
+  '2_DOT',
+  '2_DOT',
+  '2_DOT',
+  '3_DOT',
+  '3_DOT',
+  '3_DOT',
+  '4_DOT',
+  '4_DOT',
+  '4_DOT',
+  '5_DOT',
+  '5_DOT',
+  '5_DOT',
+];
+
 const allConsecutiveHand = [
   '1_DOT',
   '1_DOT',
@@ -68,6 +85,23 @@ const allConsecutiveHand = [
   '7_BAMBOO',
   '8_BAMBOO',
   '9_BAMBOO',
+];
+
+const allConsecutiveHandWithPurity = [
+  '1_CHARACTER',
+  '1_CHARACTER',
+  '2_CHARACTER',
+  '3_CHARACTER',
+  '4_CHARACTER',
+  '5_CHARACTER',
+  '6_CHARACTER',
+  '7_CHARACTER',
+  '1_CHARACTER',
+  '2_CHARACTER',
+  '3_CHARACTER',
+  '7_CHARACTER',
+  '8_CHARACTER',
+  '9_CHARACTER',
 ];
 
 const validHandWith4OfaKind = [
@@ -478,6 +512,14 @@ test('Verifies that given the allTripletsHandWithPurity, the function returns th
   expect(largestHand.points).toEqual(expected);
 });
 
+test('Verifies that given the allTripletsHandWithSemiPurity, the function returns the corresponding points', () => {
+  const result = validateHandStructure(allTripletsHandWithSemiPurity);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.ALL_TRIPLET.points + HKHandMapper.SEMI_PURITY.points;
+  expect(largestHand.points).toEqual(expected);
+});
+
 test('Verifies that given the mixedConsecutiveAndTripletHand, the function returns the corresponding points', () => {
   const result = validateHandStructure(mixedConsecutiveAndTripletHand);
   const pointResults = PointValidator.validateHandPoints(result);
@@ -563,5 +605,13 @@ test('Verifies that given the validHandWithThirteenOrphans, the function returns
   const pointResults = PointValidator.validateHandPoints(result);
   const { largestHand } = pointResults;
   const expected = HKHandMapper.THIRTEEN_ORPHANS.points;
+  expect(largestHand.points).toEqual(expected);
+});
+
+test('Verifies that given the validHandWithAllConsecutiveAndPurity, the function returns the corresponding points', () => {
+  const result = validateHandStructure(allConsecutiveHandWithPurity);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.ALL_CONSECUTIVE.points + HKHandMapper.PURITY.points;
   expect(largestHand.points).toEqual(expected);
 });
