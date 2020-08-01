@@ -58,10 +58,10 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
    */
   const wsCallbacks: Record<string, (...args: unknown[]) => void> = {
     [OutgoingAction.DRAW_TILE]: () => {
-      ws?.sendMessage(OutgoingAction.DRAW_TILE, {});
+      ws?.sendMessage(OutgoingAction.DRAW_TILE, { gameId: game.gameId });
     },
     [OutgoingAction.PLAY_TILE]: (tile: unknown) => {
-      ws?.sendMessage(OutgoingAction.PLAY_TILE, { game: game.gameId, tile });
+      ws?.sendMessage(OutgoingAction.PLAY_TILE, { gameId: game.gameId, tile });
       const mjGameState = gameState as MahjongGameState;
       mjGameState.requestRedraw();
     },
@@ -159,6 +159,10 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     mjPlayer.addTileToHand(tile);
   };
 
+  /**
+   * For PLAY_TILE
+   * @param payload PlayTileJSON
+   */
   const mjGamePlayTile = (payload: unknown): void => {
     const data = payload as PlayTileJSON;
     const tile = TileFactory.createTileFromStringDef(data.tile);
@@ -167,6 +171,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     // add validation of whether other players want to interact
     // for now, change turn
     mjGameState.goToNextTurn();
+    mjGameState.requestRedraw();
     console.log(data.connectionId); // connectionId
   };
 
