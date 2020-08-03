@@ -2,6 +2,11 @@
   --white: #ffffff;
   --black: #000000;
   --primary: #531cb3;
+  --secondary: 	#fbf7f5;
+}
+
+* {
+  box-sizing: border-box
 }
 
 body {
@@ -63,6 +68,22 @@ footer,
   overflow-y: auto;
 }
 
+.background-2 {
+  background-image: url('./assets/background_image_2.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.container-1 {
+  min-height: 70vh;
+  min-width: 25vw;
+}
+
+.games-container-1 {
+  min-height: 70vh;
+  min-width: 40vw;
+}
+
 /***************
     Flex
 ***************/
@@ -87,7 +108,9 @@ footer,
 .justify-content-space-between {
   justify-content: space-between;
 }
-
+.justify-content-space-around {
+  justify-content: space-around;
+}
 .align-center {
   align-items: center;
 }
@@ -130,6 +153,10 @@ footer,
 .background-color-primary {
   background-color: var(--primary);
 }
+.background-color-secondary {
+  background-color: var(--secondary)
+}
+
 
 /*************
     Padding
@@ -280,6 +307,10 @@ footer,
 *************/
 .border-color-black {
   border: 1px solid var(--black);
+}
+
+.border-color-white {
+  border: 1px solid var(--white);
 }
 
 /*************
