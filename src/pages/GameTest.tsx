@@ -5,14 +5,18 @@ import GameTypes from '../modules/game/gameTypes';
 import MahjongVersions from '../modules/mahjong/enums/VersionsEnum';
 import imageInit from '../pixi/imageLoader';
 import SpriteFactory from '../pixi/SpriteFactory';
-import HongKongWall from '../modules/mahjong/Wall/version/HongKongWall';
-import Hand from '../modules/mahjong/Hand/Hand';
-import Opponent from '../modules/game/Opponent/Opponent';
 import MahjongOpponent from '../modules/mahjong/MahjongOpponent/MahjongOpponent';
 import { User, Game } from '../types';
-import Player from '../modules/game/Player/Player';
 import MahjongPlayer from '../modules/mahjong/MahjongPlayer/MahjongPlayer';
 import RenderDirection from '../pixi/directions';
+import TileFactory from '../modules/mahjong/Tile/TileFactory';
+import GameState from '../modules/game/GameState/GameState';
+import MahjongGameState from '../modules/mahjong/MahjongGameState/MahjongGameState';
+import { PIXI_TEXT_STYLE } from '../pixi/mahjongConstants';
+import UserEntity from '../modules/game/UserEntity/UserEntity';
+import Interactions from '../pixi/Interactions';
+import HongKongWall from '../modules/mahjong/Wall/version/HongKongWall';
+import Tile from '../modules/mahjong/Tile/Tile';
 
 /**
  * ********************************************************
@@ -35,10 +39,22 @@ const STARTING_GAME: Game = {
   gameVersion: MahjongVersions.HongKong,
   users: ALL_USERS,
 };
-
-const w = new HongKongWall();
-const DEFAULT_WEIGHTS = Hand.generateHandWeights();
-const h1 = new Hand(w, DEFAULT_WEIGHTS);
+const tileStrings = [
+  '7_DOT',
+  '7_DOT',
+  '7_DOT',
+  '8_DOT',
+  '8_DOT',
+  '2_BAMBOO',
+  '5_BAMBOO',
+  '9_BAMBOO',
+  '9_CHARACTER',
+  'NORTH',
+  'EAST',
+  'REDDRAGON',
+  'WHITEDRAGON',
+];
+const tiles = tileStrings.map((tile) => TileFactory.createTileFromStringDef(tile));
 
 /**
  * ********************************************************
@@ -47,52 +63,14 @@ const h1 = new Hand(w, DEFAULT_WEIGHTS);
  */
 
 let pixiApplication: PIXI.Application;
-let stage: PIXI.Container;
 let pixiLoader: PIXI.Loader;
 let interactionManager: PIXI.InteractionManager;
 
 let spriteFactory: SpriteFactory;
+let gameState: GameState;
+let player: UserEntity;
 
-let player: Player;
-let opponentOne: Opponent;
-let opponentTwo: Opponent;
-let opponentThree: Opponent;
-
-let redrawPending = false;
-
-/**
- * Initialize the Player and Opponent Classes based on the users from currentGame
- * @param currentGame Game
- */
-const playersInit = (currentGame: Game, pixiStage: PIXI.Container) => {
-  const { users } = currentGame;
-
-  const indexOfCurrentUser = users.findIndex((user: User) => user.username === CURRENT_USER.username);
-  const opponents = [];
-  const directions = [RenderDirection.LEFT, RenderDirection.TOP, RenderDirection.RIGHT];
-  let currentIndex = indexOfCurrentUser + 1;
-  for (let i = 0; i < users.length - 1; i += 1) {
-    if (currentIndex >= users.length) {
-      currentIndex = 0;
-    }
-    const opponent = new MahjongOpponent(users[currentIndex].username, directions[i]);
-    opponents.push(opponent);
-    const opponentContainer = opponent.getContainer();
-    pixiStage.addChild(opponentContainer);
-    currentIndex += 1;
-  }
-  [opponentOne, opponentTwo, opponentThree] = [opponents[0], opponents[1], opponents[2]];
-  player = new MahjongPlayer(CURRENT_USER.username);
-  const mahjongPlayer = player as MahjongPlayer;
-  mahjongPlayer.setHand(h1);
-};
-
-// /**
-//  * Allows animate to redraw the game if there is a state change.
-//  */
-// const requestRedraw = () => {
-//   redrawPending = false;
-// };
+const wall = new HongKongWall();
 
 /**
  * Testing page for the Game.
@@ -101,42 +79,87 @@ const playersInit = (currentGame: Game, pixiStage: PIXI.Container) => {
 const GameTestPage = (): JSX.Element => {
   const canvasRef = useRef<HTMLDivElement>(null);
 
-  // const [redrawPending, setRedrawPending] = useState(false);
+  const mockWSCallbacks: Record<string, (...args: unknown[]) => void> = {
+    DRAW_TILE: () => {
+      console.log(gameState);
+    },
+    PLAY_TILE: (tile: unknown) => {
+      const mjGameState = gameState as MahjongGameState;
+      const tileStr = tile as string;
+      const tileInstance = TileFactory.createTileFromStringDef(tileStr);
+      mjGameState.getDeadPile().add(tileInstance);
+      mjGameState.requestRedraw();
+    },
+    REQUEST_REDRAW: () => {
+      const mjGameState = gameState as MahjongGameState;
+      mjGameState.requestRedraw();
+    },
+  };
 
-  const requestRedraw = () => {
-    redrawPending = false;
+  /**
+   * Initialize the GameState
+   * @param currentGame Game
+   */
+  const gameStateInit = (currentGame: Game) => {
+    const { users } = currentGame;
+
+    const indexOfCurrentUser = users.findIndex((user: User) => user.username === CURRENT_USER.username);
+    const allUserEntities = [];
+    const directions = [RenderDirection.LEFT, RenderDirection.TOP, RenderDirection.RIGHT];
+    let currentIndex = indexOfCurrentUser + 1;
+    for (let i = 0; i < users.length - 1; i += 1) {
+      if (currentIndex >= users.length) {
+        currentIndex = 0;
+      }
+      const opponent = new MahjongOpponent(
+        users[currentIndex].username,
+        users[currentIndex].connectionId,
+        directions[i],
+      );
+      allUserEntities[currentIndex] = opponent;
+      currentIndex += 1;
+    }
+
+    player = new MahjongPlayer(CURRENT_USER.username, CURRENT_USER.connectionId);
+    const mahjongPlayer = player as MahjongPlayer;
+    mahjongPlayer.setHand(tiles);
+
+    allUserEntities[indexOfCurrentUser] = mahjongPlayer;
+
+    gameState = new MahjongGameState(allUserEntities, mockWSCallbacks);
+    console.log(gameState);
+  };
+
+  const forGameTesting = () => {
+    const mjGameState = gameState as MahjongGameState;
+    const mjPlayer = player as MahjongPlayer;
+    const { stage } = pixiApplication;
+    const drawText = new PIXI.Text('Draw Tile', PIXI_TEXT_STYLE);
+    Interactions.addMouseInteraction(drawText, (event: PIXI.InteractionEvent) => {
+      const tile = wall.draw() as Tile;
+      mjPlayer.addTileToHand(tile);
+      console.log(event);
+      mjGameState.requestRedraw();
+    });
+    const nextTurnText = new PIXI.Text('Next turn', PIXI_TEXT_STYLE);
+    nextTurnText.x = 200;
+    Interactions.addMouseInteraction(nextTurnText, (event: PIXI.InteractionEvent) => {
+      console.log(event);
+      mjGameState.goToNextTurn();
+      mjGameState.requestRedraw();
+      console.log(mockWSCallbacks.DRAW_TILE());
+    });
+    stage.addChild(drawText);
+    stage.addChild(nextTurnText);
   };
 
   /**
    * Main Animation loop
    */
   function animate() {
-    if (!redrawPending) {
-      redrawPending = true;
-      stage.removeChildren(0, stage.children.length);
-
-      const mahjongPlayer = player as MahjongPlayer;
-      mahjongPlayer.removeAllAssets();
-      mahjongPlayer.render(spriteFactory, stage, requestRedraw);
-      mahjongPlayer.reposition(pixiApplication.view);
-
-      const mahjongOpponentOne = opponentOne as MahjongOpponent;
-      mahjongOpponentOne.removeAllAssets();
-      mahjongOpponentOne.render(spriteFactory, stage);
-      mahjongOpponentOne.reposition(pixiApplication.view);
-
-      const mahjongOpponentTwo = opponentTwo as MahjongOpponent;
-      mahjongOpponentTwo.removeAllAssets();
-      mahjongOpponentTwo.render(spriteFactory, stage);
-      mahjongOpponentTwo.reposition(pixiApplication.view);
-
-      const mahjongOpponentThree = opponentThree as MahjongOpponent;
-      mahjongOpponentThree.removeAllAssets();
-      mahjongOpponentThree.render(spriteFactory, stage);
-      mahjongOpponentThree.reposition(pixiApplication.view);
-
-      pixiApplication.render();
-    }
+    const mjGameState = gameState as MahjongGameState;
+    mjGameState.renderCanvas(spriteFactory, pixiApplication);
+    forGameTesting();
     requestAnimationFrame(animate);
   }
 
@@ -157,14 +180,12 @@ const GameTestPage = (): JSX.Element => {
     interactionManager = pixiApplication.renderer.plugins.interaction;
     pixiLoader = pixiApplication.loader;
     console.log(interactionManager);
-    stage = pixiApplication.stage;
 
     function setup(loader: PIXI.Loader, resources: Partial<Record<string, PIXI.LoaderResource>>): void {
       console.log(loader);
       spriteFactory = new SpriteFactory(resources);
 
-      playersInit(STARTING_GAME, stage);
-
+      gameStateInit(STARTING_GAME);
       animate();
     }
 
@@ -178,9 +199,8 @@ const GameTestPage = (): JSX.Element => {
    */
   useEffect(() => {
     function handleResize() {
-      opponentOne.reposition(pixiApplication.view);
-
-      requestRedraw();
+      const mjGameState = gameState as MahjongGameState;
+      mjGameState.requestRedraw();
     }
     window.addEventListener('resize', handleResize);
 

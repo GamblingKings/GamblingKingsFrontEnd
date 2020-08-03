@@ -118,5 +118,20 @@ export interface GamePageLoadJSON {
  * Interface for GAME_START payload received
  */
 export interface GameStartJSON {
-  tiles: string[];
+  tiles: string;
+}
+
+/**
+ * Interface for DRAW_TILE payload received
+ */
+export interface DrawTileJSON {
+  tile: string;
+}
+
+/**
+ * Interface for PLAY_TILE payload received
+ */
+export interface PlayTileJSON {
+  tile: string;
+  connectionId: string;
 }

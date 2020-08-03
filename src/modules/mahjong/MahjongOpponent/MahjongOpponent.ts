@@ -1,6 +1,5 @@
 import * as PIXI from 'pixi.js';
 
-import Opponent from '../../game/Opponent/Opponent';
 import Tile from '../Tile/Tile';
 import RenderDirection from '../../../pixi/directions';
 import SpriteFactory from '../../../pixi/SpriteFactory';
@@ -12,30 +11,30 @@ import {
   PIXI_TEXT_STYLE,
   BACK_TILE,
 } from '../../../pixi/mahjongConstants';
+import OpponentHand from '../Hand/OpponentHand';
+import UserEntity from '../../game/UserEntity/UserEntity';
 
 /**
  * Mahjong Opponent that holds information about its tiles and render methods
  */
-class MahjongOpponent extends Opponent {
-  private numberOfTiles: number;
+class MahjongOpponent extends UserEntity {
+  private opponentHand: OpponentHand;
 
-  private playedTiles: Tile[][] = [];
-
-  constructor(name: string, location: RenderDirection) {
-    super(name, location);
-    this.numberOfTiles = 13;
+  constructor(name: string, connectionId: string, location: RenderDirection) {
+    super(name, connectionId, location);
+    this.opponentHand = new OpponentHand();
   }
 
-  public getNumberOfTiles(): number {
-    return this.numberOfTiles;
-  }
-
-  public getPlayedTiles(): Tile[][] {
-    return this.playedTiles;
+  public getHand(): OpponentHand {
+    return this.opponentHand;
   }
 
   public addPlayedTiles(tiles: Tile[]): void {
-    this.playedTiles.push(tiles);
+    this.opponentHand.addPlayedTiles(tiles);
+  }
+
+  public getPlayedTiles(): Tile[][] {
+    return this.opponentHand.getPlayedTiles();
   }
 
   /**
@@ -53,7 +52,8 @@ class MahjongOpponent extends Opponent {
    */
   public renderMahjongHand(spriteFactory: SpriteFactory): PIXI.Container {
     const container = new PIXI.Container();
-    for (let i = 0; i < this.numberOfTiles; i += 1) {
+    const hand = this.opponentHand;
+    for (let i = 0; i < hand.getNumberOfTiles(); i += 1) {
       const backSprite = spriteFactory.generateSprite(BACK_TILE);
       backSprite.width = DEFAULT_MAHJONG_WIDTH;
       backSprite.height = DEFAULT_MAHJONG_HEIGHT;
@@ -77,9 +77,14 @@ class MahjongOpponent extends Opponent {
    * @param spriteFactory SpriteFactory
    * @param pixiStage PIXI.Container
    */
-  public render(spriteFactory: SpriteFactory, pixiStage: PIXI.Container): void {
+  public render(spriteFactory: SpriteFactory, pixiStage: PIXI.Container, isUserTurn: boolean): void {
     const opponentContainer = super.getContainer();
-
+    if (isUserTurn) {
+      const graphics = new PIXI.Graphics();
+      graphics.beginFill(0x3498db);
+      graphics.drawCircle(0, 0, 20);
+      opponentContainer.addChild(graphics);
+    }
     const hand = this.renderMahjongHand(spriteFactory);
     const name = this.renderName();
 

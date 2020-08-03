@@ -1,3 +1,7 @@
+import * as PIXI from 'pixi.js';
+
+import SpriteFactory from '../../../pixi/SpriteFactory';
+
 /**
  * The DeadPile class represents the pool of tiles that is no longer in play. Tiles are added to
  * the deadpile when the tile is "thrown" from a player hand and no one takes the tile.
@@ -5,11 +9,19 @@
  */
 
 import Tile from '../Tile/Tile';
+import {
+  FRONT_TILE,
+  DEFAULT_MAHJONG_WIDTH,
+  DEFAULT_MAHJONG_HEIGHT,
+  PIXI_TEXT_STYLE,
+} from '../../../pixi/mahjongConstants';
 
 class DeadPile {
   private deadpile: Tile[];
 
   private lastThrow: Tile | null;
+
+  private container: PIXI.Container;
 
   /**
    * Public constructor
@@ -17,6 +29,7 @@ class DeadPile {
   constructor() {
     this.deadpile = [];
     this.lastThrow = null;
+    this.container = new PIXI.Container();
   }
 
   /**
@@ -31,6 +44,10 @@ class DeadPile {
    */
   public getLastThrown(): Tile | null {
     return this.lastThrow;
+  }
+
+  public getContainer(): PIXI.Container {
+    return this.container;
   }
 
   /**
@@ -60,6 +77,42 @@ class DeadPile {
   public clear(): void {
     this.deadpile = [];
     this.lastThrow = null;
+  }
+
+  public removeAllAssets(): void {
+    this.container.removeChildren(0, this.container.children.length);
+  }
+
+  public renderTiles(spriteFactory: SpriteFactory): PIXI.Container {
+    const container = new PIXI.Container();
+
+    this.deadpile.forEach((tile: Tile, index: number) => {
+      const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
+      frontSprite.width = DEFAULT_MAHJONG_WIDTH;
+      frontSprite.height = DEFAULT_MAHJONG_HEIGHT;
+      frontSprite.x = index * DEFAULT_MAHJONG_WIDTH;
+      const tileSprite = spriteFactory.generateSprite(tile.toString());
+      tileSprite.width = DEFAULT_MAHJONG_WIDTH;
+      tileSprite.height = DEFAULT_MAHJONG_HEIGHT;
+      tileSprite.x = index * DEFAULT_MAHJONG_WIDTH;
+
+      container.addChild(frontSprite);
+      container.addChild(tileSprite);
+    });
+
+    return container;
+  }
+
+  public render(spriteFactory: SpriteFactory, pixiStage: PIXI.Container): void {
+    const tileContainer = this.renderTiles(spriteFactory);
+
+    const placeholderText = new PIXI.Text('Dead Pile', PIXI_TEXT_STYLE);
+    this.container.addChild(tileContainer);
+    this.container.addChild(placeholderText);
+    this.container.x = 250;
+    this.container.y = 400;
+
+    pixiStage.addChild(this.container);
   }
 }
 
