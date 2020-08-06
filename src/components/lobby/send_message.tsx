@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import Input from '@material-ui/core/Input';
+import Button from '@material-ui/core/Button';
+
 import WebSocketConnection from '../../modules/ws/websocket';
 import OutgoingAction from '../../modules/ws/outgoing_action';
 import { CurrentUser } from '../../types';
@@ -18,8 +21,7 @@ const SendMessageForm = ({ ws, currentUser }: SendMessageFormProps): JSX.Element
     setMessage(event.target.value);
   };
 
-  const sendMessage = (event: React.FormEvent<HTMLInputElement>): void => {
-    event.preventDefault();
+  const sendMessage = (): void => {
     const payload = {
       message,
       username: currentUser.username,
@@ -35,11 +37,10 @@ const SendMessageForm = ({ ws, currentUser }: SendMessageFormProps): JSX.Element
 
   return (
     <div>
-      <p>Send Message</p>
-      <form>
-        <input value={message} onChange={handleSetMessage} />
-        <input type="submit" value="Send" onClick={sendMessage} />
-      </form>
+      <Input placeholder="Enter a Message" defaultValue={message} onChange={handleSetMessage} />
+      <Button variant="contained" color="primary" onClick={sendMessage}>
+        Send
+      </Button>
     </div>
   );
 };

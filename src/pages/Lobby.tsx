@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import Button from '@material-ui/core/Button';
 
 import { WebSocketConnection, IncomingAction, OutgoingAction } from '../modules/ws';
 import {
@@ -18,6 +19,9 @@ import {
 import CreateGameForm from '../components/lobby/create_game';
 import SendMessageForm from '../components/lobby/send_message';
 import GameLobby from '../components/lobby/game_lobby';
+import GameRow from '../components/lobby/game_row';
+
+import logo from '../assets/logo.png';
 
 type LobbyProps = {
   ws: WebSocketConnection | null;
@@ -274,50 +278,65 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
   }, [ws]);
 
   return (
-    <div className="">
-      <header className="margin-bottom-20">
-        <h3>Gambling Kings Lobby</h3>
-      </header>
-      <div className="flex-row">
-        <div className="border-color-black margin-right-20 padding-30">
-          <p>Users</p>
-          {users.map((user) => (
-            <p key={user.connectionId}>{user.username}</p>
-          ))}
-        </div>
-        <div className="border-color-black padding-30">
-          <p>Games</p>
-          {games.map((game) => (
-            <button type="button" onClick={() => requestJoinGame(game.gameId)} key={game.gameId}>
-              {game.gameName}
-            </button>
-          ))}
-        </div>
+    <div className="page flex-column background-2">
+      <div className="flex-row align-center justify-content-center padding-20">
+        <img className="margin-right-10" src={logo} alt="mahjong-logo" />
+        <header className="">
+          <h1 className="color-white">Gambling Kings Lobby</h1>
+        </header>
       </div>
 
-      <div>
-        <button type="button" onClick={toggleCreateGameModal}>
+      <div className="flex-row justify-content-center margin-top-10 margin-bottom-20">
+        <Button variant="contained" color="primary" size="large" onClick={toggleCreateGameModal}>
           Create Game
-        </button>
+        </Button>
+      </div>
+
+      <div id="lobby-main-container" className="flex-row container-1 align-items-center justify-content-space-around">
+        <div
+          id="users-container"
+          className="border-color-white background-color-secondary padding-30 container-1 border-radius-5 overflow-y"
+        >
+          <h2 className="">Users</h2>
+          {users.map((user) => (
+            <p className="" key={user.connectionId}>
+              {user.username}
+            </p>
+          ))}
+        </div>
+
+        <div
+          id="games-container"
+          className="border-color-white padding-30 games-container-1 border-radius-5 background-color-secondary overflow-y"
+        >
+          <h2 className="">Games</h2>
+          {games.map((game) => (
+            <GameRow gameId={game.gameId} onClickHandler={requestJoinGame} roomName={game.gameName} />
+          ))}
+        </div>
+
+        <div
+          id="messages-container"
+          className="border-color-white background-color-secondary padding-30 container-1 border-radius-5 overflow-y"
+        >
+          <h2 className="">Messages</h2>
+          <SendMessageForm ws={ws} currentUser={currentUser} />
+          <div className="margin-top-10">
+            {messages.map(({ time, username, message }) => (
+              <p key={time.toString()}>{`${time} ${username} ${message}`}</p>
+            ))}
+          </div>
+        </div>
       </div>
 
       {createGameModal && (
-        <div className="modal background-color-primary margin-top-30">
+        <div className="center-modal background-color-grey margin-top-30">
           <CreateGameForm ws={ws} toggleOff={closeCreateGameModal} />
         </div>
       )}
 
-      <div className="margin-top-30">
-        <SendMessageForm ws={ws} currentUser={currentUser} />
-      </div>
-      <div>
-        <p>Messages</p>
-        {messages.map(({ time, username, message }) => (
-          <p key={time.toString()}>{`${time} ${username} ${message}`}</p>
-        ))}
-      </div>
       {currentGame && (
-        <div className="modal background-color-primary margin-top-30">
+        <div className="center-modal background-color-grey margin-top-30">
           <GameLobby
             ws={ws}
             gameRef={currentGameRef}
