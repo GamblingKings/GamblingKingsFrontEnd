@@ -19,6 +19,7 @@ import {
 import CreateGameForm from '../components/lobby/create_game';
 import SendMessageForm from '../components/lobby/send_message';
 import GameLobby from '../components/lobby/game_lobby';
+import GameRow from '../components/lobby/game_row';
 
 import logo from '../assets/logo.png';
 
@@ -294,7 +295,7 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
       <div id="lobby-main-container" className="flex-row container-1 align-items-center justify-content-space-around">
         <div
           id="users-container"
-          className="border-color-white background-color-secondary padding-30 container-1 border-radius-5"
+          className="border-color-white background-color-secondary padding-30 container-1 border-radius-5 overflow-y"
         >
           <h2 className="">Users</h2>
           {users.map((user) => (
@@ -306,24 +307,17 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
 
         <div
           id="games-container"
-          className="border-color-white padding-30 games-container-1 border-radius-5 background-color-secondary"
+          className="border-color-white padding-30 games-container-1 border-radius-5 background-color-secondary overflow-y"
         >
           <h2 className="">Games</h2>
           {games.map((game) => (
-            <button
-              className="color-white"
-              type="button"
-              onClick={() => requestJoinGame(game.gameId)}
-              key={game.gameId}
-            >
-              {game.gameName}
-            </button>
+            <GameRow gameId={game.gameId} onClickHandler={requestJoinGame} roomName={game.gameName} />
           ))}
         </div>
 
         <div
           id="messages-container"
-          className="border-color-white background-color-secondary padding-30 container-1 border-radius-5"
+          className="border-color-white background-color-secondary padding-30 container-1 border-radius-5 overflow-y"
         >
           <h2 className="">Messages</h2>
           <SendMessageForm ws={ws} currentUser={currentUser} />
@@ -336,13 +330,13 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
       </div>
 
       {createGameModal && (
-        <div className="modal background-color-primary margin-top-30">
+        <div className="center-modal background-color-grey margin-top-30">
           <CreateGameForm ws={ws} toggleOff={closeCreateGameModal} />
         </div>
       )}
 
       {currentGame && (
-        <div className="modal background-color-primary margin-top-30">
+        <div className="center-modal background-color-grey margin-top-30">
           <GameLobby
             ws={ws}
             gameRef={currentGameRef}

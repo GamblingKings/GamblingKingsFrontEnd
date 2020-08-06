@@ -1,5 +1,7 @@
 /* eslint-disable object-curly-newline */
 import React, { useState, useRef, useEffect } from 'react';
+import Button from '@material-ui/core/Button';
+import { makeStyles } from '@material-ui/core/styles';
 import { useHistory } from 'react-router-dom';
 import { Game, Message, InGameMessageJSON, InGameUpdateJSON, StartGameJSON, LeaveGameJSON } from '../../types';
 import { WebSocketConnection, IncomingAction, OutgoingAction } from '../../modules/ws';
@@ -11,6 +13,17 @@ type GameLobbyProps = {
   setGame: React.Dispatch<React.SetStateAction<Game | null>>;
   removeGame: (gameId: string) => void;
 };
+
+const useStyles = makeStyles((theme) => ({
+  marginRight: {
+    marginRight: '20px',
+  },
+  input: {},
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+}));
 
 // TODO: only host can see the start game button.
 
@@ -137,32 +150,42 @@ const GameLobby = ({ ws, game, gameRef, setGame }: GameLobbyProps): JSX.Element 
     // eslint-disable-next-line
   }, []);
 
+  const classes = useStyles();
+
   return (
-    <div className="padding-30">
-      <p className="padding-10 color-white">Game Lobby</p>
+    <div className="padding-30 flex-column justify-content-center min-width-100">
+      <div>
+        <h2 className="padding-10">Game Lobby</h2>
+      </div>
       {game && (
         <>
-          <p>Game Info</p>
-          <p>{`Game Name: ${game.gameName}`}</p>
-          <p>{`Game Type: ${game.gameType}`}</p>
-          <p>{`Game Version: ${game.gameVersion}`}</p>
-          <p>{`Host: ${game.host.username}`}</p>
+          <div className="flex-column min-width-100 margin-10 border-color-black border-radius-5 padding-20">
+            <p>Game Info</p>
+            <p>{`Game Name: ${game.gameName}`}</p>
+            <p>{`Game Type: ${game.gameType}`}</p>
+            <p>{`Game Version: ${game.gameVersion}`}</p>
+            <p>{`Host: ${game.host.username}`}</p>
+          </div>
         </>
       )}
-      <button type="button" onClick={requestLeaveGame}>
-        Leave Game
-      </button>
-      <button type="button" onClick={requestStartGame}>
-        Start Game
-      </button>
-      <div>
-        <p>Users</p>
+
+      <div className="flex-column min-width-100 margin-10 border-color-black border-radius-5 padding-20">
+        <h3>Users</h3>
         {game && game.users.map((user) => <p key={user.connectionId}>{user.username}</p>)}
       </div>
       <div>
         {messages.map(({ message, username, time }) => (
           <p key={time.toString()}>{`${time} ${username} ${message}`}</p>
         ))}
+      </div>
+
+      <div className="flex-row justify-content-center align-items-center margin-top-20 min-width-100">
+        <Button classes={{ root: classes.marginRight }} variant="contained" color="primary" onClick={requestLeaveGame}>
+          Leave Game
+        </Button>
+        <Button variant="contained" color="secondary" onClick={requestStartGame}>
+          Start Game
+        </Button>
       </div>
     </div>
   );

@@ -41,8 +41,6 @@ const SendMessageForm = ({ ws, currentUser }: SendMessageFormProps): JSX.Element
       <Button variant="contained" color="primary" onClick={sendMessage}>
         Send
       </Button>
-      {/* <input value={message} onChange={handleSetMessage} />
-        <input type="submit" value="Send" onClick={sendMessage} /> */}
     </div>
   );
 };

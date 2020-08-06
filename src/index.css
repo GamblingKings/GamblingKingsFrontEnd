@@ -1,8 +1,9 @@
 :root {
   --white: #ffffff;
   --black: #000000;
-  --primary: #531cb3;
+  --primary: #b19cd9;
   --secondary: 	#fbf7f5;
+  --grey: #cccccc;
 }
 
 * {
@@ -84,6 +85,18 @@ footer,
   min-width: 40vw;
 }
 
+.center-modal {
+  display: block;
+  z-index: 100;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: 75vh;
+  width: 50vw;
+  opacity: 1;
+}
+
 /***************
     Flex
 ***************/
@@ -114,7 +127,9 @@ footer,
 .align-center {
   align-items: center;
 }
-
+.align-self {
+  align-self: center;
+}
 /*************
     Text-align
 *************/
@@ -155,6 +170,9 @@ footer,
 }
 .background-color-secondary {
   background-color: var(--secondary)
+}
+.background-color-grey {
+  background-color: var(--grey)
 }
 
 
@@ -350,6 +368,16 @@ footer,
 }
 .min-width-200px {
   min-width: 200px;
+}
+.min-width-100 {
+  min-width: 100%;
+}
+
+/*************
+    Width
+*************/
+.overflow-y {
+  overflow-y: auto;
 }
 
 /*************
