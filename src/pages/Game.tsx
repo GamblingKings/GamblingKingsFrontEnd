@@ -96,7 +96,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     }
     player = new MahjongPlayer(current$User.username, users[indexOfCurrentUser].connectionId);
     allUserEntities[indexOfCurrentUser] = player;
-    gameState = new MahjongGameState(allUserEntities, wsCallbacks);
+    gameState = new MahjongGameState(allUserEntities, player as MahjongPlayer, wsCallbacks);
   };
 
   /**
@@ -143,7 +143,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     mjPlayer.setHand(tiles);
 
     const mjGameState = gameState as MahjongGameState;
-    mjGameState.startRound(player);
+    mjGameState.startRound();
 
     animate();
   };

@@ -4,6 +4,7 @@ import sortHandUtils from '../utils/functions/sortHand';
 import BonusTileTypes from '../enums/BonusTileEnums';
 import HonorTileTypes from '../enums/HonorTileEnums';
 import SimpleTileTypes from '../enums/SimpleTileEnums';
+import WindEnums from '../enums/WindEnums';
 
 /**
  * Hand that the Player (client-side) should have.
@@ -18,10 +19,18 @@ class PlayerHand {
 
   private hasDrawnTile: boolean;
 
+  // For hand validation
+  private wind: WindEnums;
+
+  // For hand validation
+  private flowerNumber: number; // 1 - 4
+
   constructor(tiles: Tile[] = []) {
     this.tiles = tiles;
     this.playedTiles = [];
     this.hasDrawnTile = false;
+    this.wind = WindEnums.EAST;
+    this.flowerNumber = 1;
   }
 
   /**
@@ -95,6 +104,30 @@ class PlayerHand {
 
   public getHasDrawnTile(): boolean {
     return this.hasDrawnTile;
+  }
+
+  public getFlowerNumber(): number {
+    return this.flowerNumber;
+  }
+
+  public getWind(): WindEnums {
+    return this.wind;
+  }
+
+  public setFlowerNumber(flowerNumber: number): boolean {
+    if (flowerNumber >= 1 && flowerNumber <= 4) {
+      this.flowerNumber = flowerNumber;
+      return true;
+    }
+    return false;
+  }
+
+  public setWind(wind: WindEnums): boolean {
+    if (wind in WindEnums) {
+      this.wind = wind;
+      return true;
+    }
+    return false;
   }
 
   public addPlayedTiles(tiles: Tile[]): boolean {

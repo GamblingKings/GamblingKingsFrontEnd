@@ -7,6 +7,58 @@ import SpriteFactory from '../../../pixi/SpriteFactory';
 import DeadPile from '../DeadPile/DeadPile';
 import WallCounter from '../WallCounter/WallCounter';
 import { OutgoingAction } from '../../ws';
+import MahjongPlayer from '../MahjongPlayer/MahjongPlayer';
+
+/**
+ * Get flower number based on player and dealer position
+ * @param playerPosition number
+ * @param dealerPosition number
+ */
+const getFlowerNumber = (playerPosition: number, dealerPosition: number): number => {
+  // List of permutations
+  // Pass in player position first, then dealer position for player's flower number
+  // Someone make this look prettier if they figure out a better way
+  const permutations: Record<number, Record<number, number>> = {
+    0: {
+      0: 1,
+      1: 4,
+      2: 3,
+      3: 2,
+    },
+    1: {
+      0: 2,
+      1: 1,
+      2: 4,
+      3: 3,
+    },
+    2: {
+      0: 3,
+      1: 2,
+      2: 1,
+      3: 4,
+    },
+    3: {
+      0: 4,
+      1: 3,
+      2: 2,
+      3: 1,
+    },
+  };
+  return permutations[playerPosition][dealerPosition];
+};
+
+/**
+ * Get player wind based on player flower number and current wind
+ * @param flowerNumber number
+ * @param currentWind WindEnums
+ */
+const getPlayerWind = (flowerNumber: number, currentWind: WindEnums): WindEnums => {
+  const windOrder = [WindEnums.EAST, WindEnums.SOUTH, WindEnums.WEST, WindEnums.NORTH];
+  const windIndex = windOrder.findIndex((wind) => wind === currentWind);
+
+  // Minus 1 due to flowerNumber being (1-4) and need to normalize to 0-3
+  return windOrder[(windIndex + flowerNumber - 1) % 4];
+};
 
 /**
  * Class that holds all the Mahjong game state for the Front-End Client.
@@ -26,7 +78,9 @@ class MahjongGameState extends GameState {
 
   private wallCounter: WallCounter;
 
-  constructor(users: UserEntity[], wsCallbacks: Record<string, (...args: unknown[]) => void>) {
+  private mjPlayer: MahjongPlayer;
+
+  constructor(users: UserEntity[], mjPlayer: MahjongPlayer, wsCallbacks: Record<string, (...args: unknown[]) => void>) {
     super(users);
     this.currentWind = WindEnums.EAST;
     this.redrawPending = false;
@@ -35,6 +89,7 @@ class MahjongGameState extends GameState {
     this.deadPile = new DeadPile();
     this.wallCounter = new WallCounter();
     this.wsCallbacks = wsCallbacks;
+    this.mjPlayer = mjPlayer;
   }
 
   /**
@@ -56,14 +111,18 @@ class MahjongGameState extends GameState {
     return this.deadPile;
   }
 
-  public startRound(player: UserEntity): void {
+  public startRound(): boolean {
     this.roundStarted = true;
     const gameUsers = super.getUsers();
-    const indexOfUser = gameUsers.findIndex((user) => user.getConnectionId() === player.getConnectionId());
+    const indexOfUser = gameUsers.findIndex((user) => user.getConnectionId() === this.mjPlayer.getConnectionId());
     if (indexOfUser === this.dealer) {
       this.wsCallbacks[OutgoingAction.DRAW_TILE]();
     }
-    console.log(player);
+    const flowerNumber = getFlowerNumber(indexOfUser, this.dealer);
+    const playerWind = getPlayerWind(flowerNumber, this.currentWind);
+
+    // Return true if set up is correct
+    return this.mjPlayer.setWindAndFlower(playerWind, flowerNumber);
   }
 
   public endRound(): void {

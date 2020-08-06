@@ -126,7 +126,7 @@ const GameTestPage = (): JSX.Element => {
 
     allUserEntities[indexOfCurrentUser] = mahjongPlayer;
 
-    gameState = new MahjongGameState(allUserEntities, mockWSCallbacks);
+    gameState = new MahjongGameState(allUserEntities, mahjongPlayer, mockWSCallbacks);
     console.log(gameState);
   };
 
