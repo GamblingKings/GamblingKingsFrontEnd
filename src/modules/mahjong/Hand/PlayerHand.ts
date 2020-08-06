@@ -123,7 +123,7 @@ class PlayerHand {
   }
 
   public setWind(wind: WindEnums): boolean {
-    if (wind in WindEnums) {
+    if (Object.values(WindEnums).includes(wind)) {
       this.wind = wind;
       return true;
     }

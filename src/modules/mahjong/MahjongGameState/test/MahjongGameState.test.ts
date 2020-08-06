@@ -27,7 +27,7 @@ beforeEach(() => {
   mjOpponent3 = new MahjongOpponent('Opp Right', 'connectionId', RenderDirection.RIGHT);
   users = [mjPlayer, mjOpponent1, mjOpponent2, mjOpponent3];
 
-  gameState = new MahjongGameState(users, callbacks);
+  gameState = new MahjongGameState(users, mjPlayer, callbacks);
 });
 
 test('MahjongGameState - getUsers()', () => {
@@ -44,7 +44,7 @@ test('MahjongGameState - getCurrentTurn() / goToNextTurn()', () => {
 
 test('MahjongGameState - roundStarted()', () => {
   expect(gameState.getRoundStarted()).toBeFalsy();
-  gameState.startRound(mjPlayer);
+  gameState.startRound();
   expect(gameState.getRoundStarted()).toBeTruthy();
   gameState.endRound();
   expect(gameState.getRoundStarted()).toBeFalsy();
