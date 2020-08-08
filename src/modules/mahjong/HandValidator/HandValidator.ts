@@ -7,7 +7,12 @@ import TileMapper from '../Tile/map/TileMapper';
 import MeldTypes from '../enums/MeldEnums';
 import sortHandUtils from '../utils/functions/sortHand';
 import Hand from '../Hand/Hand';
-import { isSimpleTile as isSimpleTileUtils } from '../utils/functions/checkTypes';
+import {
+  isSimpleTile as isSimpleTileUtils,
+  isBonusTile as isBonusTileUtils,
+  isBonusTile,
+} from '../utils/functions/checkTypes';
+import WindEnums from '../enums/WindEnums';
 
 class HandValidator {
   public static TRIPLET_SIZE = 3;
@@ -84,15 +89,20 @@ class HandValidator {
     const mapping: { [index: string]: number } = {};
     const sortedTiles = sortHandUtils(tiles, Hand.generateHandWeights());
     sortedTiles.forEach((t) => {
-      if (Object.prototype.hasOwnProperty.call(mapping, t.toString())) mapping[t.toString()] += 1;
-      else mapping[t.toString()] = 1;
+      const tileStr = t.toString();
+      if (!isBonusTileUtils(tileStr)) {
+        if (Object.prototype.hasOwnProperty.call(mapping, tileStr)) mapping[tileStr] += 1;
+        else mapping[tileStr] = 1;
+      }
     });
 
     return mapping;
   }
 
-  public static determineAllPossiblePairs(tiles: Tile[]): ValidPair[] {
+  public static determineAllPossiblePairs(tiles: Tile[], wind: WindEnums = WindEnums.EAST, flower = 1): ValidPair[] {
     const tileMapping = this.createTileMapping(tiles);
+    const filteredTiles = tiles.filter((t) => !isBonusTile(t.toString()));
+    const bonusTiles = tiles.filter((t) => isBonusTile(t.toString()));
 
     /**
      * Valid Pair Schema:
@@ -116,7 +126,10 @@ class HandValidator {
           pair: key,
           remainingTiles: mappingCopy,
           numTiles,
-          originalTiles: tiles,
+          filteredTiles,
+          bonusTiles,
+          wind,
+          flower,
         });
       }
     });
@@ -136,7 +149,7 @@ class HandValidator {
     };
 
     validPairs.forEach((vp) => {
-      results.isThirteenTerminals = HandValidator.validateThirteenOrphans(vp.originalTiles);
+      results.isThirteenTerminals = HandValidator.validateThirteenOrphans(vp.filteredTiles);
       if (results.isThirteenTerminals) {
         results.valid.push({
           ...vp,

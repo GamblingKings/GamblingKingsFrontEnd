@@ -49,6 +49,22 @@ const HKHandMapper: { [index: string]: HandDefinition } = {
     points: 13,
     name: 'ALL_KONGS',
   },
+  DRAGON_MELD: {
+    points: 1,
+    name: 'DRAGON_MELD',
+  },
+  WIND_MELD: {
+    points: 1,
+    name: 'WIND_MELD',
+  },
+  FLOWER: {
+    points: 1,
+    name: 'FLOWER',
+  },
+  SEASON: {
+    points: 1,
+    name: 'SEASON',
+  },
 };
 
 export default HKHandMapper;

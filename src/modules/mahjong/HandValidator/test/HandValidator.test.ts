@@ -2,6 +2,7 @@ import HandValidator from '../HandValidator';
 import TileFactory from '../../Tile/TileFactory';
 import Tile from '../../Tile/Tile';
 import validateHandStructure from '../../utils/functions/validateHandStructure';
+import WindEnums from '../../enums/WindEnums';
 
 const validThirteenOrphansHand = [
   '1_DOT',
@@ -245,4 +246,14 @@ test('Validate Thirteen Orphans returns false if hand does not contain all 13 re
   validThirteenOrphansHand.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
   tiles.splice(1, 1, TileFactory.createTileFromStringDef('GREENDRAGON'));
   expect(HandValidator.validateThirteenOrphans(tiles)).toBeFalsy();
+});
+
+test('Validate that the wind gets set correctly', () => {
+  const result = validateHandStructure(validHandWithPurity, WindEnums.NORTH);
+  expect(result.valid[0].wind).toBe(WindEnums.NORTH);
+});
+
+test('Validate that the flower gets set correctly', () => {
+  const result = validateHandStructure(validHandWithPurity, WindEnums.NORTH, 3);
+  expect(result.valid[0].flower).toBe(3);
 });
