@@ -16,6 +16,7 @@ import UserEntity from '../../game/UserEntity/UserEntity';
 import PlayerHand from '../Hand/PlayerHand';
 import Tile from '../Tile/Tile';
 import { OutgoingAction } from '../../ws';
+import WindEnums from '../enums/WindEnums';
 
 /**
  * Mahjong player that holds information about current hand (tiles) and render methods
@@ -45,6 +46,10 @@ class MahjongPlayer extends UserEntity {
 
   public addTileToHand(tile: Tile): void {
     this.hand.draw(tile);
+  }
+
+  public setWindAndFlower(wind: WindEnums, flowerNumber: number): boolean {
+    return this.hand.setWind(wind) && this.hand.setFlowerNumber(flowerNumber);
   }
 
   /**

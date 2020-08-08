@@ -1,6 +1,7 @@
 import PlayerHand from '../PlayerHand';
 import TileFactory from '../../Tile/TileFactory';
 import Tile from '../../Tile/Tile';
+import WindEnums from '../../enums/WindEnums';
 
 let emptyHand: PlayerHand;
 let fullHand: PlayerHand;
@@ -92,4 +93,39 @@ test('PlayerHand - draw()', () => {
   fullHand.throw();
   expect(fullHand.getTiles()).toHaveLength(13);
   expect(fullHand.getTiles()).toStrictEqual(tiles);
+});
+
+test('PlayerHand - getFlowerNumber()', () => {
+  expect(emptyHand.getFlowerNumber()).toBe(1);
+  expect(fullHand.getFlowerNumber()).toBe(1);
+});
+
+test('PlayerHand - setFlowerNumber()', () => {
+  expect(emptyHand.getFlowerNumber()).toBe(1);
+  expect(fullHand.getFlowerNumber()).toBe(1);
+  expect(emptyHand.setFlowerNumber(2)).toBeTruthy();
+  expect(emptyHand.getFlowerNumber()).toBe(2);
+  expect(emptyHand.setFlowerNumber(3)).toBeTruthy();
+  expect(emptyHand.getFlowerNumber()).toBe(3);
+  expect(emptyHand.setFlowerNumber(4)).toBeTruthy();
+  expect(emptyHand.getFlowerNumber()).toBe(4);
+  expect(emptyHand.setFlowerNumber(0)).toBeFalsy();
+  expect(emptyHand.getFlowerNumber()).toBe(4);
+});
+
+test('PlayerHand - getWind()', () => {
+  expect(emptyHand.getWind()).toBe(WindEnums.EAST);
+  expect(fullHand.getWind()).toBe(WindEnums.EAST);
+});
+
+test('PlayerHand - setWind()', () => {
+  expect(emptyHand.getWind()).toBe(WindEnums.EAST);
+  expect(emptyHand.setWind(WindEnums.SOUTH)).toBeTruthy();
+  expect(emptyHand.getWind()).toBe(WindEnums.SOUTH);
+  expect(emptyHand.setWind(WindEnums.WEST)).toBeTruthy();
+  expect(emptyHand.getWind()).toBe(WindEnums.WEST);
+  expect(emptyHand.setWind(WindEnums.NORTH)).toBeTruthy();
+  expect(emptyHand.getWind()).toBe(WindEnums.NORTH);
+  expect(emptyHand.setWind('SOMETHING' as WindEnums)).toBeFalsy();
+  expect(emptyHand.getWind()).toBe(WindEnums.NORTH);
 });

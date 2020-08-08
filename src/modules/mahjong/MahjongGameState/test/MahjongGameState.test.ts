@@ -1,6 +1,7 @@
 import 'jest-webgl-canvas-mock';
-// import * as PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js';
 
+import SpriteFactory from '../../../../pixi/SpriteFactory';
 import MahjongPlayer from '../../MahjongPlayer/MahjongPlayer';
 import MahjongOpponent from '../../MahjongOpponent/MahjongOpponent';
 import RenderDirection from '../../../../pixi/directions';
@@ -15,6 +16,9 @@ let mjOpponent3: MahjongOpponent;
 let gameState: MahjongGameState;
 let users: UserEntity[];
 
+let pixiApp: PIXI.Application;
+const spriteFactory = new SpriteFactory({});
+
 const callbacks = {
   DRAW_TILE: () => {},
   PLAY_TILE: () => {},
@@ -27,7 +31,9 @@ beforeEach(() => {
   mjOpponent3 = new MahjongOpponent('Opp Right', 'connectionId', RenderDirection.RIGHT);
   users = [mjPlayer, mjOpponent1, mjOpponent2, mjOpponent3];
 
-  gameState = new MahjongGameState(users, callbacks);
+  gameState = new MahjongGameState(users, mjPlayer, callbacks);
+
+  pixiApp = { stage: new PIXI.Container(), view: {} as HTMLCanvasElement }; // mocking
 });
 
 test('MahjongGameState - getUsers()', () => {
@@ -44,7 +50,7 @@ test('MahjongGameState - getCurrentTurn() / goToNextTurn()', () => {
 
 test('MahjongGameState - roundStarted()', () => {
   expect(gameState.getRoundStarted()).toBeFalsy();
-  gameState.startRound(mjPlayer);
+  gameState.startRound();
   expect(gameState.getRoundStarted()).toBeTruthy();
   gameState.endRound();
   expect(gameState.getRoundStarted()).toBeFalsy();
@@ -77,4 +83,11 @@ test('MahjongGameState - getCurrentWind(), changeWind()', () => {
   expect(gameState.getCurrentWind()).toBe(WindEnums.NORTH);
   gameState.changeWind();
   expect(gameState.getCurrentWind()).toBe(WindEnums.EAST);
+});
+
+test('MahjongGameState - renderCanvas()', () => {
+  gameState.renderCanvas(spriteFactory, pixiApp);
+  expect(pixiApp.stage.children).toHaveLength(6); // 4 - users, 1 deadpile, 1 wall
+  gameState.requestRedraw();
+  expect(pixiApp.stage.children).toHaveLength(6);
 });
