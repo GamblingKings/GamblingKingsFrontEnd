@@ -5,14 +5,20 @@ import imageInit from '../pixi/imageLoader';
 import SpriteFactory from '../pixi/SpriteFactory';
 import RenderDirection from '../pixi/directions';
 import { WebSocketConnection, OutgoingAction, IncomingAction } from '../modules/ws';
-// can't satisfy eslint and prettier at the same time here
-// eslint-disable-next-line object-curly-newline
-import { GamePageLoadJSON, GameStartJSON, Game, CurrentUser, User, DrawTileJSON, PlayTileJSON } from '../types';
+import {
+  GamePageLoadJSON,
+  GameStartJSON,
+  Game,
+  CurrentUser,
+  User,
+  DrawTileJSON,
+  PlayTileJSON,
+  InteractionSuccessJSON,
+} from '../types';
 import GameTypes from '../modules/game/gameTypes';
 import MahjongOpponent from '../modules/mahjong/MahjongOpponent/MahjongOpponent';
 import MahjongPlayer from '../modules/mahjong/MahjongPlayer/MahjongPlayer';
 import TileFactory from '../modules/mahjong/Tile/TileFactory';
-import UserEntity from '../modules/game/UserEntity/UserEntity';
 import Tile from '../modules/mahjong/Tile/Tile';
 import GameState from '../modules/game/GameState/GameState';
 import MahjongGameState from '../modules/mahjong/MahjongGameState/MahjongGameState';
@@ -26,12 +32,7 @@ let interactionManager: PIXI.InteractionManager;
 let spriteFactory: SpriteFactory;
 
 /**
- * Player State
- */
-let player: UserEntity;
-
-/**
- * Game States
+ * Game State
  */
 let gameState: GameState;
 
@@ -65,6 +66,10 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       const mjGameState = gameState as MahjongGameState;
       mjGameState.requestRedraw();
     },
+    [OutgoingAction.PLAYED_TILE_INTERACTION]: (params: unknown) => {
+      const payload = params as Record<string, unknown>;
+      ws?.sendMessage(OutgoingAction.PLAYED_TILE_INTERACTION, { gameId: game.gameId, ...payload });
+    },
     REQUEST_REDRAW: () => {
       const mjGameState = gameState as MahjongGameState;
       mjGameState.requestRedraw();
@@ -94,7 +99,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       allUserEntities[currentIndex] = opponent;
       currentIndex += 1;
     }
-    player = new MahjongPlayer(current$User.username, users[indexOfCurrentUser].connectionId);
+    const player = new MahjongPlayer(current$User.username, users[indexOfCurrentUser].connectionId);
     allUserEntities[indexOfCurrentUser] = player;
     gameState = new MahjongGameState(allUserEntities, player as MahjongPlayer, wsCallbacks);
   };
@@ -138,12 +143,16 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     tileArray.forEach((tile: string) => {
       tiles.push(TileFactory.createTileFromStringDef(tile));
     });
+    const mjGameState = gameState as MahjongGameState;
 
-    const mjPlayer = player as MahjongPlayer;
+    const mjPlayer = mjGameState.getMjPlayer();
     mjPlayer.setHand(tiles);
 
-    const mjGameState = gameState as MahjongGameState;
-    mjGameState.startRound();
+    const readyToGo = mjGameState.startRound();
+
+    if (!readyToGo) {
+      console.error('Game start error. Verify the game state.');
+    }
 
     animate();
   };
@@ -155,8 +164,12 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
   const mjGameDrawTile = (payload: unknown): void => {
     const data = payload as DrawTileJSON;
     const tile = TileFactory.createTileFromStringDef(data.tile);
-    const mjPlayer = player as MahjongPlayer;
+
+    const mjGameState = gameState as MahjongGameState;
+    const mjPlayer = mjGameState.getMjPlayer();
+
     mjPlayer.addTileToHand(tile);
+    mjGameState.requestRedraw();
   };
 
   /**
@@ -168,11 +181,32 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     const tile = TileFactory.createTileFromStringDef(data.tile);
     const mjGameState = gameState as MahjongGameState;
     mjGameState.getDeadPile().add(tile);
-    // add validation of whether other players want to interact
-    // for now, change turn
-    mjGameState.goToNextTurn();
+
+    const mjPlayer = mjGameState.getMjPlayer();
+
+    // Ask for interaction if player was not the one who played tile
+    if (data.connectionId !== mjPlayer.getConnectionId()) {
+      mjPlayer.promptForInteraction();
+    }
     mjGameState.requestRedraw();
-    console.log(data.connectionId); // connectionId
+  };
+
+  /**
+   * For INTERACTION_SUCCESS
+   * @param payload InteractionSuccessJSON
+   */
+  const mjInteractionSuccess = (payload: unknown): void => {
+    const data = payload as InteractionSuccessJSON;
+    const mjGameState = gameState as MahjongGameState;
+
+    if (data.skipInteraction) {
+      mjGameState.goToNextTurn();
+    } else {
+      const { connectionId, playedTile, meldType } = data;
+      // update state properly
+      console.log(connectionId, playedTile, meldType);
+    }
+    mjGameState.requestRedraw();
   };
 
   // Set up PIXI application.
@@ -229,6 +263,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       ws.addListener(IncomingAction.GAME_START, gameStartInit);
       ws.addListener(IncomingAction.DRAW_TILE, mjGameDrawTile);
       ws.addListener(IncomingAction.PLAY_TILE, mjGamePlayTile);
+      ws.addListener(IncomingAction.INTERACTION_SUCCESS, mjInteractionSuccess);
     }
 
     return function cleanup() {
@@ -237,6 +272,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
         ws.removeListener(IncomingAction.GAME_START);
         ws.removeListener(IncomingAction.DRAW_TILE);
         ws.removeListener(IncomingAction.PLAY_TILE);
+        ws.removeListener(IncomingAction.INTERACTION_SUCCESS);
       }
     };
     // eslint-disable-next-line

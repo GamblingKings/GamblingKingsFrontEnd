@@ -92,6 +92,9 @@ const GameTestPage = (): JSX.Element => {
       mjGameState.getDeadPile().add(tileInstance);
       mjGameState.requestRedraw();
     },
+    PLAYED_TILE_INTERACTION: (params: unknown) => {
+      console.log(params);
+    },
     REQUEST_REDRAW: () => {
       const mjGameState = gameState as MahjongGameState;
       mjGameState.requestRedraw();

@@ -10,6 +10,7 @@ enum OutgoingAction {
   GAME_PAGE_LOAD = 'GAME_PAGE_LOAD',
   DRAW_TILE = 'DRAW_TILE',
   PLAY_TILE = 'PLAY_TILE',
+  PLAYED_TILE_INTERACTION = 'PLAYED_TILE_INTERACTION',
 }
 
 export default OutgoingAction;

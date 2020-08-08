@@ -17,6 +17,7 @@ import PlayerHand from '../Hand/PlayerHand';
 import Tile from '../Tile/Tile';
 import { OutgoingAction } from '../../ws';
 import WindEnums from '../enums/WindEnums';
+import MeldTypes from '../enums/MeldEnums';
 
 /**
  * Mahjong player that holds information about current hand (tiles) and render methods
@@ -24,11 +25,14 @@ import WindEnums from '../enums/WindEnums';
 class MahjongPlayer extends UserEntity {
   private hand: PlayerHand;
 
+  private allowInteraction: boolean;
+
   private interactionContainer: PIXI.Container;
 
   constructor(name: string, connectionId: string) {
     super(name, connectionId, RenderDirection.BOTTOM);
     this.hand = new PlayerHand();
+    this.allowInteraction = false;
     this.interactionContainer = new PIXI.Container();
   }
 
@@ -50,6 +54,14 @@ class MahjongPlayer extends UserEntity {
 
   public setWindAndFlower(wind: WindEnums, flowerNumber: number): boolean {
     return this.hand.setWind(wind) && this.hand.setFlowerNumber(flowerNumber);
+  }
+
+  public promptForInteraction(): void {
+    this.allowInteraction = true;
+  }
+
+  public interactionSent(): void {
+    this.allowInteraction = false;
   }
 
   /**
@@ -165,20 +177,56 @@ class MahjongPlayer extends UserEntity {
     spriteFactory: SpriteFactory,
     callbacks: Record<string, (...args: unknown[]) => void>,
   ): void {
+    console.log(spriteFactory);
     const container = new PIXI.Container();
-    // Prototyping how to do this...
-    const drawTile = spriteFactory.generateSprite(FRONT_TILE);
-    drawTile.height = DEFAULT_MAHJONG_HEIGHT;
-    drawTile.width = DEFAULT_MAHJONG_WIDTH;
-    container.addChild(drawTile);
     container.x = 200 + this.hand.getTiles().length * DEFAULT_MAHJONG_WIDTH;
-    Interactions.addMouseInteraction(drawTile, (event: PIXI.InteractionEvent) => {
-      console.log(event.target);
-      const tile = this.hand.throw();
-      if (tile !== null) {
-        callbacks[OutgoingAction.PLAY_TILE](tile.toString());
-      }
-    });
+
+    // Render play button if player has drawn.
+    if (this.hand.getHasDrawnTile()) {
+      const playText = new PIXI.Text('PLAY TILE', PIXI_TEXT_STYLE);
+      container.addChild(playText);
+      Interactions.addMouseInteraction(playText, (event: PIXI.InteractionEvent) => {
+        console.log(event.target);
+        const tile = this.hand.throw();
+        if (tile !== null) {
+          callbacks[OutgoingAction.PLAY_TILE](tile.toString());
+        }
+      });
+    }
+
+    // Render interaction buttons when player is prompted to.
+    if (this.allowInteraction) {
+      // Possible interactions with creating melds.
+      Object.values(MeldTypes).forEach((possibleMeld: string, index: number) => {
+        const text = new PIXI.Text(possibleMeld, PIXI_TEXT_STYLE);
+        text.y += 30 * (index + 1);
+        container.addChild(text);
+        Interactions.addMouseInteraction(text, (event: PIXI.InteractionEvent) => {
+          console.log(event.target);
+          const payload = {
+            meldType: possibleMeld,
+            skipInteraction: false,
+            playedTile: '1_DOT', // placeholder
+          };
+          callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
+          this.interactionSent();
+        });
+      });
+
+      // Skip Interaction
+      const skipText = new PIXI.Text('SKIP', PIXI_TEXT_STYLE);
+      skipText.y = 120;
+      Interactions.addMouseInteraction(skipText, (event: PIXI.InteractionEvent) => {
+        console.log(event.target);
+        const payload = {
+          skipInteraction: true,
+        };
+        callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
+        this.interactionSent();
+      });
+
+      container.addChild(skipText);
+    }
 
     this.interactionContainer.addChild(container);
   }

@@ -111,6 +111,10 @@ class MahjongGameState extends GameState {
     return this.deadPile;
   }
 
+  public getMjPlayer(): MahjongPlayer {
+    return this.mjPlayer;
+  }
+
   public startRound(): boolean {
     this.roundStarted = true;
     const gameUsers = super.getUsers();

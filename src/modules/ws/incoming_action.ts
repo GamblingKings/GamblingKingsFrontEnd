@@ -30,6 +30,7 @@ enum IncomingAction {
   GAME_START = 'GAME_START',
   DRAW_TILE = 'DRAW_TILE',
   PLAY_TILE = 'PLAY_TILE',
+  INTERACTION_SUCCESS = 'INTERACTION_SUCCESS',
 }
 
 export default IncomingAction;

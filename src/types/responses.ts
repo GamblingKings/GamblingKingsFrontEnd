@@ -135,3 +135,13 @@ export interface PlayTileJSON {
   tile: string;
   connectionId: string;
 }
+
+/**
+ * Interface for INTERACTION_SUCCESS payload received
+ */
+export interface InteractionSuccessJSON {
+  connectionId?: string;
+  playedTile?: string;
+  meldType?: string;
+  skipInteraction: string;
+}
