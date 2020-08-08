@@ -29,6 +29,7 @@ const tileStrings = [
 ];
 
 let tiles: Tile[];
+const tile = TileFactory.createTileFromStringDef('1_DOT');
 
 const spriteFactory = new SpriteFactory({});
 const callbacks = {};
@@ -38,7 +39,7 @@ const NAME = 'Jay Chou';
 let mjPlayer: MahjongPlayer;
 
 beforeEach(() => {
-  tiles = tileStrings.map((tile) => TileFactory.createTileFromStringDef(tile));
+  tiles = tileStrings.map((t) => TileFactory.createTileFromStringDef(t));
   mjPlayer = new MahjongPlayer(NAME, 'ASDF');
   pixiStage = new PIXI.Container();
 });
@@ -93,6 +94,10 @@ test('MahjongPlayer - render() - full hand', () => {
   mjPlayer.removeAllAssets();
   mjPlayer.render(spriteFactory, pixiStage, false, callbacks);
   expect(pixiStage.children).toHaveLength(1);
+  mjPlayer.removeAllAssets();
+  mjPlayer.render(spriteFactory, pixiStage, true, callbacks);
+  expect(mjPlayer.getContainer().children).toHaveLength(4);
+  expect(pixiStage.children).toHaveLength(1);
 });
 
 test('MahjongPlayer - removeAllAssets()', () => {
@@ -121,4 +126,10 @@ test('MahjongPlayer - setWindAndFlower()', () => {
   expect(mjPlayer.setWindAndFlower(WindEnums.SOUTH, 1)).toBeTruthy();
   expect(mjPlayer.setWindAndFlower(WindEnums.SOUTH, 0)).toBeFalsy();
   expect(mjPlayer.setWindAndFlower(WindEnums.SOUTH, 5)).toBeFalsy();
+});
+
+test('MahjongPlayer - addHandToTile()', () => {
+  mjPlayer.setHand(tiles);
+  mjPlayer.addTileToHand(tile);
+  expect(mjPlayer.getHand().getTiles()).toHaveLength(14);
 });
