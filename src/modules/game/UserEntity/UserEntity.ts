@@ -64,7 +64,7 @@ abstract class UserEntity {
   static getContainerPosition(direction: RenderDirection, canvasRef: HTMLCanvasElement): { x: number; y: number } {
     const positions = {
       [RenderDirection.LEFT]: {
-        x: 50,
+        x: 100,
         y: 80,
       },
       [RenderDirection.TOP]: {
@@ -72,12 +72,12 @@ abstract class UserEntity {
         y: 80,
       },
       [RenderDirection.RIGHT]: {
-        x: canvasRef.clientWidth - 120,
+        x: canvasRef.clientWidth - 160,
         y: 80,
       },
       [RenderDirection.BOTTOM]: {
         x: 100,
-        y: canvasRef.clientHeight - 120,
+        y: canvasRef.clientHeight - 160,
       },
     };
     return positions[direction];

@@ -67,12 +67,12 @@ test('MahjongPlayer - renderHand()', () => {
   // Empty hand
   const handContainerEmpty = mjPlayer.renderHand(spriteFactory, callbacks);
 
-  expect(handContainerEmpty.children).toHaveLength(0);
+  expect(handContainerEmpty.children).toHaveLength(1); // 1 child for playedtiles container
 
   // 13 tiles for front and 13 tiles for back
   mjPlayer.setHand(tiles);
   const handContainerFull = mjPlayer.renderHand(spriteFactory, callbacks);
-  expect(handContainerFull.children).toHaveLength(26);
+  expect(handContainerFull.children).toHaveLength(27); // 26 + 1 child for playedtiles container
 });
 
 test('MahjongPlayer - render() - empty hand', () => {
@@ -116,7 +116,7 @@ test('MahjongPlayer - reposition()', () => {
   mjPlayer.reposition(canvas);
 
   expect(mjPlayer.getContainer().x).toBe(100);
-  expect(mjPlayer.getContainer().y).toBe(-120);
+  expect(mjPlayer.getContainer().y).toBe(-160);
 });
 
 test('MahjongPlayer - setWindAndFlower()', () => {

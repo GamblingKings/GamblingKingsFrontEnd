@@ -108,6 +108,42 @@ class MahjongPlayer extends UserEntity {
       container.addChild(sprite);
     });
 
+    // Render played tiles
+    const allMeldsContainer = new PIXI.Container();
+    const playedTiles = this.hand.getPlayedTiles();
+    playedTiles.forEach((meld: Tile[], index: number) => {
+      const meldContainer = new PIXI.Container();
+      meld.forEach((tile: Tile, tileIndex: number) => {
+        const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
+        frontSprite.width = DEFAULT_MAHJONG_WIDTH;
+        frontSprite.height = DEFAULT_MAHJONG_HEIGHT;
+        frontSprite.x = PLAYER_HAND_SPRITE_X + tileIndex * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
+        frontSprite.y += DEFAULT_MAHJONG_HEIGHT + DISTANCE_FROM_TILES;
+        meldContainer.addChild(frontSprite);
+
+        const sprite = spriteFactory.generateSprite(tile.toString());
+        sprite.width = DEFAULT_MAHJONG_WIDTH;
+        sprite.height = DEFAULT_MAHJONG_HEIGHT;
+        sprite.x = PLAYER_HAND_SPRITE_X + tileIndex * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
+        sprite.y += DEFAULT_MAHJONG_HEIGHT + DISTANCE_FROM_TILES;
+        meldContainer.addChild(sprite);
+      });
+
+      // Give adequate/correct spacing between each meld for readability
+      if (index !== 0) {
+        const previousMeldLength = playedTiles[index - 1].length;
+        // eslint + prettier conflict
+        // eslint-disable-next-line operator-linebreak
+        meldContainer.x =
+          // eslint-disable-next-line operator-linebreak
+          (DEFAULT_MAHJONG_WIDTH + 3 * DISTANCE_FROM_TILES) * previousMeldLength +
+          allMeldsContainer.getChildAt(index - 1).x;
+      }
+
+      allMeldsContainer.addChild(meldContainer);
+    });
+    container.addChild(allMeldsContainer);
+
     return container;
   }
 
