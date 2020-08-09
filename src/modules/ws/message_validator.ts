@@ -20,7 +20,7 @@ const MESSAGE_FORMATS: Record<string, string[]> = {
   [OutgoingAction.GAME_PAGE_LOAD]: ['gameId'],
   [OutgoingAction.PLAY_TILE]: ['gameId', 'tile'],
   [OutgoingAction.DRAW_TILE]: ['gameId'],
-  [OutgoingAction.PLAYED_TILE_INTERACTION]: ['gameId', 'playedTile', 'meldType', 'skipInteraction'],
+  [OutgoingAction.PLAYED_TILE_INTERACTION]: ['gameId', 'playedTiles', 'meldType', 'skipInteraction'],
 };
 
 /**

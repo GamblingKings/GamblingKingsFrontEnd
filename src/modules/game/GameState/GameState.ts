@@ -29,6 +29,10 @@ abstract class GameState {
     }
     return this.currentTurn;
   }
+
+  public setTurn(index: number): void {
+    this.currentTurn = index;
+  }
 }
 
 export default GameState;

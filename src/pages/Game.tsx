@@ -187,6 +187,9 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     // Ask for interaction if player was not the one who played tile
     if (data.connectionId !== mjPlayer.getConnectionId()) {
       mjPlayer.promptForInteraction();
+      // set timeout, if nothing happens, send skip
+    } else {
+      // Display msg to player who played tile to wait while others make decision
     }
     mjGameState.requestRedraw();
   };
@@ -202,9 +205,24 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     if (data.skipInteraction) {
       mjGameState.goToNextTurn();
     } else {
-      const { connectionId, playedTile, meldType } = data;
-      // update state properly
-      console.log(connectionId, playedTile, meldType);
+      const { connectionId, playedTiles, meldType } = data;
+
+      if (connectionId && playedTiles && meldType) {
+        const tiles = playedTiles.map((tileStr) => TileFactory.createTileFromStringDef(tileStr));
+        const userIndex = mjGameState.getUsers().findIndex((user) => user.getConnectionId() === connectionId);
+        const mjPlayer = mjGameState.getMjPlayer();
+        if (connectionId === mjPlayer.getConnectionId()) {
+          // Player updates their PlayedTiles
+          mjPlayer.getHand().addPlayedTiles(tiles);
+          mjPlayer.getHand().setCanPlayTile();
+        } else {
+          // Opponent update playedTiles
+          const opponent = mjGameState.getUsers()[userIndex] as MahjongOpponent;
+          opponent.getHand().addPlayedTiles(tiles);
+        }
+        // Set turn to the person who interacted successfully
+        mjGameState.setTurn(userIndex);
+      }
     }
     mjGameState.requestRedraw();
   };

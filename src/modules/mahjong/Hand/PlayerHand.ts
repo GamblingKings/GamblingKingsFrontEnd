@@ -17,7 +17,7 @@ class PlayerHand {
 
   private selectedTile = -1;
 
-  private hasDrawnTile: boolean;
+  private canPlayTile: boolean;
 
   // For hand validation
   private wind: WindEnums;
@@ -28,7 +28,7 @@ class PlayerHand {
   constructor(tiles: Tile[] = []) {
     this.tiles = tiles;
     this.playedTiles = [];
-    this.hasDrawnTile = false;
+    this.canPlayTile = false;
     this.wind = WindEnums.EAST;
     this.flowerNumber = 1;
   }
@@ -102,8 +102,8 @@ class PlayerHand {
     return this.playedTiles;
   }
 
-  public getHasDrawnTile(): boolean {
-    return this.hasDrawnTile;
+  public getCanPlayTile(): boolean {
+    return this.canPlayTile;
   }
 
   public getFlowerNumber(): number {
@@ -112,6 +112,10 @@ class PlayerHand {
 
   public getWind(): WindEnums {
     return this.wind;
+  }
+
+  public setCanPlayTile(): void {
+    this.canPlayTile = true;
   }
 
   public setFlowerNumber(flowerNumber: number): boolean {
@@ -153,12 +157,12 @@ class PlayerHand {
   }
 
   public throw(): Tile | null {
-    if (this.selectedTile >= 0 && this.selectedTile < this.tiles.length && this.hasDrawnTile) {
+    if (this.selectedTile >= 0 && this.selectedTile < this.tiles.length && this.canPlayTile) {
       const index = this.selectedTile;
       const tile = this.tiles[index];
       this.tiles.splice(index, 1);
       this.selectedTile = -1;
-      this.hasDrawnTile = false;
+      this.canPlayTile = false;
       this.sortHand(PlayerHand.generateHandWeights());
       return tile;
     }
@@ -166,11 +170,11 @@ class PlayerHand {
   }
 
   public draw(tile: Tile): boolean {
-    if (this.hasDrawnTile) {
+    if (this.canPlayTile) {
       return false;
     }
     this.tiles.push(tile);
-    this.hasDrawnTile = true;
+    this.canPlayTile = true;
     this.setSelectedTile(this.tiles.length - 1);
     return true;
   }

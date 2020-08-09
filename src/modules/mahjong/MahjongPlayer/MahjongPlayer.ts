@@ -88,8 +88,8 @@ class MahjongPlayer extends UserEntity {
 
     const selectedTile = this.hand.getSelectedTile();
     const tiles = this.hand.getTiles();
-    const hasDrawn = this.hand.getHasDrawnTile();
-    const lastTile = hasDrawn ? tiles.length - 1 : -1;
+    const canPlay = this.hand.getCanPlayTile();
+    const lastTile = canPlay ? tiles.length - 1 : -1;
 
     tiles.forEach((tile: Tile, index: number) => {
       const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
@@ -182,7 +182,7 @@ class MahjongPlayer extends UserEntity {
     container.x = 200 + this.hand.getTiles().length * DEFAULT_MAHJONG_WIDTH;
 
     // Render play button if player has drawn.
-    if (this.hand.getHasDrawnTile()) {
+    if (this.hand.getCanPlayTile()) {
       const playText = new PIXI.Text('PLAY TILE', PIXI_TEXT_STYLE);
       container.addChild(playText);
       Interactions.addMouseInteraction(playText, (event: PIXI.InteractionEvent) => {
@@ -206,7 +206,7 @@ class MahjongPlayer extends UserEntity {
           const payload = {
             meldType: possibleMeld,
             skipInteraction: false,
-            playedTile: '1_DOT', // placeholder
+            playedTiles: ['1_DOT', '1_DOT', '1_DOT'], // placeholder
           };
           callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
           this.interactionSent();
@@ -220,6 +220,8 @@ class MahjongPlayer extends UserEntity {
         console.log(event.target);
         const payload = {
           skipInteraction: true,
+          meldType: '',
+          playedTiles: [],
         };
         callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
         this.interactionSent();

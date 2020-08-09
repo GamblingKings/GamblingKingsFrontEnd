@@ -141,7 +141,7 @@ export interface PlayTileJSON {
  */
 export interface InteractionSuccessJSON {
   connectionId?: string;
-  playedTile?: string;
+  playedTiles?: string[];
   meldType?: string;
   skipInteraction: string;
 }
