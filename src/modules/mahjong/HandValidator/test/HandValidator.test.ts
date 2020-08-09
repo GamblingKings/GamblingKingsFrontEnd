@@ -21,6 +21,23 @@ const validThirteenOrphansHand = [
   '1_DOT',
 ];
 
+const validHandWithAllHonors = [
+  'REDDRAGON',
+  'REDDRAGON',
+  'REDDRAGON',
+  'EAST',
+  'EAST',
+  'GREENDRAGON',
+  'GREENDRAGON',
+  'GREENDRAGON',
+  'WEST',
+  'WEST',
+  'WEST',
+  'NORTH',
+  'NORTH',
+  'NORTH',
+];
+
 const allTripletsHand = [
   '1_DOT',
   '1_DOT',
@@ -256,4 +273,53 @@ test('Validate that the wind gets set correctly', () => {
 test('Validate that the flower gets set correctly', () => {
   const result = validateHandStructure(validHandWithPurity, WindEnums.NORTH, 3);
   expect(result.valid[0].flower).toBe(3);
+});
+
+/**
+ * Can Create Melds Tests
+ */
+
+test('Validate that can create Melds will work for triplets and Consecutives', () => {
+  const tiles: Tile[] = [];
+  allTripletsHand.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
+  const spliced = tiles.splice(tiles.length - 1, 1);
+  const results = HandValidator.canCreateMeld(tiles, spliced[0]);
+  expect(results.triplet.canCreate).toBeTruthy();
+  expect(results.consecutive.canCreate).toBeTruthy();
+});
+
+test('Validate that canCreateMelds will work for quads', () => {
+  const tiles: Tile[] = [];
+  validHandWithPurity.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
+  const kongTile = TileFactory.createTileFromStringDef('9_CHARACTER');
+  const results = HandValidator.canCreateMeld(tiles, kongTile);
+  expect(results.quad.canCreate).toBeTruthy();
+  expect(results.triplet.canCreate).toBeFalsy();
+});
+
+test('Validate that canCreateMelds will only create a triplet for honor hands', () => {
+  const tiles: Tile[] = [];
+  validHandWithAllHonors.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
+  const spliced = tiles.splice(1, 1);
+  const results = HandValidator.canCreateMeld(tiles, spliced[0]);
+  expect(results.triplet.canCreate).toBeTruthy();
+  expect(results.consecutive.canCreate).toBeFalsy();
+});
+
+test('Validate that if the take tile is 9 charaacter, you can only create one meld', () => {
+  const tiles: Tile[] = [];
+  allConsecutiveHand.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
+  const spliced = tiles.splice(tiles.length - 1, 1);
+  const results = HandValidator.canCreateMeld(tiles, spliced[0]);
+  expect(results.consecutive.canCreate).toBeTruthy();
+  expect(results.consecutive.melds).toHaveLength(1);
+});
+
+test('Validate that if we take a middle tile, there will be two melds - one for upper, for for lower', () => {
+  const tiles: Tile[] = [];
+  allConsecutiveWithLipeikou.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
+  const spliced = tiles.splice(5, 1);
+  const results = HandValidator.canCreateMeld(tiles, spliced[0]);
+  expect(results.consecutive.canCreate).toBeTruthy();
+  expect(results.consecutive.melds).toHaveLength(2);
 });

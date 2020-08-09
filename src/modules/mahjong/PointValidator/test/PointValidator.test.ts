@@ -39,6 +39,24 @@ const allTripletsHand = [
   '7_CHARACTER',
 ];
 
+const allTripletsHandWithNorthWindAndThreeFlower = [
+  '1_DOT',
+  '1_DOT',
+  '2_DOT',
+  '2_DOT',
+  '2_DOT',
+  '3_DOT',
+  '3_DOT',
+  '3_DOT',
+  '4_CHARACTER',
+  '4_CHARACTER',
+  '4_CHARACTER',
+  'NORTH',
+  'NORTH',
+  'NORTH',
+  '3_FLOWER',
+];
+
 const allTripletsHandWithPurity = [
   '1_DOT',
   '1_DOT',
@@ -88,6 +106,25 @@ const allConsecutiveHand = [
   '7_BAMBOO',
   '8_BAMBOO',
   '9_BAMBOO',
+];
+
+const allConsecutiveHandWithTwoSeasonFourFlower = [
+  '1_DOT',
+  '1_DOT',
+  '2_CHARACTER',
+  '3_CHARACTER',
+  '4_CHARACTER',
+  '5_CHARACTER',
+  '6_CHARACTER',
+  '7_CHARACTER',
+  '1_BAMBOO',
+  '2_BAMBOO',
+  '3_BAMBOO',
+  '7_BAMBOO',
+  '8_BAMBOO',
+  '9_BAMBOO',
+  '2_SEASON',
+  '4_FLOWER',
 ];
 
 const allConsecutiveHandWithPurity = [
@@ -157,6 +194,25 @@ const validHandWithSemiPurityExample2 = [
   '5_CHARACTER',
   '6_CHARACTER',
   '6_CHARACTER',
+];
+
+const validHandWithSemiPurityAndEastWindWithTwoFlowerAndTwoSeason = [
+  '1_CHARACTER',
+  '1_CHARACTER',
+  'EAST',
+  'EAST',
+  'EAST',
+  '4_CHARACTER',
+  '4_CHARACTER',
+  '4_CHARACTER',
+  '3_CHARACTER',
+  '5_CHARACTER',
+  '5_CHARACTER',
+  '5_CHARACTER',
+  '6_CHARACTER',
+  '6_CHARACTER',
+  '2_FLOWER',
+  '2_SEASON',
 ];
 
 const validHandWithPurity = [
@@ -696,5 +752,29 @@ test('Verifies that given the validHandWithAllConsecutiveAndPurity, the function
   const pointResults = PointValidator.validateHandPoints(result);
   const { largestHand } = pointResults;
   const expected = HKHandMapper.ALL_CONSECUTIVE.points + HKHandMapper.PURITY.points;
+  expect(largestHand.totalPoints).toEqual(expected);
+});
+
+test('Verifies that given the allTripletsHandWithNorthWindAndThreeFlower, the function returns the corresponding points', () => {
+  const result = validateHandStructure(allTripletsHandWithNorthWindAndThreeFlower, WindEnums.NORTH, 3);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.ALL_TRIPLET.points + HKHandMapper.WIND_MELD.points + HKHandMapper.FLOWER.points;
+  expect(largestHand.totalPoints).toEqual(expected);
+});
+
+test('Verifies that given the allConsecutiveHandWithTwoSeasonFourFlower, the function returns the corresponding points', () => {
+  const result = validateHandStructure(allConsecutiveHandWithTwoSeasonFourFlower, WindEnums.NORTH, 2);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.ALL_CONSECUTIVE.points + HKHandMapper.SEASON.points;
+  expect(largestHand.totalPoints).toEqual(expected);
+});
+
+test('Verifies that given the validHandWithSemiPurityAndEastWindWithTwoFlowerAndTwoSeason, the function returns the corresponding points', () => {
+  const result = validateHandStructure(validHandWithSemiPurityAndEastWindWithTwoFlowerAndTwoSeason, WindEnums.NORTH, 2);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.SEMI_PURITY.points + HKHandMapper.SEASON.points + HKHandMapper.FLOWER.points;
   expect(largestHand.totalPoints).toEqual(expected);
 });

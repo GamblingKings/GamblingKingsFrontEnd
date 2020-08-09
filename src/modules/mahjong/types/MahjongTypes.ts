@@ -77,3 +77,15 @@ export interface HandDefinition {
   points: number;
   name: string;
 }
+
+export interface CreateMeld {
+  canCreate: boolean;
+  melds: Meld[];
+}
+
+export interface CreateMeldResults {
+  tileToTake: Tile;
+  quad: CreateMeld;
+  triplet: CreateMeld;
+  consecutive: CreateMeld;
+}

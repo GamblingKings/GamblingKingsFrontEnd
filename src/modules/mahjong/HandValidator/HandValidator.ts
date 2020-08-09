@@ -2,7 +2,13 @@
  * Class to store logic related to validating a Mahjong Hand
  */
 import Tile from '../Tile/Tile';
-import { ValidPair, Meld, HandStructureResults } from '../types/MahjongTypes';
+// eslint-disable-next-line prettier/prettier
+import {
+  ValidPair,
+  Meld,
+  HandStructureResults,
+  CreateMeldResults,
+} from '../types/MahjongTypes';
 import TileMapper from '../Tile/map/TileMapper';
 import MeldTypes from '../enums/MeldEnums';
 import sortHandUtils from '../utils/functions/sortHand';
@@ -238,6 +244,94 @@ class HandValidator {
 
     return results;
   }
+
+  public static canCreateMeld = (tiles: Tile[], tileToTake: Tile): CreateMeldResults => {
+    const results: CreateMeldResults = {
+      tileToTake,
+      quad: {
+        canCreate: false,
+        melds: [],
+      },
+      triplet: {
+        canCreate: false,
+        melds: [],
+      },
+      consecutive: {
+        canCreate: false,
+        melds: [], // Can create different types of consecutives
+      },
+    };
+
+    const tileToTakeStrDef = tileToTake.toString();
+    const tilesStrDef = tiles.map((t) => t.toString());
+
+    // Try to create a triplet first
+    let numberOfTheSameTileInHand = 0;
+
+    tiles.forEach((t) => {
+      if (t.toString() === tileToTake.toString()) numberOfTheSameTileInHand += 1;
+    });
+
+    if (numberOfTheSameTileInHand === 2) {
+      results.triplet.canCreate = true;
+      results.triplet.melds.push({ type: MeldTypes.TRIPLET, tiles: Array(3).fill(tileToTakeStrDef) });
+    } else if (numberOfTheSameTileInHand === 3) {
+      results.quad.canCreate = true;
+      results.quad.melds.push({ type: MeldTypes.QUAD, tiles: Array(4).fill(tileToTakeStrDef) });
+    }
+
+    // Try to create a consecutive
+    if (isSimpleTileUtils(tileToTakeStrDef)) {
+      let { prev } = TileMapper[tileToTakeStrDef];
+      let { next } = TileMapper[tileToTakeStrDef];
+
+      const lowerBoundTiles: string[] = [];
+      const upperboundTiles: string[] = [];
+
+      let ableToCreateLowerBound = true;
+      let ableToCreateUpperBound = true;
+
+      while (prev != null && lowerBoundTiles.length !== 2) {
+        if (prev) lowerBoundTiles.push(prev);
+        if (prev) prev = TileMapper[prev].prev;
+      }
+
+      if (lowerBoundTiles.length === 2) {
+        lowerBoundTiles.forEach((str) => {
+          if (str && !tilesStrDef.includes(str)) ableToCreateLowerBound = false;
+        });
+
+        if (ableToCreateLowerBound) {
+          results.consecutive.canCreate = true;
+          results.consecutive.melds.push({
+            type: MeldTypes.CONSECUTIVE,
+            tiles: [tileToTakeStrDef, ...lowerBoundTiles.map((str) => str as string)],
+          });
+        }
+      }
+
+      while (next != null && upperboundTiles.length !== 2) {
+        if (next) upperboundTiles.push(next);
+        if (next) next = TileMapper[next].next;
+      }
+
+      if (upperboundTiles.length === 2) {
+        upperboundTiles.forEach((str) => {
+          if (str && !tilesStrDef.includes(str)) ableToCreateUpperBound = false;
+        });
+
+        if (ableToCreateUpperBound) {
+          results.consecutive.canCreate = true;
+          results.consecutive.melds.push({
+            type: MeldTypes.CONSECUTIVE,
+            tiles: [tileToTakeStrDef, ...upperboundTiles.map((str) => str as string)],
+          });
+        }
+      }
+    }
+
+    return results;
+  };
 }
 
 export default HandValidator;
