@@ -106,15 +106,23 @@ test('MahjongPlayer - render() - full hand', () => {
   expect(pixiStage.children).toHaveLength(1);
 });
 
+test('MahjongPlayer - renderHand() - has drawn tile', () => {
+  mjPlayer.setHand(tiles);
+  mjPlayer.getHand().draw(tile);
+  const hand = mjPlayer.renderHand(spriteFactory, callbacks);
+  expect(hand.children).toHaveLength(29); // 28 + 1 child for playedtiles container
+});
+
 test('MahjongPlayer - renderHand() - with played tiles', () => {
   mjPlayer.setHand(tiles);
   mjPlayer.getHand().addPlayedTiles(SAMPLE_TILE_ARRAY);
-  const hand = mjPlayer.renderHand(spriteFactory, callbacks);
+  let hand = mjPlayer.renderHand(spriteFactory, callbacks);
 
   // test will fail when tiles in hand get removed
   expect(hand.children).toHaveLength(27); // 26 + 1 child for playedtiles container
   mjPlayer.removeAllAssets();
   mjPlayer.getHand().addPlayedTiles(SAMPLE_TILE_ARRAY);
+  hand = mjPlayer.renderHand(spriteFactory, callbacks);
   // test will fail when tiles in hand get removed
   expect(hand.children).toHaveLength(27); // 26 + 1 child for playedtiles container
 });
