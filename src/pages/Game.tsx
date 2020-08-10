@@ -187,10 +187,20 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
 
     // Ask for interaction if player was not the one who played tile
     if (data.connectionId !== mjPlayer.getConnectionId()) {
+      const users = mjGameState.getUsers();
+      // Change state that the opponent has played a tile.
+      const opponentIndex = users.findIndex((user) => user.getConnectionId() === data.connectionId);
+      if (opponentIndex !== -1) {
+        const opponent = users[opponentIndex] as MahjongOpponent;
+        opponent.playedTile();
+      } else {
+        console.error('Game state error. Desync is likely to happen.');
+      }
+
       mjPlayer.setAllowInteraction(true);
-      // set timeout, if nothing happens, send skip
+      // TODO: (NextPR) set timeout, if nothing happens, send skip
     } else {
-      // Display msg to player who played tile to wait while others make decision
+      // TODO (NextPR): Display msg to player who played tile to wait while others make decision
     }
     mjGameState.requestRedraw();
   };
@@ -230,6 +240,10 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       // If it's user's turn, player can draw tile
       if (mjGameState.getUsers()[userIndex].getConnectionId() === mjGameState.getMjPlayer().getConnectionId()) {
         ws?.sendMessage(OutgoingAction.DRAW_TILE, { gameId: game.gameId });
+      } else {
+        // Change state that opponent will draw a tile
+        const opponent = mjGameState.getUsers()[userIndex] as MahjongOpponent;
+        opponent.drawTile();
       }
     } else {
       const { connectionId, playedTiles, meldType } = data;
@@ -242,7 +256,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
           // Player updates their PlayedTiles
           mjPlayer.getHand().addPlayedTiles(tiles);
 
-          // remove played tiles from player hand
+          // TODO (NextPR): remove played tiles from player hand
 
           mjPlayer.getHand().setMadeMeld(true);
         } else {

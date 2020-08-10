@@ -111,6 +111,11 @@ test('MahjongPlayer - renderHand() - with played tiles', () => {
   mjPlayer.getHand().addPlayedTiles(SAMPLE_TILE_ARRAY);
   const hand = mjPlayer.renderHand(spriteFactory, callbacks);
 
+  // test will fail when tiles in hand get removed
+  expect(hand.children).toHaveLength(27); // 26 + 1 child for playedtiles container
+  mjPlayer.removeAllAssets();
+  mjPlayer.getHand().addPlayedTiles(SAMPLE_TILE_ARRAY);
+  // test will fail when tiles in hand get removed
   expect(hand.children).toHaveLength(27); // 26 + 1 child for playedtiles container
 });
 
@@ -158,4 +163,25 @@ test('MahjongPlayer - getAllowInteraction()', () => {
   expect(mjPlayer.getAllowInteraction()).toBeTruthy();
   mjPlayer.setAllowInteraction(false);
   expect(mjPlayer.getAllowInteraction()).toBeFalsy();
+});
+
+test('MahjongPlayer - renderInteraction()', () => {
+  expect(mjPlayer.getInteractionContainer().children).toHaveLength(0);
+
+  mjPlayer.renderInteractions(spriteFactory, callbacks);
+  expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
+});
+
+test('MahjongPlayer - renderInteraction() with other parameters', () => {
+  expect(mjPlayer.getInteractionContainer().children).toHaveLength(0);
+
+  mjPlayer.setAllowInteraction(true);
+  mjPlayer.renderInteractions(spriteFactory, callbacks);
+  expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
+
+  mjPlayer.removeAllAssets();
+  mjPlayer.setAllowInteraction(false);
+  mjPlayer.getHand().draw(tile);
+  mjPlayer.renderInteractions(spriteFactory, callbacks);
+  expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 });

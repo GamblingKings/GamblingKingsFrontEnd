@@ -38,6 +38,14 @@ class MahjongOpponent extends UserEntity {
     return this.opponentHand.getPlayedTiles();
   }
 
+  public drawTile(): void {
+    this.opponentHand.setHasDrawn(true);
+  }
+
+  public playedTile(): void {
+    this.opponentHand.playedTile();
+  }
+
   /**
    * Removes all children from the container in super class.
    */
@@ -54,11 +62,17 @@ class MahjongOpponent extends UserEntity {
   public renderMahjongHand(spriteFactory: SpriteFactory): PIXI.Container {
     const container = new PIXI.Container();
     const hand = this.opponentHand;
+    const hasDrawn = hand.getHasDrawn();
+    const lastTile = hasDrawn ? hand.getNumberOfTiles() - 1 : -1;
     for (let i = 0; i < hand.getNumberOfTiles(); i += 1) {
       const backSprite = spriteFactory.generateSprite(BACK_TILE);
       backSprite.width = DEFAULT_MAHJONG_WIDTH;
       backSprite.height = DEFAULT_MAHJONG_HEIGHT;
       backSprite.x = i * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
+
+      if (i === lastTile) {
+        backSprite.y -= 10;
+      }
       container.addChild(backSprite);
     }
 

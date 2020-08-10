@@ -63,9 +63,14 @@ test('MahjongOpponent - renderMahjongHand()', () => {
 });
 
 test('MahjongOpponent - renderMahjongHand() with playedTiles', () => {
-  const hand = mjOpponent.renderMahjongHand(spriteFactory);
   mjOpponent.addPlayedTiles(SAMPLE_TILE_ARRAY);
-  expect(hand.children).toHaveLength(14); // 13 tiles and 1 container for playedTiles
+  let hand = mjOpponent.renderMahjongHand(spriteFactory);
+  expect(hand.children).toHaveLength(12); // 11 tiles and 1 container for playedTiles
+
+  mjOpponent.removeAllAssets();
+  mjOpponent.addPlayedTiles(SAMPLE_TILE_ARRAY);
+  hand = mjOpponent.renderMahjongHand(spriteFactory);
+  expect(hand.children).toHaveLength(10); // 8 tiles and 1 container for playedTiles
 });
 
 test('MahjongOpponent - render()', () => {

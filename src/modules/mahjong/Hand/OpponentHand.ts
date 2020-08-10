@@ -8,9 +8,11 @@ class OpponentHand {
 
   private playedTiles: Tile[][];
 
+  private hasDrawn: boolean;
+
   constructor() {
     this.numberOfTiles = 13;
-
+    this.hasDrawn = false;
     this.playedTiles = [];
   }
 
@@ -22,13 +24,29 @@ class OpponentHand {
     return this.playedTiles;
   }
 
+  public getHasDrawn(): boolean {
+    return this.hasDrawn;
+  }
+
+  public setHasDrawn(permission: boolean): void {
+    if (permission) {
+      this.numberOfTiles += 1;
+    }
+    this.hasDrawn = permission;
+  }
+
+  public playedTile(): void {
+    this.setHasDrawn(false);
+    this.numberOfTiles -= 1;
+  }
+
   /**
    * Add Tiles[] to playedTiles and also remove its length from numberOfTiles
    * @param tiles Tiles[]
    */
   public addPlayedTiles(tiles: Tile[]): void {
     this.playedTiles.push(tiles);
-    this.numberOfTiles -= tiles.length;
+    this.numberOfTiles -= tiles.length - 1; // Subtract 1 taken from dead pile
   }
 }
 
