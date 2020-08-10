@@ -60,6 +60,17 @@ class DeadPile {
   }
 
   /**
+   * Removes the last tile from the deadpile
+   */
+  public removeLastTile(): boolean {
+    if (this.deadpile.length > 0) {
+      this.deadpile.pop();
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Adds the lastThrow Tile to the deadPile and reassigns the lastThrow to be a tile object
    * @param t A Tile object, i.e. SimpleTile, BonusTile, HonorTile
    */

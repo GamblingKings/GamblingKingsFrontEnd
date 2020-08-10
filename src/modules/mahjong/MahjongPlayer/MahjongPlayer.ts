@@ -56,12 +56,12 @@ class MahjongPlayer extends UserEntity {
     return this.hand.setWind(wind) && this.hand.setFlowerNumber(flowerNumber);
   }
 
-  public promptForInteraction(): void {
-    this.allowInteraction = true;
+  public setAllowInteraction(permission: boolean): void {
+    this.allowInteraction = permission;
   }
 
-  public interactionSent(): void {
-    this.allowInteraction = false;
+  public getAllowInteraction(): boolean {
+    return this.allowInteraction;
   }
 
   /**
@@ -88,8 +88,8 @@ class MahjongPlayer extends UserEntity {
 
     const selectedTile = this.hand.getSelectedTile();
     const tiles = this.hand.getTiles();
-    const canPlay = this.hand.getCanPlayTile();
-    const lastTile = canPlay ? tiles.length - 1 : -1;
+    const hasDrawn = this.hand.getHasDrawn();
+    const lastTile = hasDrawn ? tiles.length - 1 : -1;
 
     tiles.forEach((tile: Tile, index: number) => {
       const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
@@ -182,7 +182,7 @@ class MahjongPlayer extends UserEntity {
     container.x = 200 + this.hand.getTiles().length * DEFAULT_MAHJONG_WIDTH;
 
     // Render play button if player has drawn.
-    if (this.hand.getCanPlayTile()) {
+    if (this.hand.canPlayTile()) {
       const playText = new PIXI.Text('PLAY TILE', PIXI_TEXT_STYLE);
       container.addChild(playText);
       Interactions.addMouseInteraction(playText, (event: PIXI.InteractionEvent) => {
@@ -208,8 +208,13 @@ class MahjongPlayer extends UserEntity {
             skipInteraction: false,
             playedTiles: ['1_DOT', '1_DOT', '1_DOT'], // placeholder
           };
-          callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
-          this.interactionSent();
+          // TODO: add in meld validator results
+          // Extra boolean check might prevent duplicate messages from sending if user double clicks fast enough
+          if (this.allowInteraction) {
+            this.setAllowInteraction(false);
+            callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
+          }
+          callbacks.REQUEST_REDRAW();
         });
       });
 
@@ -223,8 +228,12 @@ class MahjongPlayer extends UserEntity {
           meldType: '',
           playedTiles: [],
         };
-        callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
-        this.interactionSent();
+        // Extra boolean check might prevent duplicate messages from sending if user double clicks fast enough
+        if (this.allowInteraction) {
+          this.setAllowInteraction(false);
+          callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
+        }
+        callbacks.REQUEST_REDRAW();
       });
 
       container.addChild(skipText);

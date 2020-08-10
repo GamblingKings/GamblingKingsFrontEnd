@@ -22,8 +22,13 @@ class OpponentHand {
     return this.playedTiles;
   }
 
+  /**
+   * Add Tiles[] to playedTiles and also remove its length from numberOfTiles
+   * @param tiles Tiles[]
+   */
   public addPlayedTiles(tiles: Tile[]): void {
     this.playedTiles.push(tiles);
+    this.numberOfTiles -= tiles.length;
   }
 }
 

@@ -14,6 +14,7 @@ import {
   DrawTileJSON,
   PlayTileJSON,
   InteractionSuccessJSON,
+  PlayedTileInteractionJSON,
 } from '../types';
 import GameTypes from '../modules/game/gameTypes';
 import MahjongOpponent from '../modules/mahjong/MahjongOpponent/MahjongOpponent';
@@ -186,12 +187,31 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
 
     // Ask for interaction if player was not the one who played tile
     if (data.connectionId !== mjPlayer.getConnectionId()) {
-      mjPlayer.promptForInteraction();
+      mjPlayer.setAllowInteraction(true);
       // set timeout, if nothing happens, send skip
     } else {
       // Display msg to player who played tile to wait while others make decision
     }
     mjGameState.requestRedraw();
+  };
+
+  /**
+   * For PLAYED_TILE_INTERACTION
+   * @param payload PlayedTileInteraction
+   */
+  const mjPlayedTileInteraction = (payload: unknown): void => {
+    const data = payload as PlayedTileInteractionJSON;
+    // eslint-disable-next-line object-curly-newline
+    const { playedTiles, skipInteraction, meldType, success } = data;
+    // If there was an error with processing PLAYED_TILE_INTERACTION, resend message
+    if (!success) {
+      ws?.sendMessage(OutgoingAction.PLAYED_TILE_INTERACTION, {
+        playedTiles,
+        skipInteraction,
+        meldType,
+        gameId: game.gameId,
+      });
+    }
   };
 
   /**
@@ -203,7 +223,14 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     const mjGameState = gameState as MahjongGameState;
 
     if (data.skipInteraction) {
+      // If everybody skips, game can proceed normally
       mjGameState.goToNextTurn();
+
+      const userIndex = mjGameState.getCurrentTurn();
+      // If it's user's turn, player can draw tile
+      if (mjGameState.getUsers()[userIndex].getConnectionId() === mjGameState.getMjPlayer().getConnectionId()) {
+        ws?.sendMessage(OutgoingAction.DRAW_TILE, { gameId: game.gameId });
+      }
     } else {
       const { connectionId, playedTiles, meldType } = data;
 
@@ -214,7 +241,10 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
         if (connectionId === mjPlayer.getConnectionId()) {
           // Player updates their PlayedTiles
           mjPlayer.getHand().addPlayedTiles(tiles);
-          mjPlayer.getHand().setCanPlayTile();
+
+          // remove played tiles from player hand
+
+          mjPlayer.getHand().setMadeMeld(true);
         } else {
           // Opponent update playedTiles
           const opponent = mjGameState.getUsers()[userIndex] as MahjongOpponent;
@@ -223,7 +253,10 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
         // Set turn to the person who interacted successfully
         mjGameState.setTurn(userIndex);
       }
+      // Remove last tile from deadpile
+      mjGameState.getDeadPile().removeLastTile();
     }
+
     mjGameState.requestRedraw();
   };
 
@@ -282,6 +315,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       ws.addListener(IncomingAction.DRAW_TILE, mjGameDrawTile);
       ws.addListener(IncomingAction.PLAY_TILE, mjGamePlayTile);
       ws.addListener(IncomingAction.INTERACTION_SUCCESS, mjInteractionSuccess);
+      ws.addListener(IncomingAction.PLAYED_TILE_INTERACTION, mjPlayedTileInteraction);
     }
 
     return function cleanup() {
@@ -291,6 +325,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
         ws.removeListener(IncomingAction.DRAW_TILE);
         ws.removeListener(IncomingAction.PLAY_TILE);
         ws.removeListener(IncomingAction.INTERACTION_SUCCESS);
+        ws.removeListener(IncomingAction.PLAYED_TILE_INTERACTION);
       }
     };
     // eslint-disable-next-line

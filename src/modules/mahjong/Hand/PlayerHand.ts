@@ -17,7 +17,9 @@ class PlayerHand {
 
   private selectedTile = -1;
 
-  private canPlayTile: boolean;
+  private hasDrawn: boolean;
+
+  private madeMeld: boolean;
 
   // For hand validation
   private wind: WindEnums;
@@ -28,7 +30,8 @@ class PlayerHand {
   constructor(tiles: Tile[] = []) {
     this.tiles = tiles;
     this.playedTiles = [];
-    this.canPlayTile = false;
+    this.hasDrawn = false;
+    this.madeMeld = false;
     this.wind = WindEnums.EAST;
     this.flowerNumber = 1;
   }
@@ -102,8 +105,16 @@ class PlayerHand {
     return this.playedTiles;
   }
 
-  public getCanPlayTile(): boolean {
-    return this.canPlayTile;
+  public setHasDrawn(permission: boolean): void {
+    this.hasDrawn = permission;
+  }
+
+  public getHasDrawn(): boolean {
+    return this.hasDrawn;
+  }
+
+  public setMadeMeld(permission: boolean): void {
+    this.madeMeld = permission;
   }
 
   public getFlowerNumber(): number {
@@ -114,8 +125,19 @@ class PlayerHand {
     return this.wind;
   }
 
-  public setCanPlayTile(): void {
-    this.canPlayTile = true;
+  /**
+   * Return boolean of whether the hand can play tile
+   */
+  public canPlayTile(): boolean {
+    return this.hasDrawn || this.madeMeld;
+  }
+
+  /**
+   * Reset booleans so hand cannot play tile
+   */
+  public setCannotPlayTile(): void {
+    this.setHasDrawn(false);
+    this.setMadeMeld(false);
   }
 
   public setFlowerNumber(flowerNumber: number): boolean {
@@ -162,19 +184,19 @@ class PlayerHand {
       const tile = this.tiles[index];
       this.tiles.splice(index, 1);
       this.selectedTile = -1;
-      this.canPlayTile = false;
       this.sortHand(PlayerHand.generateHandWeights());
+      this.setCannotPlayTile();
       return tile;
     }
     return null;
   }
 
   public draw(tile: Tile): boolean {
-    if (this.canPlayTile) {
+    if (this.canPlayTile()) {
       return false;
     }
     this.tiles.push(tile);
-    this.canPlayTile = true;
+    this.setHasDrawn(true);
     this.setSelectedTile(this.tiles.length - 1);
     return true;
   }

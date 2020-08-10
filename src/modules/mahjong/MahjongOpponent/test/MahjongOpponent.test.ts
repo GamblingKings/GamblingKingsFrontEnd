@@ -62,6 +62,12 @@ test('MahjongOpponent - renderMahjongHand()', () => {
   expect(hand.children).toHaveLength(14); // 13 tiles and 1 container for playedTiles
 });
 
+test('MahjongOpponent - renderMahjongHand() with playedTiles', () => {
+  const hand = mjOpponent.renderMahjongHand(spriteFactory);
+  mjOpponent.addPlayedTiles(SAMPLE_TILE_ARRAY);
+  expect(hand.children).toHaveLength(14); // 13 tiles and 1 container for playedTiles
+});
+
 test('MahjongOpponent - render()', () => {
   mjOpponent.render(spriteFactory, pixiStage, false);
 
@@ -103,6 +109,10 @@ test('MahjongOpponent - reposition() / render()', () => {
   expect(mjOpponent.getContainer().y).toBe(80);
   mjOpponent.render(spriteFactory, pixiStage, false);
   expect(mjOpponent.getContainer().children).toHaveLength(2);
+
+  mjOpponent.removeAllAssets();
+  mjOpponent.render(spriteFactory, pixiStage, true);
+  expect(mjOpponent.getContainer().children).toHaveLength(3); // 2 + 1 for its turn
 
   mjOpponent = new MahjongOpponent(NAME, CONNECTION_ID, LOCATION_TOP);
   mjOpponent.reposition(canvas);

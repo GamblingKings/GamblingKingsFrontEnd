@@ -143,5 +143,15 @@ export interface InteractionSuccessJSON {
   connectionId?: string;
   playedTiles?: string[];
   meldType?: string;
-  skipInteraction: string;
+  skipInteraction: boolean;
+}
+
+/**
+ * Interface for PLAYED_TILE_INTERACTION payload received
+ */
+export interface PlayedTileInteractionJSON {
+  playedTiles: string[];
+  meldType: string;
+  skipInteraction: boolean;
+  success: boolean;
 }
