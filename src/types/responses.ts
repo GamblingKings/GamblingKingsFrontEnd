@@ -156,4 +156,5 @@ export interface PlayedTileInteractionJSON {
   skipInteraction: boolean;
   success: boolean;
   error: string;
+  connectionId: string;
 }
