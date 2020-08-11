@@ -312,8 +312,10 @@ class HandValidator {
       }
 
       while (next != null && upperboundTiles.length !== 2) {
-        if (next) upperboundTiles.push(next);
-        if (next) next = TileMapper[next].next;
+        if (next) {
+          upperboundTiles.push(next);
+          next = TileMapper[next].next;
+        }
       }
 
       if (upperboundTiles.length === 2) {
