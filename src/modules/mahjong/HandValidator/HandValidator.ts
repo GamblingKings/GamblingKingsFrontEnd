@@ -268,8 +268,8 @@ class HandValidator {
     // Try to create a triplet first
     let numberOfTheSameTileInHand = 0;
 
-    tiles.forEach((t) => {
-      if (t.toString() === tileToTake.toString()) numberOfTheSameTileInHand += 1;
+    tilesStrDef.forEach((t) => {
+      if (t === tileToTakeStrDef) numberOfTheSameTileInHand += 1;
     });
 
     if (numberOfTheSameTileInHand === 2) {
@@ -282,8 +282,7 @@ class HandValidator {
 
     // Try to create a consecutive
     if (isSimpleTileUtils(tileToTakeStrDef)) {
-      let { prev } = TileMapper[tileToTakeStrDef];
-      let { next } = TileMapper[tileToTakeStrDef];
+      let { prev, next } = TileMapper[tileToTakeStrDef];
 
       const lowerBoundTiles: string[] = [];
       const upperboundTiles: string[] = [];
@@ -291,9 +290,11 @@ class HandValidator {
       let ableToCreateLowerBound = true;
       let ableToCreateUpperBound = true;
 
-      while (prev != null && lowerBoundTiles.length !== 2) {
-        if (prev) lowerBoundTiles.push(prev);
-        if (prev) prev = TileMapper[prev].prev;
+      while (prev && lowerBoundTiles.length !== 2) {
+        if (prev) {
+          lowerBoundTiles.push(prev);
+          prev = TileMapper[prev].prev;
+        }
       }
 
       if (lowerBoundTiles.length === 2) {
