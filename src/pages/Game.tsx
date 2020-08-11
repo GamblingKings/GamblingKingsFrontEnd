@@ -81,10 +81,10 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
    * Initialize the GameState
    * @param currentGame Game
    */
-  const gameStateInit = (currentGame: Game, current$User: CurrentUser) => {
+  const gameStateInit = (currentGame: Game) => {
     const { users } = currentGame;
 
-    const indexOfCurrentUser = users.findIndex((user: User) => user.username === current$User.username);
+    const indexOfCurrentUser = users.findIndex((user: User) => user.username === currentUser.username);
     const allUserEntities = [];
     const directions = [RenderDirection.LEFT, RenderDirection.TOP, RenderDirection.RIGHT];
     let currentIndex = indexOfCurrentUser + 1;
@@ -100,7 +100,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       allUserEntities[currentIndex] = opponent;
       currentIndex += 1;
     }
-    const player = new MahjongPlayer(current$User.username, users[indexOfCurrentUser].connectionId);
+    const player = new MahjongPlayer(currentUser.username, users[indexOfCurrentUser].connectionId);
     allUserEntities[indexOfCurrentUser] = player;
     gameState = new MahjongGameState(allUserEntities, player as MahjongPlayer, wsCallbacks);
   };
@@ -231,18 +231,21 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
   const mjInteractionSuccess = (payload: unknown): void => {
     const data = payload as InteractionSuccessJSON;
     const mjGameState = gameState as MahjongGameState;
+    const mjPlayer = mjGameState.getMjPlayer();
 
     if (data.skipInteraction) {
       // If everybody skips, game can proceed normally
       mjGameState.goToNextTurn();
 
       const userIndex = mjGameState.getCurrentTurn();
+      const currentUserEntity = mjGameState.getUsers()[userIndex];
+
       // If it's user's turn, player can draw tile
-      if (mjGameState.getUsers()[userIndex].getConnectionId() === mjGameState.getMjPlayer().getConnectionId()) {
+      if (currentUserEntity.getConnectionId() === mjPlayer.getConnectionId()) {
         ws?.sendMessage(OutgoingAction.DRAW_TILE, { gameId: game.gameId });
       } else {
         // Change state that opponent will draw a tile
-        const opponent = mjGameState.getUsers()[userIndex] as MahjongOpponent;
+        const opponent = currentUserEntity as MahjongOpponent;
         opponent.drawTile();
       }
     } else {
@@ -251,7 +254,6 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       if (connectionId && playedTiles && meldType) {
         const tiles = playedTiles.map((tileStr) => TileFactory.createTileFromStringDef(tileStr));
         const userIndex = mjGameState.getUsers().findIndex((user) => user.getConnectionId() === connectionId);
-        const mjPlayer = mjGameState.getMjPlayer();
         if (connectionId === mjPlayer.getConnectionId()) {
           // Player updates their PlayedTiles
           mjPlayer.getHand().addPlayedTiles(tiles);
@@ -308,7 +310,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       if (ws) {
         ws.sendMessage(OutgoingAction.GAME_PAGE_LOAD, { gameId: game.gameId });
       }
-      gameStateInit(game, currentUser);
+      gameStateInit(game);
       /**
        * Load resources (images) into Sprite Factory
        */

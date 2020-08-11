@@ -19,6 +19,9 @@ import { OutgoingAction } from '../../ws';
 import WindEnums from '../enums/WindEnums';
 import MeldTypes from '../enums/MeldEnums';
 
+const PLAY_TILE_TEXT = 'PLAY_TILE';
+const SKIP_TEXT = 'SKIP';
+
 /**
  * Mahjong player that holds information about current hand (tiles) and render methods
  */
@@ -183,7 +186,7 @@ class MahjongPlayer extends UserEntity {
 
     // Render play button if player has drawn.
     if (this.hand.canPlayTile()) {
-      const playText = new PIXI.Text('PLAY TILE', PIXI_TEXT_STYLE);
+      const playText = new PIXI.Text(PLAY_TILE_TEXT, PIXI_TEXT_STYLE);
       container.addChild(playText);
       Interactions.addMouseInteraction(playText, (event: PIXI.InteractionEvent) => {
         console.log(event.target);
@@ -219,7 +222,7 @@ class MahjongPlayer extends UserEntity {
       });
 
       // Skip Interaction
-      const skipText = new PIXI.Text('SKIP', PIXI_TEXT_STYLE);
+      const skipText = new PIXI.Text(SKIP_TEXT, PIXI_TEXT_STYLE);
       skipText.y = 120;
       Interactions.addMouseInteraction(skipText, (event: PIXI.InteractionEvent) => {
         console.log(event.target);

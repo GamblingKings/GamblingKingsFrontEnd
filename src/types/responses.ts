@@ -144,6 +144,7 @@ export interface InteractionSuccessJSON {
   playedTiles?: string[];
   meldType?: string;
   skipInteraction: boolean;
+  success: boolean;
 }
 
 /**
@@ -154,4 +155,5 @@ export interface PlayedTileInteractionJSON {
   meldType: string;
   skipInteraction: boolean;
   success: boolean;
+  error: string;
 }
