@@ -71,6 +71,8 @@ let gameState: GameState;
 let player: UserEntity;
 
 const wall = new HongKongWall();
+const playedTilesOne = ['1_DOT', '1_DOT', '1_DOT'].map((tile) => TileFactory.createTileFromStringDef(tile));
+const playedTilesTwo = ['4_DOT', '5_DOT', '6_DOT'].map((tile) => TileFactory.createTileFromStringDef(tile));
 
 /**
  * Testing page for the Game.
@@ -89,6 +91,9 @@ const GameTestPage = (): JSX.Element => {
       const tileInstance = TileFactory.createTileFromStringDef(tileStr);
       mjGameState.getDeadPile().add(tileInstance);
       mjGameState.requestRedraw();
+    },
+    PLAYED_TILE_INTERACTION: (params: unknown) => {
+      console.log(params);
     },
     REQUEST_REDRAW: () => {
       const mjGameState = gameState as MahjongGameState;
@@ -123,8 +128,14 @@ const GameTestPage = (): JSX.Element => {
     player = new MahjongPlayer(CURRENT_USER.username, CURRENT_USER.connectionId);
     const mahjongPlayer = player as MahjongPlayer;
     mahjongPlayer.setHand(tiles);
+    mahjongPlayer.getHand().addPlayedTiles(playedTilesOne);
+    mahjongPlayer.getHand().addPlayedTiles(playedTilesTwo);
 
     allUserEntities[indexOfCurrentUser] = mahjongPlayer;
+
+    const opponentTest = allUserEntities[0] as MahjongOpponent;
+    opponentTest.addPlayedTiles(playedTilesOne);
+    opponentTest.addPlayedTiles(playedTilesTwo);
 
     gameState = new MahjongGameState(allUserEntities, mahjongPlayer, mockWSCallbacks);
     console.log(gameState);

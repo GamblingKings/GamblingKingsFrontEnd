@@ -8,6 +8,7 @@ import DeadPile from '../DeadPile/DeadPile';
 import WallCounter from '../WallCounter/WallCounter';
 import { OutgoingAction } from '../../ws';
 import MahjongPlayer from '../MahjongPlayer/MahjongPlayer';
+import MahjongOpponent from '../MahjongOpponent/MahjongOpponent';
 
 /**
  * Get flower number based on player and dealer position
@@ -111,12 +112,21 @@ class MahjongGameState extends GameState {
     return this.deadPile;
   }
 
+  public getMjPlayer(): MahjongPlayer {
+    return this.mjPlayer;
+  }
+
   public startRound(): boolean {
     this.roundStarted = true;
     const gameUsers = super.getUsers();
     const indexOfUser = gameUsers.findIndex((user) => user.getConnectionId() === this.mjPlayer.getConnectionId());
     if (indexOfUser === this.dealer) {
+      // Draw tile if player is the dealer
       this.wsCallbacks[OutgoingAction.DRAW_TILE]();
+    } else {
+      // Opponent draws tile
+      const opponent = gameUsers[this.dealer] as MahjongOpponent;
+      opponent.drawTile();
     }
     const flowerNumber = getFlowerNumber(indexOfUser, this.dealer);
     const playerWind = getPlayerWind(flowerNumber, this.currentWind);

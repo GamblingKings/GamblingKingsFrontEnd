@@ -46,3 +46,12 @@ test('DeadPile - render()', () => {
   d.removeAllAssets();
   expect(d.getContainer().children).toHaveLength(0);
 });
+
+test('DeadPile - removeLastTile()', () => {
+  expect(d.removeLastTile()).toBeFalsy();
+  d.add(charSimpleTile);
+  d.add(bambooSimpleTile);
+  expect(d.getDeadPile()).toHaveLength(2);
+  expect(d.removeLastTile()).toBeTruthy();
+  expect(d.getDeadPile()).toHaveLength(1);
+});

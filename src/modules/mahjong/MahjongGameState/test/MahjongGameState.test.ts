@@ -15,6 +15,7 @@ let mjOpponent2: MahjongOpponent;
 let mjOpponent3: MahjongOpponent;
 let gameState: MahjongGameState;
 let users: UserEntity[];
+const PLAYER_NAME = 'Jay Chou';
 
 let pixiApp: PIXI.Application;
 const spriteFactory = new SpriteFactory({});
@@ -25,7 +26,7 @@ const callbacks = {
 };
 
 beforeEach(() => {
-  mjPlayer = new MahjongPlayer('Player', 'connectionId');
+  mjPlayer = new MahjongPlayer(PLAYER_NAME, 'connectionId');
   mjOpponent1 = new MahjongOpponent('Opp Left', 'connectionId', RenderDirection.LEFT);
   mjOpponent2 = new MahjongOpponent('Opp Top', 'connectionId', RenderDirection.TOP);
   mjOpponent3 = new MahjongOpponent('Opp Right', 'connectionId', RenderDirection.RIGHT);
@@ -90,4 +91,17 @@ test('MahjongGameState - renderCanvas()', () => {
   expect(pixiApp.stage.children).toHaveLength(6); // 4 - users, 1 deadpile, 1 wall
   gameState.requestRedraw();
   expect(pixiApp.stage.children).toHaveLength(6);
+});
+
+test('MahjongGameState - getDeadPile()', () => {
+  expect(gameState.getDeadPile().getDeadPile()).toHaveLength(0);
+});
+
+test('MahjongGameState - getMjPlayer()', () => {
+  expect(gameState.getMjPlayer().getName()).toBe(PLAYER_NAME);
+});
+
+test('MahjongGameState - setTurn()', () => {
+  gameState.setTurn(1);
+  expect(gameState.getCurrentTurn()).toBe(1);
 });

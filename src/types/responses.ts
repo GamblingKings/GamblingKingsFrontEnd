@@ -135,3 +135,26 @@ export interface PlayTileJSON {
   tile: string;
   connectionId: string;
 }
+
+/**
+ * Interface for INTERACTION_SUCCESS payload received
+ */
+export interface InteractionSuccessJSON {
+  connectionId?: string;
+  playedTiles?: string[];
+  meldType?: string;
+  skipInteraction: boolean;
+  success: boolean;
+}
+
+/**
+ * Interface for PLAYED_TILE_INTERACTION payload received
+ */
+export interface PlayedTileInteractionJSON {
+  playedTiles: string[];
+  meldType: string;
+  skipInteraction: boolean;
+  success: boolean;
+  error: string;
+  connectionId: string;
+}

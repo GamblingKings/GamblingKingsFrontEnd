@@ -10,6 +10,7 @@ import {
   DISTANCE_FROM_TILES,
   PIXI_TEXT_STYLE,
   BACK_TILE,
+  FRONT_TILE,
 } from '../../../pixi/mahjongConstants';
 import OpponentHand from '../Hand/OpponentHand';
 import UserEntity from '../../game/UserEntity/UserEntity';
@@ -37,6 +38,14 @@ class MahjongOpponent extends UserEntity {
     return this.opponentHand.getPlayedTiles();
   }
 
+  public drawTile(): void {
+    this.opponentHand.setHasDrawn(true);
+  }
+
+  public playedTile(): void {
+    this.opponentHand.playedTile();
+  }
+
   /**
    * Removes all children from the container in super class.
    */
@@ -53,13 +62,58 @@ class MahjongOpponent extends UserEntity {
   public renderMahjongHand(spriteFactory: SpriteFactory): PIXI.Container {
     const container = new PIXI.Container();
     const hand = this.opponentHand;
+    const hasDrawn = hand.getHasDrawn();
+    const lastTile = hasDrawn ? hand.getNumberOfTiles() - 1 : -1;
     for (let i = 0; i < hand.getNumberOfTiles(); i += 1) {
       const backSprite = spriteFactory.generateSprite(BACK_TILE);
       backSprite.width = DEFAULT_MAHJONG_WIDTH;
       backSprite.height = DEFAULT_MAHJONG_HEIGHT;
       backSprite.x = i * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
+
+      if (i === lastTile) {
+        backSprite.y -= 10;
+      }
       container.addChild(backSprite);
     }
+
+    // Render played tiles
+    const allMeldsContainer = new PIXI.Container();
+    const playedTiles = this.getHand().getPlayedTiles();
+    playedTiles.forEach((meld: Tile[], index: number) => {
+      const meldContainer = new PIXI.Container();
+      meld.forEach((tile: Tile, tileIndex: number) => {
+        const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
+        frontSprite.width = DEFAULT_MAHJONG_WIDTH;
+        frontSprite.height = DEFAULT_MAHJONG_HEIGHT;
+        frontSprite.x = tileIndex * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
+        frontSprite.y += DEFAULT_MAHJONG_HEIGHT + DISTANCE_FROM_TILES;
+
+        meldContainer.addChild(frontSprite);
+
+        const tileSprite = spriteFactory.generateSprite(tile.toString());
+        tileSprite.width = DEFAULT_MAHJONG_WIDTH;
+        tileSprite.height = DEFAULT_MAHJONG_HEIGHT;
+        tileSprite.x = tileIndex * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
+        tileSprite.y += DEFAULT_MAHJONG_HEIGHT + DISTANCE_FROM_TILES;
+
+        meldContainer.addChild(tileSprite);
+      });
+      // Give adequate/correct spacing between each meld for readability
+      if (index !== 0) {
+        const previousMeldLength = playedTiles[index - 1].length;
+        // eslint + prettier conflict
+        // eslint-disable-next-line operator-linebreak
+        meldContainer.x =
+          // eslint-disable-next-line operator-linebreak
+          (DEFAULT_MAHJONG_WIDTH + 3 * DISTANCE_FROM_TILES) * previousMeldLength +
+          allMeldsContainer.getChildAt(index - 1).x;
+      }
+
+      allMeldsContainer.addChild(meldContainer);
+    });
+
+    container.addChild(allMeldsContainer);
+
     return container;
   }
 

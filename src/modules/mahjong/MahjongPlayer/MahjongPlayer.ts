@@ -17,6 +17,10 @@ import PlayerHand from '../Hand/PlayerHand';
 import Tile from '../Tile/Tile';
 import { OutgoingAction } from '../../ws';
 import WindEnums from '../enums/WindEnums';
+import MeldTypes from '../enums/MeldEnums';
+
+const PLAY_TILE_TEXT = 'PLAY_TILE';
+const SKIP_TEXT = 'SKIP';
 
 /**
  * Mahjong player that holds information about current hand (tiles) and render methods
@@ -24,11 +28,14 @@ import WindEnums from '../enums/WindEnums';
 class MahjongPlayer extends UserEntity {
   private hand: PlayerHand;
 
+  private allowInteraction: boolean;
+
   private interactionContainer: PIXI.Container;
 
   constructor(name: string, connectionId: string) {
     super(name, connectionId, RenderDirection.BOTTOM);
     this.hand = new PlayerHand();
+    this.allowInteraction = false;
     this.interactionContainer = new PIXI.Container();
   }
 
@@ -50,6 +57,14 @@ class MahjongPlayer extends UserEntity {
 
   public setWindAndFlower(wind: WindEnums, flowerNumber: number): boolean {
     return this.hand.setWind(wind) && this.hand.setFlowerNumber(flowerNumber);
+  }
+
+  public setAllowInteraction(permission: boolean): void {
+    this.allowInteraction = permission;
+  }
+
+  public getAllowInteraction(): boolean {
+    return this.allowInteraction;
   }
 
   /**
@@ -76,7 +91,7 @@ class MahjongPlayer extends UserEntity {
 
     const selectedTile = this.hand.getSelectedTile();
     const tiles = this.hand.getTiles();
-    const hasDrawn = this.hand.getHasDrawnTile();
+    const hasDrawn = this.hand.getHasDrawn();
     const lastTile = hasDrawn ? tiles.length - 1 : -1;
 
     tiles.forEach((tile: Tile, index: number) => {
@@ -108,6 +123,42 @@ class MahjongPlayer extends UserEntity {
       container.addChild(sprite);
     });
 
+    // Render played tiles
+    const allMeldsContainer = new PIXI.Container();
+    const playedTiles = this.hand.getPlayedTiles();
+    playedTiles.forEach((meld: Tile[], index: number) => {
+      const meldContainer = new PIXI.Container();
+      meld.forEach((tile: Tile, tileIndex: number) => {
+        const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
+        frontSprite.width = DEFAULT_MAHJONG_WIDTH;
+        frontSprite.height = DEFAULT_MAHJONG_HEIGHT;
+        frontSprite.x = PLAYER_HAND_SPRITE_X + tileIndex * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
+        frontSprite.y += DEFAULT_MAHJONG_HEIGHT + DISTANCE_FROM_TILES;
+        meldContainer.addChild(frontSprite);
+
+        const sprite = spriteFactory.generateSprite(tile.toString());
+        sprite.width = DEFAULT_MAHJONG_WIDTH;
+        sprite.height = DEFAULT_MAHJONG_HEIGHT;
+        sprite.x = PLAYER_HAND_SPRITE_X + tileIndex * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
+        sprite.y += DEFAULT_MAHJONG_HEIGHT + DISTANCE_FROM_TILES;
+        meldContainer.addChild(sprite);
+      });
+
+      // Give adequate/correct spacing between each meld for readability
+      if (index !== 0) {
+        const previousMeldLength = playedTiles[index - 1].length;
+        // eslint + prettier conflict
+        // eslint-disable-next-line operator-linebreak
+        meldContainer.x =
+          // eslint-disable-next-line operator-linebreak
+          (DEFAULT_MAHJONG_WIDTH + 3 * DISTANCE_FROM_TILES) * previousMeldLength +
+          allMeldsContainer.getChildAt(index - 1).x;
+      }
+
+      allMeldsContainer.addChild(meldContainer);
+    });
+    container.addChild(allMeldsContainer);
+
     return container;
   }
 
@@ -129,20 +180,67 @@ class MahjongPlayer extends UserEntity {
     spriteFactory: SpriteFactory,
     callbacks: Record<string, (...args: unknown[]) => void>,
   ): void {
+    console.log(spriteFactory);
     const container = new PIXI.Container();
-    // Prototyping how to do this...
-    const drawTile = spriteFactory.generateSprite(FRONT_TILE);
-    drawTile.height = DEFAULT_MAHJONG_HEIGHT;
-    drawTile.width = DEFAULT_MAHJONG_WIDTH;
-    container.addChild(drawTile);
     container.x = 200 + this.hand.getTiles().length * DEFAULT_MAHJONG_WIDTH;
-    Interactions.addMouseInteraction(drawTile, (event: PIXI.InteractionEvent) => {
-      console.log(event.target);
-      const tile = this.hand.throw();
-      if (tile !== null) {
-        callbacks[OutgoingAction.PLAY_TILE](tile.toString());
-      }
-    });
+
+    // Render play button if player has drawn.
+    if (this.hand.canPlayTile()) {
+      const playText = new PIXI.Text(PLAY_TILE_TEXT, PIXI_TEXT_STYLE);
+      container.addChild(playText);
+      Interactions.addMouseInteraction(playText, (event: PIXI.InteractionEvent) => {
+        console.log(event.target);
+        const tile = this.hand.throw();
+        if (tile !== null) {
+          callbacks[OutgoingAction.PLAY_TILE](tile.toString());
+        }
+      });
+    }
+
+    // Render interaction buttons when player is prompted to.
+    if (this.allowInteraction) {
+      // Possible interactions with creating melds.
+      Object.values(MeldTypes).forEach((possibleMeld: string, index: number) => {
+        const text = new PIXI.Text(possibleMeld, PIXI_TEXT_STYLE);
+        text.y += 30 * (index + 1);
+        container.addChild(text);
+        Interactions.addMouseInteraction(text, (event: PIXI.InteractionEvent) => {
+          console.log(event.target);
+          const payload = {
+            meldType: possibleMeld,
+            skipInteraction: false,
+            playedTiles: ['1_DOT', '1_DOT', '1_DOT'], // placeholder
+          };
+          // TODO: add in meld validator results
+          // Extra boolean check might prevent duplicate messages from sending if user double clicks fast enough
+          if (this.allowInteraction) {
+            this.setAllowInteraction(false);
+            callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
+          }
+          callbacks.REQUEST_REDRAW();
+        });
+      });
+
+      // Skip Interaction
+      const skipText = new PIXI.Text(SKIP_TEXT, PIXI_TEXT_STYLE);
+      skipText.y = 120;
+      Interactions.addMouseInteraction(skipText, (event: PIXI.InteractionEvent) => {
+        console.log(event.target);
+        const payload = {
+          skipInteraction: true,
+          meldType: '',
+          playedTiles: [],
+        };
+        // Extra boolean check might prevent duplicate messages from sending if user double clicks fast enough
+        if (this.allowInteraction) {
+          this.setAllowInteraction(false);
+          callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
+        }
+        callbacks.REQUEST_REDRAW();
+      });
+
+      container.addChild(skipText);
+    }
 
     this.interactionContainer.addChild(container);
   }
