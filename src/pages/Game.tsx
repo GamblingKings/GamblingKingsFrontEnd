@@ -198,7 +198,6 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       }
 
       mjPlayer.setAllowInteraction(true);
-      // TODO: (NextPR) set timeout, if nothing happens, send skip
     } else {
       // TODO (NextPR): Display msg to player who played tile to wait while others make decision
     }
@@ -236,6 +235,9 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     if (data.skipInteraction) {
       // If everybody skips, game can proceed normally
       mjGameState.goToNextTurn();
+
+      // Increase wall counter
+      mjGameState.getWallCounter().increaseCounter();
 
       const userIndex = mjGameState.getCurrentTurn();
       const currentUserEntity = mjGameState.getUsers()[userIndex];

@@ -116,6 +116,10 @@ class MahjongGameState extends GameState {
     return this.mjPlayer;
   }
 
+  public getWallCounter(): WallCounter {
+    return this.wallCounter;
+  }
+
   public startRound(): boolean {
     this.roundStarted = true;
     const gameUsers = super.getUsers();
@@ -183,6 +187,10 @@ class MahjongGameState extends GameState {
         user.render(spriteFactory, stage, isUserTurn, this.wsCallbacks);
         user.reposition(view);
       });
+      const deadPileTiles = this.deadPile.getDeadPile();
+
+      this.mjPlayer.renderInteractions(spriteFactory, this.wsCallbacks, deadPileTiles);
+
       // Render Wall
       this.wallCounter.removeAllAssets();
       this.wallCounter.render(spriteFactory, stage);
