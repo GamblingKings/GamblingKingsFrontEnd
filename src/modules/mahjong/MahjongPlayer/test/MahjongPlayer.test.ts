@@ -7,6 +7,7 @@ import SpriteFactory from '../../../../pixi/SpriteFactory';
 import TileFactory from '../../Tile/TileFactory';
 import Tile from '../../Tile/Tile';
 import WindEnums from '../../enums/WindEnums';
+import DeadPile from '../../DeadPile/DeadPile';
 
 const { JSDOM } = jsdom;
 const dom = new JSDOM();
@@ -30,6 +31,7 @@ const tileStrings = [
 
 let tiles: Tile[];
 const tile = TileFactory.createTileFromStringDef('1_DOT');
+const deadPile = new DeadPile();
 
 const spriteFactory = new SpriteFactory({});
 const callbacks = {};
@@ -176,7 +178,7 @@ test('MahjongPlayer - getAllowInteraction()', () => {
 test('MahjongPlayer - renderInteraction()', () => {
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(0);
 
-  mjPlayer.renderInteractions(spriteFactory, callbacks);
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile());
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 });
 
@@ -184,12 +186,12 @@ test('MahjongPlayer - renderInteraction() with other parameters', () => {
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(0);
 
   mjPlayer.setAllowInteraction(true);
-  mjPlayer.renderInteractions(spriteFactory, callbacks);
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile());
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 
   mjPlayer.removeAllAssets();
   mjPlayer.setAllowInteraction(false);
   mjPlayer.getHand().draw(tile);
-  mjPlayer.renderInteractions(spriteFactory, callbacks);
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile());
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 });
