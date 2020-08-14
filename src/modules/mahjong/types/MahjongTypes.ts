@@ -7,6 +7,7 @@ import HonorTileTypes from '../enums/HonorTileEnums';
 import BonusTileTypes from '../enums/BonusTileEnums';
 import MeldTypes from '../enums/MeldEnums';
 import Tile from '../Tile/Tile';
+import WindEnums from '../enums/WindEnums';
 
 export interface TileDefinition {
   type: SimpleTileTypes | HonorTileTypes | BonusTileTypes;
@@ -19,8 +20,11 @@ export interface ValidPair {
   pair: string;
   remainingTiles: { [index: string]: number };
   numTiles: number;
-  originalTiles: Tile[];
+  filteredTiles: Tile[];
+  bonusTiles: Tile[];
   melds?: Meld[];
+  wind: WindEnums;
+  flower: number;
 }
 
 export interface Meld {
@@ -51,9 +55,17 @@ export interface SortHandWeights {
 
 export interface HandPointResults {
   melds?: Meld[];
-  points: number;
+  totalPoints: number;
+  handPoints: number;
+  extraPoints: number;
+  windPoints: number;
+  dragonPoints: number;
+  flowerPoints: number;
   hands: HandDefinition[];
   tiles: Tile[];
+  bonusTiles: Tile[];
+  wind: WindEnums;
+  flower: number;
 }
 
 export interface PointValidationResults {
@@ -64,4 +76,16 @@ export interface PointValidationResults {
 export interface HandDefinition {
   points: number;
   name: string;
+}
+
+export interface CreateMeld {
+  canCreate: boolean;
+  melds: Meld[];
+}
+
+export interface CreateMeldResults {
+  tileToTake: Tile;
+  quad: CreateMeld;
+  triplet: CreateMeld;
+  consecutive: CreateMeld;
 }

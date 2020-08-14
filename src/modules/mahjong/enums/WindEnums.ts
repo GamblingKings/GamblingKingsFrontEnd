@@ -2,10 +2,10 @@
  * Enum class that stores all possible Winds.
  */
 enum WindEnums {
-  EAST = 'East',
-  SOUTH = 'South',
-  WEST = 'West',
-  NORTH = 'North',
+  EAST = 'EAST',
+  SOUTH = 'SOUTH',
+  WEST = 'WEST',
+  NORTH = 'NORTH',
 }
 
 export default WindEnums;
