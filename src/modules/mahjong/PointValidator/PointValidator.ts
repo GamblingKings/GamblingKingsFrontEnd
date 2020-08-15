@@ -275,6 +275,11 @@ class PointValidator {
     return points;
   }
 
+  public static validateConcealed(concealed: boolean): number {
+    if (concealed) return 1;
+    return 0;
+  }
+
   // Validate points of a hand
   /**
    * Determine how many points comes from valid hands such as all triplets, all consecutives, purity, etc..
@@ -289,6 +294,7 @@ class PointValidator {
         windPoints: 0,
         dragonPoints: 0,
         flowerPoints: 0,
+        concealedPoint: 0,
         hands: [],
         tiles: [],
         wind: WindEnums.EAST,
@@ -306,6 +312,7 @@ class PointValidator {
       windPoints: 0,
       dragonPoints: 0,
       flowerPoints: 0,
+      concealedPoint: 0,
       hands: [],
       tiles: [],
       wind: WindEnums.EAST,
@@ -332,6 +339,7 @@ class PointValidator {
       let windPoints = 0;
       let dragonPoints = 0;
       let flowerPoints = 0;
+      let concealedPoint = 0;
       const hands: HandDefinition[] = [];
 
       const consecutive: HandDefinition = PointValidator.validateAllConsecutives(vp);
@@ -408,12 +416,17 @@ class PointValidator {
         const containsLargeOrSmallDragons =
           hands.filter((handDef) => handDef.name === LDN || handDef.name === SDN).length > 0;
 
-        if (!containsLargeOrSmallWinds) windPoints = PointValidator.validateWind(vp.melds, vp.wind);
+        if (!containsLargeOrSmallWinds) {
+          windPoints = PointValidator.validateWind(vp.melds, vp.wind);
+          windPoints += PointValidator.validateWind(vp.melds, vp.roundWind);
+        }
         if (!containsLargeOrSmallDragons) dragonPoints = PointValidator.validateDragon(vp.melds);
         flowerPoints = PointValidator.validateFlower(vp.flower, vp.bonusTiles);
       }
 
-      extraPoints = windPoints + dragonPoints + flowerPoints;
+      concealedPoint = this.validateConcealed(vp.concealed);
+
+      extraPoints = windPoints + dragonPoints + flowerPoints + concealedPoint;
       totalPoints = handPoints + extraPoints;
 
       const resultOfThisVP = {
@@ -429,6 +442,7 @@ class PointValidator {
         wind: vp.wind,
         bonusTiles: vp.bonusTiles,
         flower: vp.flower,
+        concealedPoint,
       };
 
       if (resultOfThisVP.totalPoints > largestHand.totalPoints) largestHand = resultOfThisVP;

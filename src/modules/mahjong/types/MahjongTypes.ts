@@ -25,6 +25,8 @@ export interface ValidPair {
   melds?: Meld[];
   wind: WindEnums;
   flower: number;
+  roundWind: WindEnums;
+  concealed: boolean;
 }
 
 export interface Meld {
@@ -61,6 +63,7 @@ export interface HandPointResults {
   windPoints: number;
   dragonPoints: number;
   flowerPoints: number;
+  concealedPoint: number;
   hands: HandDefinition[];
   tiles: Tile[];
   bonusTiles: Tile[];
