@@ -424,7 +424,7 @@ class PointValidator {
         flowerPoints = PointValidator.validateFlower(vp.flower, vp.bonusTiles);
       }
 
-      concealedPoint = this.validateConcealed(vp.concealed);
+      concealedPoint = PointValidator.validateConcealed(vp.concealed);
 
       extraPoints = windPoints + dragonPoints + flowerPoints + concealedPoint;
       totalPoints = handPoints + extraPoints;
