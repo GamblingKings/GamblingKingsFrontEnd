@@ -675,6 +675,14 @@ test('Verifies that given the allConsecutiveHand, the function returns the corre
   expect(largestHand.totalPoints).toEqual(expected);
 });
 
+test('Verifies that given the allConsecutiveHand with concealed true, the function returns the corresponding points', () => {
+  const result = validateHandStructure(allConsecutiveHand, WindEnums.EAST, 1, WindEnums.EAST, true);
+  const pointResults = PointValidator.validateHandPoints(result);
+  const { largestHand } = pointResults;
+  const expected = HKHandMapper.ALL_CONSECUTIVE.points + HKHandMapper.CONCEALED.points;
+  expect(largestHand.totalPoints).toEqual(expected);
+});
+
 test('Verifies that given the semiPurityHand, the function returns the corresponding points', () => {
   const result = validateHandStructure(validHandWithSemiPurity);
   const pointResults = PointValidator.validateHandPoints(result);
@@ -775,6 +783,7 @@ test('Verifies that given the validHandWithSemiPurityAndEastWindWithTwoFlowerAnd
   const result = validateHandStructure(validHandWithSemiPurityAndEastWindWithTwoFlowerAndTwoSeason, WindEnums.NORTH, 2);
   const pointResults = PointValidator.validateHandPoints(result);
   const { largestHand } = pointResults;
-  const expected = HKHandMapper.SEMI_PURITY.points + HKHandMapper.SEASON.points + HKHandMapper.FLOWER.points;
+  // eslint-disable-next-line prettier/prettier
+  const expected = HKHandMapper.SEMI_PURITY.points + HKHandMapper.SEASON.points + HKHandMapper.FLOWER.points + HKHandMapper.ROUND_WIND.points;
   expect(largestHand.totalPoints).toEqual(expected);
 });

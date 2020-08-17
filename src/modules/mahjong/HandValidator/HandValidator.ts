@@ -105,7 +105,13 @@ class HandValidator {
     return mapping;
   }
 
-  public static determineAllPossiblePairs(tiles: Tile[], wind: WindEnums = WindEnums.EAST, flower = 1): ValidPair[] {
+  public static determineAllPossiblePairs(
+    tiles: Tile[],
+    wind: WindEnums = WindEnums.EAST,
+    flower = 1,
+    roundWind = WindEnums.EAST,
+    concealed = false,
+  ): ValidPair[] {
     const tileMapping = this.createTileMapping(tiles);
     const filteredTiles = tiles.filter((t) => !isBonusTile(t.toString()));
     const bonusTiles = tiles.filter((t) => isBonusTile(t.toString()));
@@ -136,6 +142,8 @@ class HandValidator {
           bonusTiles,
           wind,
           flower,
+          roundWind,
+          concealed,
         });
       }
     });

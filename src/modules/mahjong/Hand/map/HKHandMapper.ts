@@ -65,6 +65,14 @@ const HKHandMapper: { [index: string]: HandDefinition } = {
     points: 1,
     name: 'SEASON',
   },
+  CONCEALED: {
+    points: 1,
+    name: 'CONCEALED',
+  },
+  ROUND_WIND: {
+    points: 1,
+    name: 'ROUND_WIND',
+  },
 };
 
 export default HKHandMapper;
