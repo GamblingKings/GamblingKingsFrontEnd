@@ -349,3 +349,12 @@ test('Validate that if the take tile is the middle, it can create a meld', () =>
   expect(results.consecutive.canCreate).toBeTruthy();
   expect(results.consecutive.melds).toHaveLength(1);
 });
+
+test('Validate that if the positioning is not true, then player is not able to take a consecutive', () => {
+  const tiles: Tile[] = [];
+  allConsecutiveHand2.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
+  const spliced = tiles.splice(1, 1);
+  const results = HandValidator.canCreateMeld(tiles, spliced[0], false);
+  expect(results.consecutive.canCreate).toBeFalsy();
+  expect(results.consecutive.melds).toHaveLength(0);
+});

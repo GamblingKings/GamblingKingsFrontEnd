@@ -253,7 +253,13 @@ class HandValidator {
     return results;
   }
 
-  public static canCreateMeld = (tiles: Tile[], tileToTake: Tile): CreateMeldResults => {
+  /**
+   * Determines if a hand can create a meld given a thrown tile
+   * @param tiles the tiles in the hand
+   * @param tileToTake the tile that is thrown
+   * @param positioning whether the hand is positioned correctly to take a consecutive
+   */
+  public static canCreateMeld = (tiles: Tile[], tileToTake: Tile, positioning = true): CreateMeldResults => {
     const results: CreateMeldResults = {
       tileToTake,
       quad: {
@@ -289,73 +295,75 @@ class HandValidator {
     }
 
     // Try to create a consecutive
-    if (isSimpleTileUtils(tileToTakeStrDef)) {
-      let { prev, next } = TileMapper[tileToTakeStrDef];
+    if (positioning) {
+      if (isSimpleTileUtils(tileToTakeStrDef)) {
+        let { prev, next } = TileMapper[tileToTakeStrDef];
 
-      const lowerBoundTiles: string[] = [];
-      const upperboundTiles: string[] = [];
-      const bothBoundTiles: string[] = [];
+        const lowerBoundTiles: string[] = [];
+        const upperboundTiles: string[] = [];
+        const bothBoundTiles: string[] = [];
 
-      let ableToCreateLowerBound = true;
-      let ableToCreateUpperBound = true;
-      let ableToCreateBothBound = true;
+        let ableToCreateLowerBound = true;
+        let ableToCreateUpperBound = true;
+        let ableToCreateBothBound = true;
 
-      if (prev) bothBoundTiles.push(prev);
-      if (next) bothBoundTiles.push(next);
+        if (prev) bothBoundTiles.push(prev);
+        if (next) bothBoundTiles.push(next);
 
-      if (bothBoundTiles.length === 2) {
-        bothBoundTiles.forEach((str) => {
-          if (str && !tilesStrDef.includes(str)) ableToCreateBothBound = false;
-        });
-
-        if (ableToCreateBothBound) {
-          results.consecutive.canCreate = true;
-          results.consecutive.melds.push({
-            type: MeldTypes.CONSECUTIVE,
-            tiles: [tileToTakeStrDef, ...bothBoundTiles],
+        if (bothBoundTiles.length === 2) {
+          bothBoundTiles.forEach((str) => {
+            if (str && !tilesStrDef.includes(str)) ableToCreateBothBound = false;
           });
+
+          if (ableToCreateBothBound) {
+            results.consecutive.canCreate = true;
+            results.consecutive.melds.push({
+              type: MeldTypes.CONSECUTIVE,
+              tiles: [tileToTakeStrDef, ...bothBoundTiles],
+            });
+          }
         }
-      }
 
-      while (prev && lowerBoundTiles.length !== 2) {
-        if (prev) {
-          lowerBoundTiles.push(prev);
-          prev = TileMapper[prev].prev;
+        while (prev && lowerBoundTiles.length !== 2) {
+          if (prev) {
+            lowerBoundTiles.push(prev);
+            prev = TileMapper[prev].prev;
+          }
         }
-      }
 
-      if (lowerBoundTiles.length === 2) {
-        lowerBoundTiles.forEach((str) => {
-          if (str && !tilesStrDef.includes(str)) ableToCreateLowerBound = false;
-        });
-
-        if (ableToCreateLowerBound) {
-          results.consecutive.canCreate = true;
-          results.consecutive.melds.push({
-            type: MeldTypes.CONSECUTIVE,
-            tiles: [tileToTakeStrDef, ...lowerBoundTiles],
+        if (lowerBoundTiles.length === 2) {
+          lowerBoundTiles.forEach((str) => {
+            if (str && !tilesStrDef.includes(str)) ableToCreateLowerBound = false;
           });
+
+          if (ableToCreateLowerBound) {
+            results.consecutive.canCreate = true;
+            results.consecutive.melds.push({
+              type: MeldTypes.CONSECUTIVE,
+              tiles: [tileToTakeStrDef, ...lowerBoundTiles],
+            });
+          }
         }
-      }
 
-      while (next != null && upperboundTiles.length !== 2) {
-        if (next) {
-          upperboundTiles.push(next);
-          next = TileMapper[next].next;
+        while (next != null && upperboundTiles.length !== 2) {
+          if (next) {
+            upperboundTiles.push(next);
+            next = TileMapper[next].next;
+          }
         }
-      }
 
-      if (upperboundTiles.length === 2) {
-        upperboundTiles.forEach((str) => {
-          if (str && !tilesStrDef.includes(str)) ableToCreateUpperBound = false;
-        });
-
-        if (ableToCreateUpperBound) {
-          results.consecutive.canCreate = true;
-          results.consecutive.melds.push({
-            type: MeldTypes.CONSECUTIVE,
-            tiles: [tileToTakeStrDef, ...upperboundTiles],
+        if (upperboundTiles.length === 2) {
+          upperboundTiles.forEach((str) => {
+            if (str && !tilesStrDef.includes(str)) ableToCreateUpperBound = false;
           });
+
+          if (ableToCreateUpperBound) {
+            results.consecutive.canCreate = true;
+            results.consecutive.melds.push({
+              type: MeldTypes.CONSECUTIVE,
+              tiles: [tileToTakeStrDef, ...upperboundTiles],
+            });
+          }
         }
       }
     }
