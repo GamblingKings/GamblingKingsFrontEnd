@@ -18,6 +18,9 @@ import Tile from '../Tile/Tile';
 import { OutgoingAction } from '../../ws';
 import WindEnums from '../enums/WindEnums';
 import HandValidator from '../HandValidator/HandValidator';
+// import Timer from '../../game/Timer/Timer';
+// eslint-disable-next-line import/no-cycle
+import MahjongGameState from '../MahjongGameState/MahjongGameState';
 
 const PLAY_TILE_TEXT = 'PLAY_TILE';
 const SKIP_TEXT = 'SKIP';
@@ -29,6 +32,8 @@ const WAITING_TEXT = 'Waiting for others...';
 class MahjongPlayer extends UserEntity {
   private hand: PlayerHand;
 
+  // private timer: Timer;
+
   private allowInteraction: boolean;
 
   private interactionContainer: PIXI.Container;
@@ -38,6 +43,7 @@ class MahjongPlayer extends UserEntity {
     this.hand = new PlayerHand();
     this.allowInteraction = false;
     this.interactionContainer = new PIXI.Container();
+    // this.timer = new Timer();
   }
 
   public getHand(): PlayerHand {
@@ -180,7 +186,7 @@ class MahjongPlayer extends UserEntity {
   public renderInteractions(
     spriteFactory: SpriteFactory,
     callbacks: Record<string, (...args: unknown[]) => void>,
-    deadPileTiles: Tile[],
+    gameState: MahjongGameState,
   ): void {
     console.log(spriteFactory);
     const container = new PIXI.Container();
@@ -199,10 +205,17 @@ class MahjongPlayer extends UserEntity {
       });
     }
 
+    const deadPileTiles = gameState.getDeadPile().getDeadPile();
+    const currentTurn = gameState.getCurrentTurn();
+    const playerIndex = gameState.getUsers().findIndex((user) => user.getConnectionId() === this.getConnectionId());
+    const canCreateConsecutive = playerIndex === (currentTurn + 1) % 4;
+    console.log(canCreateConsecutive);
+
     // Render interaction buttons when player is prompted to.
     if (this.allowInteraction && deadPileTiles.length > 0) {
       const hand = this.hand.getTiles();
       const playedTile = deadPileTiles[deadPileTiles.length - 1];
+      // TODO: add in boolean to canCreateMeld to take into account for consecutive
       const results = HandValidator.canCreateMeld(hand, playedTile);
       console.log(results);
       const { quad, triplet, consecutive } = results;

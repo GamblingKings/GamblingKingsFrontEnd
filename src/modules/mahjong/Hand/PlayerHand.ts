@@ -21,6 +21,8 @@ class PlayerHand {
 
   private madeMeld: boolean;
 
+  // TODO: add boolean to say concealed
+
   // For hand validation
   private wind: WindEnums;
 

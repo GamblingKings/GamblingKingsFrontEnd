@@ -7,6 +7,7 @@ import SpriteFactory from '../../../pixi/SpriteFactory';
 import DeadPile from '../DeadPile/DeadPile';
 import WallCounter from '../WallCounter/WallCounter';
 import { OutgoingAction } from '../../ws';
+// eslint-disable-next-line import/no-cycle
 import MahjongPlayer from '../MahjongPlayer/MahjongPlayer';
 import MahjongOpponent from '../MahjongOpponent/MahjongOpponent';
 
@@ -126,11 +127,9 @@ class MahjongGameState extends GameState {
     const indexOfUser = gameUsers.findIndex((user) => user.getConnectionId() === this.mjPlayer.getConnectionId());
     if (indexOfUser === this.dealer) {
       // Draw tile if player is the dealer
-      console.log('player dealer');
       this.wsCallbacks[OutgoingAction.DRAW_TILE]();
     } else {
       // Opponent draws tile
-      console.log('opponent dealer');
       const opponent = gameUsers[this.dealer] as MahjongOpponent;
       opponent.drawTile();
     }
@@ -189,9 +188,8 @@ class MahjongGameState extends GameState {
         user.render(spriteFactory, stage, isUserTurn, this.wsCallbacks);
         user.reposition(view);
       });
-      const deadPileTiles = this.deadPile.getDeadPile();
 
-      this.mjPlayer.renderInteractions(spriteFactory, this.wsCallbacks, deadPileTiles);
+      this.mjPlayer.renderInteractions(spriteFactory, this.wsCallbacks, this);
 
       // Render Wall
       this.wallCounter.removeAllAssets();
