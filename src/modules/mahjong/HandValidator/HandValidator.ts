@@ -294,9 +294,28 @@ class HandValidator {
 
       const lowerBoundTiles: string[] = [];
       const upperboundTiles: string[] = [];
+      const bothBoundTiles: string[] = [];
 
       let ableToCreateLowerBound = true;
       let ableToCreateUpperBound = true;
+      let ableToCreateBothBound = true;
+
+      if (prev) bothBoundTiles.push(prev);
+      if (next) bothBoundTiles.push(next);
+
+      if (bothBoundTiles.length === 2) {
+        bothBoundTiles.forEach((str) => {
+          if (str && !tilesStrDef.includes(str)) ableToCreateBothBound = false;
+        });
+
+        if (ableToCreateBothBound) {
+          results.consecutive.canCreate = true;
+          results.consecutive.melds.push({
+            type: MeldTypes.CONSECUTIVE,
+            tiles: [tileToTakeStrDef, ...bothBoundTiles],
+          });
+        }
+      }
 
       while (prev && lowerBoundTiles.length !== 2) {
         if (prev) {
@@ -314,7 +333,7 @@ class HandValidator {
           results.consecutive.canCreate = true;
           results.consecutive.melds.push({
             type: MeldTypes.CONSECUTIVE,
-            tiles: [tileToTakeStrDef, ...lowerBoundTiles.map((str) => str as string)],
+            tiles: [tileToTakeStrDef, ...lowerBoundTiles],
           });
         }
       }
@@ -335,7 +354,7 @@ class HandValidator {
           results.consecutive.canCreate = true;
           results.consecutive.melds.push({
             type: MeldTypes.CONSECUTIVE,
-            tiles: [tileToTakeStrDef, ...upperboundTiles.map((str) => str as string)],
+            tiles: [tileToTakeStrDef, ...upperboundTiles],
           });
         }
       }

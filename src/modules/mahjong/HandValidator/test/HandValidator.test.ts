@@ -72,6 +72,23 @@ const allConsecutiveHand = [
   '9_BAMBOO',
 ];
 
+const allConsecutiveHand2 = [
+  '1_DOT',
+  '2_DOT',
+  '3_DOT',
+  '1_CHARACTER',
+  '1_CHARACTER',
+  '2_CHARACTER',
+  '3_CHARACTER',
+  '4_CHARACTER',
+  '5_CHARACTER',
+  '6_CHARACTER',
+  '7_CHARACTER',
+  '1_BAMBOO',
+  '2_BAMBOO',
+  '3_BAMBOO',
+];
+
 const allConsecutiveWithLipeikou = [
   '1_DOT',
   '1_DOT',
@@ -315,11 +332,20 @@ test('Validate that if the take tile is 9 charaacter, you can only create one me
   expect(results.consecutive.melds).toHaveLength(1);
 });
 
-test('Validate that if we take a middle tile, there will be two melds - one for upper, for for lower', () => {
+test('Validate that if we take a middle tile, there will be three melds - one for upper, for for lower, one for middle', () => {
   const tiles: Tile[] = [];
   allConsecutiveWithLipeikou.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
   const spliced = tiles.splice(5, 1);
   const results = HandValidator.canCreateMeld(tiles, spliced[0]);
   expect(results.consecutive.canCreate).toBeTruthy();
-  expect(results.consecutive.melds).toHaveLength(2);
+  expect(results.consecutive.melds).toHaveLength(3);
+});
+
+test('Validate that if the take tile is the middle, it can create a meld', () => {
+  const tiles: Tile[] = [];
+  allConsecutiveHand2.forEach((str) => tiles.push(TileFactory.createTileFromStringDef(str)));
+  const spliced = tiles.splice(1, 1);
+  const results = HandValidator.canCreateMeld(tiles, spliced[0]);
+  expect(results.consecutive.canCreate).toBeTruthy();
+  expect(results.consecutive.melds).toHaveLength(1);
 });
