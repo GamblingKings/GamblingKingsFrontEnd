@@ -120,3 +120,17 @@ test('MahjongGameState - setTurn()', () => {
   gameState.setTurn(1);
   expect(gameState.getCurrentTurn()).toBe(1);
 });
+
+test('MahjongGameState - update()', () => {
+  mjPlayer.setAllowInteraction(true);
+  const timer = mjPlayer.getTimer();
+  expect(timer.getContainer().children).toHaveLength(0); // timer hasn't started
+});
+
+test('MahjongGameState - renderCanvas() -include timer', () => {
+  mjPlayer.setAllowInteraction(true);
+  gameState.renderCanvas(spriteFactory, pixiApp);
+  expect(pixiApp.stage.children).toHaveLength(7); // 4 - users, 1 deadpile, 1 wall, 1 timer
+  gameState.requestRedraw();
+  expect(pixiApp.stage.children).toHaveLength(7);
+});

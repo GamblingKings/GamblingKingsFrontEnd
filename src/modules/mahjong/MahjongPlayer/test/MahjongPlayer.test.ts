@@ -30,6 +30,23 @@ const tileStrings = [
   'WHITEDRAGON',
 ];
 
+const winnableTileStrings = [
+  '7_DOT',
+  '7_DOT',
+  '7_DOT',
+  '8_DOT',
+  '8_DOT',
+  '2_BAMBOO',
+  '2_BAMBOO',
+  '2_BAMBOO',
+  '9_CHARACTER',
+  '9_CHARACTER',
+  '9_CHARACTER',
+  'NORTH',
+  'NORTH',
+];
+const winnableTiles = winnableTileStrings.map((tile) => TileFactory.createTileFromStringDef(tile));
+
 let tiles: Tile[];
 const tile = TileFactory.createTileFromStringDef('1_DOT');
 const tile8 = TileFactory.createTileFromStringDef('8_DOT');
@@ -194,7 +211,7 @@ test('MahjongPlayer - renderInteraction() with deadpile', () => {
   mjPlayer.setAllowInteraction(true);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(0);
 
-  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile());
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 });
 
@@ -204,7 +221,7 @@ test('MahjongPlayer - renderInteraction() with deadpile and skip', () => {
   mjPlayer.setAllowInteraction(true);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(0);
 
-  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false);
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(0); // nothing to render
 });
 
@@ -212,12 +229,31 @@ test('MahjongPlayer - renderInteraction() with other parameters', () => {
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(0);
 
   mjPlayer.setAllowInteraction(true);
-  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false);
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 
   mjPlayer.removeAllAssets();
   mjPlayer.setAllowInteraction(false);
   mjPlayer.getHand().draw(tile);
-  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false);
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST);
+  expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
+});
+
+test('MahjongPlayer - getTimer()', () => {
+  const timer = mjPlayer.getTimer();
+  expect(timer.getIsRunning()).toBeFalsy();
+});
+
+test('MahjongPlayer - canWin + renderInteraction()', () => {
+  mjPlayer.setHand(winnableTiles);
+  deadPile.add(tile8);
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST);
+  expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
+});
+
+test('MahjongPlayer - canWin selfdrawn + renderInteraction()', () => {
+  mjPlayer.setHand(winnableTiles);
+  mjPlayer.addTileToHand(tile8);
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 });
