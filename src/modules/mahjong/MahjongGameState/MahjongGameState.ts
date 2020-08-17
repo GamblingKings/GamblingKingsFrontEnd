@@ -126,9 +126,11 @@ class MahjongGameState extends GameState {
     const indexOfUser = gameUsers.findIndex((user) => user.getConnectionId() === this.mjPlayer.getConnectionId());
     if (indexOfUser === this.dealer) {
       // Draw tile if player is the dealer
+      console.log('player dealer');
       this.wsCallbacks[OutgoingAction.DRAW_TILE]();
     } else {
       // Opponent draws tile
+      console.log('opponent dealer');
       const opponent = gameUsers[this.dealer] as MahjongOpponent;
       opponent.drawTile();
     }

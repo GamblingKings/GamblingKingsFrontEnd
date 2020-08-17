@@ -8,6 +8,7 @@ import TileFactory from '../../Tile/TileFactory';
 import Tile from '../../Tile/Tile';
 import WindEnums from '../../enums/WindEnums';
 import DeadPile from '../../DeadPile/DeadPile';
+import { OutgoingAction } from '../../../ws';
 
 const { JSDOM } = jsdom;
 const dom = new JSDOM();
@@ -35,7 +36,10 @@ const tile8 = TileFactory.createTileFromStringDef('8_DOT');
 let deadPile: DeadPile;
 
 const spriteFactory = new SpriteFactory({});
-const callbacks = {};
+const callbacks = {
+  [OutgoingAction.PLAYED_TILE_INTERACTION]: () => console.log('played tile callback'),
+  REQUEST_REDRAW: () => console.log('redraw callback'),
+};
 let pixiStage: PIXI.Container;
 
 const NAME = 'Jay Chou';
@@ -192,6 +196,16 @@ test('MahjongPlayer - renderInteraction() with deadpile', () => {
 
   mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile());
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
+});
+
+test('MahjongPlayer - renderInteraction() with deadpile and skip', () => {
+  deadPile.add(tile);
+  mjPlayer.setHand(tiles);
+  mjPlayer.setAllowInteraction(true);
+  expect(mjPlayer.getInteractionContainer().children).toHaveLength(0);
+
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile());
+  expect(mjPlayer.getInteractionContainer().children).toHaveLength(0); // nothing to render
 });
 
 test('MahjongPlayer - renderInteraction() with other parameters', () => {

@@ -14,7 +14,9 @@ let mjOpponent1: MahjongOpponent;
 let mjOpponent2: MahjongOpponent;
 let mjOpponent3: MahjongOpponent;
 let gameState: MahjongGameState;
+let gameStateOne: MahjongGameState;
 let users: UserEntity[];
+let usersOpponentFirst: UserEntity[];
 const PLAYER_NAME = 'Jay Chou';
 
 let pixiApp: PIXI.Application;
@@ -27,12 +29,14 @@ const callbacks = {
 
 beforeEach(() => {
   mjPlayer = new MahjongPlayer(PLAYER_NAME, 'connectionId');
-  mjOpponent1 = new MahjongOpponent('Opp Left', 'connectionId', RenderDirection.LEFT);
-  mjOpponent2 = new MahjongOpponent('Opp Top', 'connectionId', RenderDirection.TOP);
-  mjOpponent3 = new MahjongOpponent('Opp Right', 'connectionId', RenderDirection.RIGHT);
+  mjOpponent1 = new MahjongOpponent('Opp Left', 'connectionId1', RenderDirection.LEFT);
+  mjOpponent2 = new MahjongOpponent('Opp Top', 'connectionId2', RenderDirection.TOP);
+  mjOpponent3 = new MahjongOpponent('Opp Right', 'connectionId3', RenderDirection.RIGHT);
   users = [mjPlayer, mjOpponent1, mjOpponent2, mjOpponent3];
+  usersOpponentFirst = [mjOpponent1, mjPlayer, mjOpponent2, mjOpponent3];
 
   gameState = new MahjongGameState(users, mjPlayer, callbacks);
+  gameStateOne = new MahjongGameState(usersOpponentFirst, mjPlayer, callbacks);
 
   pixiApp = { stage: new PIXI.Container(), view: {} as HTMLCanvasElement }; // mocking
 });
@@ -55,6 +59,17 @@ test('MahjongGameState - roundStarted()', () => {
   expect(gameState.getRoundStarted()).toBeTruthy();
   gameState.endRound();
   expect(gameState.getRoundStarted()).toBeFalsy();
+});
+
+test('MahjongGameState - roundStarted() - opponent first', () => {
+  expect(gameStateOne.getRoundStarted()).toBeFalsy();
+  gameStateOne.startRound();
+  expect(gameStateOne.getRoundStarted()).toBeTruthy();
+  expect(mjOpponent1.getHand().getHasDrawn()).toBeTruthy();
+});
+
+test('MahjongGameState - getWallCounter()', () => {
+  expect(gameState.getWallCounter().getContainer().children).toHaveLength(0);
 });
 
 test('MahjongGameState - getDealer() / changeDealer()', () => {
