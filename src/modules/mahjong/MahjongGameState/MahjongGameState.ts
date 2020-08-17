@@ -201,7 +201,13 @@ class MahjongGameState extends GameState {
         (user) => user.getConnectionId() === this.mjPlayer.getConnectionId(),
       );
       const canCreateConsecutive = playerIndex === (this.getCurrentTurn() + 1) % 4;
-      this.mjPlayer.renderInteractions(spriteFactory, this.wsCallbacks, deadPileTiles, canCreateConsecutive);
+      this.mjPlayer.renderInteractions(
+        spriteFactory,
+        this.wsCallbacks,
+        deadPileTiles,
+        canCreateConsecutive,
+        this.getCurrentWind(),
+      );
 
       if (this.mjPlayer.getAllowInteraction()) {
         const timer = this.mjPlayer.getTimer().getContainer();

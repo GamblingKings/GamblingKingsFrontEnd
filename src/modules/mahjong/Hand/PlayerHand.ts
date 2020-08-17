@@ -21,7 +21,7 @@ class PlayerHand {
 
   private madeMeld: boolean;
 
-  // TODO: add boolean to say concealed
+  private concealed: boolean;
 
   // For hand validation
   private wind: WindEnums;
@@ -36,6 +36,7 @@ class PlayerHand {
     this.madeMeld = false;
     this.wind = WindEnums.EAST;
     this.flowerNumber = 1;
+    this.concealed = true;
   }
 
   /**
@@ -127,6 +128,10 @@ class PlayerHand {
     return this.wind;
   }
 
+  public getConcealed(): boolean {
+    return this.concealed;
+  }
+
   /**
    * Return boolean of whether the hand can play tile
    */
@@ -161,6 +166,10 @@ class PlayerHand {
   public addPlayedTiles(tiles: Tile[]): boolean {
     // could add validation that this is valid meld
     this.playedTiles.push(tiles);
+
+    if (tiles.length >= 3) {
+      this.concealed = false;
+    }
     return true;
   }
 
@@ -220,6 +229,10 @@ class PlayerHand {
 
   public sortHand(weights: SortHandWeights): void {
     this.tiles = sortHandUtils(this.tiles, weights);
+  }
+
+  public getAllTiles(): Tile[] {
+    return [...this.tiles, ...this.playedTiles.flat()];
   }
 }
 

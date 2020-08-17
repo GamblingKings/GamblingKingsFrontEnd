@@ -19,8 +19,11 @@ import { OutgoingAction } from '../../ws';
 import WindEnums from '../enums/WindEnums';
 import HandValidator from '../HandValidator/HandValidator';
 import Timer from '../../game/Timer/Timer';
+import validateHandStructure from '../utils/functions/validateHandStructure';
+import MeldTypes from '../enums/MeldEnums';
 
 const PLAY_TILE_TEXT = 'PLAY_TILE';
+const WIN_TEXT = 'WIN ROUND';
 const SKIP_TEXT = 'SKIP';
 const WAITING_TEXT = 'Waiting for others...';
 
@@ -88,7 +91,6 @@ class MahjongPlayer extends UserEntity {
 
   /**
    * Return a PIXI.container containing all the tile sprites
-   * TODO: render played tiles
    * @param spriteFactory SpriteFactory
    * @param callbacks references to functions that so events can send to ws
    */
@@ -190,12 +192,13 @@ class MahjongPlayer extends UserEntity {
     callbacks: Record<string, (...args: unknown[]) => void>,
     deadPileTiles: Tile[],
     canCreateConsecutive: boolean,
+    currentWind: WindEnums,
   ): void {
     console.log(spriteFactory);
     const container = new PIXI.Container();
     container.x = 200 + this.hand.getTiles().length * DEFAULT_MAHJONG_WIDTH;
 
-    // Render play button if player has drawn.
+    // Render play button if player has drawn or can play tile after making meld.
     if (this.hand.canPlayTile()) {
       const playText = new PIXI.Text(PLAY_TILE_TEXT, PIXI_TEXT_STYLE);
       container.addChild(playText);
@@ -206,6 +209,26 @@ class MahjongPlayer extends UserEntity {
           callbacks[OutgoingAction.PLAY_TILE](tile.toString());
         }
       });
+
+      // Render win button if player can win
+      const allTiles = [...this.hand.getAllTiles()].map((tile) => tile.toString());
+      const canWin = validateHandStructure(
+        allTiles,
+        this.hand.getWind(),
+        this.hand.getFlowerNumber(),
+        currentWind,
+        this.hand.getConcealed(),
+      );
+      if (canWin.valid.length > 0 || canWin.isThirteenTerminals) {
+        const winText = new PIXI.Text(WIN_TEXT, PIXI_TEXT_STYLE);
+        winText.y = DEFAULT_MAHJONG_HEIGHT;
+        Interactions.addMouseInteraction(winText, (event: PIXI.InteractionEvent) => {
+          console.log(event.target);
+          // TODO: send message to backend WIN_ROUND
+          callbacks.REQUEST_REDRAW();
+        });
+        container.addChild(winText);
+      }
     }
 
     // Render interaction buttons when player is prompted to.
@@ -213,6 +236,17 @@ class MahjongPlayer extends UserEntity {
       const hand = this.hand.getTiles();
       const playedTile = deadPileTiles[deadPileTiles.length - 1];
       const results = HandValidator.canCreateMeld(hand, playedTile, canCreateConsecutive);
+
+      const allTiles = [...this.hand.getAllTiles(), playedTile].map((tile) => tile.toString());
+      // Validate whether player can win
+      const canWin = validateHandStructure(
+        allTiles,
+        this.hand.getWind(),
+        this.hand.getFlowerNumber(),
+        currentWind,
+        false,
+      );
+      console.log(canWin);
       console.log(results);
       const { quad, triplet, consecutive } = results;
 
@@ -235,6 +269,28 @@ class MahjongPlayer extends UserEntity {
       let canCreateIndex = 0;
 
       const meldCreateOrder = [quad, triplet, consecutive];
+
+      // Render win text when player can win from played tile
+      if (canWin.valid.length > 0 || canWin.isThirteenTerminals) {
+        const winText = new PIXI.Text(WIN_TEXT, PIXI_TEXT_STYLE);
+        winText.y = (canCreateIndex * DEFAULT_MAHJONG_HEIGHT) / 1.5;
+        Interactions.addMouseInteraction(winText, (event: PIXI.InteractionEvent) => {
+          console.log(event.target);
+          const payload = {
+            skipInteraction: false,
+            meldType: MeldTypes.WIN,
+            playedTiles: allTiles,
+          };
+          // Extra boolean check might prevent duplicate messages from sending if user double clicks fast enough
+          if (this.allowInteraction) {
+            this.setAllowInteraction(false);
+            callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
+          }
+          callbacks.REQUEST_REDRAW();
+        });
+        container.addChild(winText);
+        canCreateIndex += 1;
+      }
 
       // Render possible melds that player can make.
       // Player can click on the meld container to send message.
@@ -298,7 +354,6 @@ class MahjongPlayer extends UserEntity {
         }
         callbacks.REQUEST_REDRAW();
       });
-
       container.addChild(skipText);
     }
 
