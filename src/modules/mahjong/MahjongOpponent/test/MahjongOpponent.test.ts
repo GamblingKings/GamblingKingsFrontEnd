@@ -62,6 +62,12 @@ test('MahjongOpponent - renderMahjongHand()', () => {
   expect(hand.children).toHaveLength(14); // 13 tiles and 1 container for playedTiles
 });
 
+test('MahjongOpponent - renderMahjongHand() and drawn', () => {
+  mjOpponent.drawTile();
+  const hand = mjOpponent.renderMahjongHand(spriteFactory);
+  expect(hand.children).toHaveLength(15); // 14 tiles and 1 container for playedTiles
+});
+
 test('MahjongOpponent - renderMahjongHand() with playedTiles', () => {
   mjOpponent.addPlayedTiles(SAMPLE_TILE_ARRAY);
   let hand = mjOpponent.renderMahjongHand(spriteFactory);
@@ -125,4 +131,16 @@ test('MahjongOpponent - reposition() / render()', () => {
   expect(mjOpponent.getContainer().y).toBe(80);
   mjOpponent.render(spriteFactory, pixiStage, false);
   expect(mjOpponent.getContainer().children).toHaveLength(2);
+});
+
+test('MahjongOpponent - setHasDrawn()', () => {
+  expect(mjOpponent.getHand().getHasDrawn()).toBeFalsy();
+  mjOpponent.drawTile();
+  expect(mjOpponent.getHand().getHasDrawn()).toBeTruthy();
+});
+
+test('MahjongOpponent - playedTile()', () => {
+  mjOpponent.drawTile();
+  mjOpponent.playedTile();
+  expect(mjOpponent.getHand().getHasDrawn()).toBeFalsy();
 });

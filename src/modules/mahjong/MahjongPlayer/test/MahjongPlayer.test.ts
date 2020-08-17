@@ -31,7 +31,8 @@ const tileStrings = [
 
 let tiles: Tile[];
 const tile = TileFactory.createTileFromStringDef('1_DOT');
-const deadPile = new DeadPile();
+const tile8 = TileFactory.createTileFromStringDef('8_DOT');
+let deadPile: DeadPile;
 
 const spriteFactory = new SpriteFactory({});
 const callbacks = {};
@@ -48,6 +49,7 @@ const SAMPLE_TILE_ARRAY = [
 
 beforeEach(() => {
   tiles = tileStrings.map((t) => TileFactory.createTileFromStringDef(t));
+  deadPile = new DeadPile();
   mjPlayer = new MahjongPlayer(NAME, 'ASDF');
   pixiStage = new PIXI.Container();
 });
@@ -176,6 +178,16 @@ test('MahjongPlayer - getAllowInteraction()', () => {
 });
 
 test('MahjongPlayer - renderInteraction()', () => {
+  expect(mjPlayer.getInteractionContainer().children).toHaveLength(0);
+
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile());
+  expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
+});
+
+test('MahjongPlayer - renderInteraction() with deadpile', () => {
+  deadPile.add(tile8);
+  mjPlayer.setHand(tiles);
+  mjPlayer.setAllowInteraction(true);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(0);
 
   mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile());
