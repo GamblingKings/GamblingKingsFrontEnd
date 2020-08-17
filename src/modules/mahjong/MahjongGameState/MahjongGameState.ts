@@ -7,7 +7,6 @@ import SpriteFactory from '../../../pixi/SpriteFactory';
 import DeadPile from '../DeadPile/DeadPile';
 import WallCounter from '../WallCounter/WallCounter';
 import { OutgoingAction } from '../../ws';
-// eslint-disable-next-line import/no-cycle
 import MahjongPlayer from '../MahjongPlayer/MahjongPlayer';
 import MahjongOpponent from '../MahjongOpponent/MahjongOpponent';
 
@@ -176,6 +175,14 @@ class MahjongGameState extends GameState {
     }
   }
 
+  public update(): void {
+    if (this.mjPlayer.getAllowInteraction()) {
+      const timer = this.mjPlayer.getTimer();
+      timer.removeAllAssets();
+      timer.update();
+    }
+  }
+
   public renderCanvas(spriteFactory: SpriteFactory, pixiApp: PIXI.Application): void {
     const { view, stage } = pixiApp;
     const currentTurn = super.getCurrentTurn();
@@ -189,7 +196,18 @@ class MahjongGameState extends GameState {
         user.reposition(view);
       });
 
-      this.mjPlayer.renderInteractions(spriteFactory, this.wsCallbacks, this);
+      const deadPileTiles = this.deadPile.getDeadPile();
+      const playerIndex = this.getUsers().findIndex(
+        (user) => user.getConnectionId() === this.mjPlayer.getConnectionId(),
+      );
+      const canCreateConsecutive = playerIndex === (this.getCurrentTurn() + 1) % 4;
+      this.mjPlayer.renderInteractions(spriteFactory, this.wsCallbacks, deadPileTiles, canCreateConsecutive);
+
+      if (this.mjPlayer.getAllowInteraction()) {
+        const timer = this.mjPlayer.getTimer().getContainer();
+        timer.y = pixiApp.view.clientHeight - 100;
+        stage.addChild(timer);
+      }
 
       // Render Wall
       this.wallCounter.removeAllAssets();

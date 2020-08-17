@@ -110,6 +110,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
    */
   function animate() {
     const mjGameState = gameState as MahjongGameState;
+    mjGameState.update();
     mjGameState.renderCanvas(spriteFactory, pixiApplication);
     requestAnimationFrame(animate);
   }
@@ -198,6 +199,19 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       }
 
       mjPlayer.setAllowInteraction(true);
+      const timer = mjPlayer.getTimer();
+      // Set and start timer
+      timer.setCallback(() => {
+        const wsPayload = {
+          skipInteraction: true,
+          meldType: '',
+          playedTiles: [],
+        };
+        wsCallbacks[OutgoingAction.PLAYED_TILE_INTERACTION](wsPayload);
+        mjPlayer.setAllowInteraction(false);
+        wsCallbacks.REQUEST_REDRAW();
+      });
+      timer.startTimer(new Date().getTime(), 5000);
     } else {
       // TODO (NextPR): Display msg to player who played tile to wait while others make decision
     }
@@ -236,9 +250,6 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       // If everybody skips, game can proceed normally
       mjGameState.goToNextTurn();
 
-      // Increase wall counter
-      mjGameState.getWallCounter().increaseCounter();
-
       const userIndex = mjGameState.getCurrentTurn();
       const currentUserEntity = mjGameState.getUsers()[userIndex];
 
@@ -250,6 +261,8 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
         const opponent = currentUserEntity as MahjongOpponent;
         opponent.drawTile();
       }
+      // Increase wall counter
+      mjGameState.getWallCounter().increaseCounter();
     } else {
       const { connectionId, playedTiles, meldType } = data;
       // Remove last tile from deadpile

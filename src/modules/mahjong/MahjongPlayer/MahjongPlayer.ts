@@ -18,9 +18,7 @@ import Tile from '../Tile/Tile';
 import { OutgoingAction } from '../../ws';
 import WindEnums from '../enums/WindEnums';
 import HandValidator from '../HandValidator/HandValidator';
-// import Timer from '../../game/Timer/Timer';
-// eslint-disable-next-line import/no-cycle
-import MahjongGameState from '../MahjongGameState/MahjongGameState';
+import Timer from '../../game/Timer/Timer';
 
 const PLAY_TILE_TEXT = 'PLAY_TILE';
 const SKIP_TEXT = 'SKIP';
@@ -32,7 +30,7 @@ const WAITING_TEXT = 'Waiting for others...';
 class MahjongPlayer extends UserEntity {
   private hand: PlayerHand;
 
-  // private timer: Timer;
+  private timer: Timer;
 
   private allowInteraction: boolean;
 
@@ -43,7 +41,7 @@ class MahjongPlayer extends UserEntity {
     this.hand = new PlayerHand();
     this.allowInteraction = false;
     this.interactionContainer = new PIXI.Container();
-    // this.timer = new Timer();
+    this.timer = new Timer();
   }
 
   public getHand(): PlayerHand {
@@ -72,6 +70,10 @@ class MahjongPlayer extends UserEntity {
 
   public getAllowInteraction(): boolean {
     return this.allowInteraction;
+  }
+
+  public getTimer(): Timer {
+    return this.timer;
   }
 
   /**
@@ -186,7 +188,8 @@ class MahjongPlayer extends UserEntity {
   public renderInteractions(
     spriteFactory: SpriteFactory,
     callbacks: Record<string, (...args: unknown[]) => void>,
-    gameState: MahjongGameState,
+    deadPileTiles: Tile[],
+    canCreateConsecutive: boolean,
   ): void {
     console.log(spriteFactory);
     const container = new PIXI.Container();
@@ -205,18 +208,11 @@ class MahjongPlayer extends UserEntity {
       });
     }
 
-    const deadPileTiles = gameState.getDeadPile().getDeadPile();
-    const currentTurn = gameState.getCurrentTurn();
-    const playerIndex = gameState.getUsers().findIndex((user) => user.getConnectionId() === this.getConnectionId());
-    const canCreateConsecutive = playerIndex === (currentTurn + 1) % 4;
-    console.log(canCreateConsecutive);
-
     // Render interaction buttons when player is prompted to.
     if (this.allowInteraction && deadPileTiles.length > 0) {
       const hand = this.hand.getTiles();
       const playedTile = deadPileTiles[deadPileTiles.length - 1];
-      // TODO: add in boolean to canCreateMeld to take into account for consecutive
-      const results = HandValidator.canCreateMeld(hand, playedTile);
+      const results = HandValidator.canCreateMeld(hand, playedTile, canCreateConsecutive);
       console.log(results);
       const { quad, triplet, consecutive } = results;
 
@@ -228,6 +224,7 @@ class MahjongPlayer extends UserEntity {
           playedTiles: [],
         };
         this.setAllowInteraction(false);
+        this.timer.stopTimer();
         callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
         const waitingText = new PIXI.Text(WAITING_TEXT, PIXI_TEXT_STYLE);
         container.addChild(waitingText);
@@ -273,6 +270,7 @@ class MahjongPlayer extends UserEntity {
               if (this.allowInteraction) {
                 this.setAllowInteraction(false);
                 callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
+                this.timer.stopTimer();
               }
               callbacks.REQUEST_REDRAW();
             });

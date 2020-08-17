@@ -204,7 +204,7 @@ test('MahjongPlayer - renderInteraction() with deadpile and skip', () => {
   mjPlayer.setAllowInteraction(true);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(0);
 
-  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile());
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(0); // nothing to render
 });
 
@@ -212,12 +212,12 @@ test('MahjongPlayer - renderInteraction() with other parameters', () => {
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(0);
 
   mjPlayer.setAllowInteraction(true);
-  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile());
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 
   mjPlayer.removeAllAssets();
   mjPlayer.setAllowInteraction(false);
   mjPlayer.getHand().draw(tile);
-  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile());
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 });
