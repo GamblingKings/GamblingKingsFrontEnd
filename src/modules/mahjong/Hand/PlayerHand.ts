@@ -162,6 +162,21 @@ class PlayerHand {
     return true;
   }
 
+  public removeTiles(tiles: Tile[]): boolean {
+    const numOfTilesToRemove = tiles.length;
+    const numOfHandTiles = this.tiles.length;
+    tiles.forEach((tile) => {
+      const indexToSplice = this.tiles.findIndex((handTile) => tile.toString() === handTile.toString());
+      if (indexToSplice !== -1) {
+        this.tiles.splice(indexToSplice, 1);
+      } else {
+        console.error('Tile not found in hand. Could not remove in removeTiles()');
+      }
+    });
+
+    return this.tiles.length === numOfHandTiles - numOfTilesToRemove;
+  }
+
   public getSelectedTile(): number {
     return this.selectedTile;
   }
