@@ -257,3 +257,19 @@ test('MahjongPlayer - canWin selfdrawn + renderInteraction()', () => {
   mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 });
+
+test('MahjongPlayer - renderInteractionsWithPlayedTiles()', () => {
+  const container = new PIXI.Container();
+  mjPlayer.setAllowInteraction(true);
+  mjPlayer.setHand(winnableTiles);
+  deadPile.add(tile8);
+  mjPlayer.renderInteractionsWithPlayedTile(
+    spriteFactory,
+    callbacks,
+    deadPile.getDeadPile(),
+    false,
+    WindEnums.EAST,
+    container,
+  );
+  expect(container.children).toHaveLength(1);
+});

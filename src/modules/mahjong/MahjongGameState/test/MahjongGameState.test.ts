@@ -125,6 +125,8 @@ test('MahjongGameState - update()', () => {
   mjPlayer.setAllowInteraction(true);
   const timer = mjPlayer.getTimer();
   expect(timer.getContainer().children).toHaveLength(0); // timer hasn't started
+  gameState.update();
+  expect(timer.getContainer().children).toHaveLength(0); // timer hasn't started
 });
 
 test('MahjongGameState - renderCanvas() -include timer', () => {
