@@ -211,7 +211,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
         mjPlayer.setAllowInteraction(false);
         wsCallbacks.REQUEST_REDRAW();
       });
-      timer.startTimer(new Date().getTime(), 5000);
+      timer.startTimer(new Date().getTime(), 7500);
     } else {
       // TODO (NextPR): Display msg to player who played tile to wait while others make decision
     }
