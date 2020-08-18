@@ -242,6 +242,7 @@ class MahjongPlayer extends UserEntity {
         if (this.allowInteraction) {
           this.setAllowInteraction(false);
           callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
+          this.timer.stopTimer();
         }
         callbacks.REQUEST_REDRAW();
       });
@@ -308,6 +309,7 @@ class MahjongPlayer extends UserEntity {
       if (this.allowInteraction) {
         this.setAllowInteraction(false);
         callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
+        this.timer.stopTimer();
       }
       callbacks.REQUEST_REDRAW();
     });
