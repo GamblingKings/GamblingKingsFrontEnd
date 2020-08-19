@@ -140,7 +140,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
    */
   const gameStartInit = (payload: unknown): void => {
     const data = payload as GameStartJSON;
-    const tileArray = JSON.parse(data.tiles);
+    const tileArray = data.tiles;
     const tiles: Tile[] = [];
     tileArray.forEach((tile: string) => {
       tiles.push(TileFactory.createTileFromStringDef(tile));
