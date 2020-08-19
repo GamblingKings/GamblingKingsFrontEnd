@@ -2,7 +2,7 @@
  * Class to store logic related to validating a Mahjong Hand
  */
 import Tile from '../Tile/Tile';
-// eslint-disable-next-line prettier/prettier
+// eslint-disable-next-line
 import {
   ValidPair,
   Meld,

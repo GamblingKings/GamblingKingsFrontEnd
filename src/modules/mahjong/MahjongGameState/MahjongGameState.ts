@@ -116,6 +116,10 @@ class MahjongGameState extends GameState {
     return this.mjPlayer;
   }
 
+  public getWallCounter(): WallCounter {
+    return this.wallCounter;
+  }
+
   public startRound(): boolean {
     this.roundStarted = true;
     const gameUsers = super.getUsers();
@@ -171,6 +175,14 @@ class MahjongGameState extends GameState {
     }
   }
 
+  public update(): void {
+    if (this.mjPlayer.getAllowInteraction()) {
+      const timer = this.mjPlayer.getTimer();
+      timer.removeAllAssets();
+      timer.update();
+    }
+  }
+
   public renderCanvas(spriteFactory: SpriteFactory, pixiApp: PIXI.Application): void {
     const { view, stage } = pixiApp;
     const currentTurn = super.getCurrentTurn();
@@ -183,6 +195,26 @@ class MahjongGameState extends GameState {
         user.render(spriteFactory, stage, isUserTurn, this.wsCallbacks);
         user.reposition(view);
       });
+
+      const deadPileTiles = this.deadPile.getDeadPile();
+      const playerIndex = this.getUsers().findIndex(
+        (user) => user.getConnectionId() === this.mjPlayer.getConnectionId(),
+      );
+      const canCreateConsecutive = playerIndex === (this.getCurrentTurn() + 1) % 4;
+      this.mjPlayer.renderInteractions(
+        spriteFactory,
+        this.wsCallbacks,
+        deadPileTiles,
+        canCreateConsecutive,
+        this.getCurrentWind(),
+      );
+
+      if (this.mjPlayer.getAllowInteraction()) {
+        const timer = this.mjPlayer.getTimer().getContainer();
+        timer.y = pixiApp.view.clientHeight - 100;
+        stage.addChild(timer);
+      }
+
       // Render Wall
       this.wallCounter.removeAllAssets();
       this.wallCounter.render(spriteFactory, stage);

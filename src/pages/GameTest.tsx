@@ -17,6 +17,7 @@ import UserEntity from '../modules/game/UserEntity/UserEntity';
 import Interactions from '../pixi/Interactions';
 import HongKongWall from '../modules/mahjong/Wall/version/HongKongWall';
 import Tile from '../modules/mahjong/Tile/Tile';
+// import Timer from '../modules/game/Timer/Timer';
 
 /**
  * ********************************************************
@@ -73,6 +74,9 @@ let player: UserEntity;
 const wall = new HongKongWall();
 const playedTilesOne = ['1_DOT', '1_DOT', '1_DOT'].map((tile) => TileFactory.createTileFromStringDef(tile));
 const playedTilesTwo = ['4_DOT', '5_DOT', '6_DOT'].map((tile) => TileFactory.createTileFromStringDef(tile));
+
+// const timer = new Timer();
+// timer.startTimer(new Date().getTime(), 10000);
 
 /**
  * Testing page for the Game.
@@ -138,7 +142,12 @@ const GameTestPage = (): JSX.Element => {
     opponentTest.addPlayedTiles(playedTilesTwo);
 
     gameState = new MahjongGameState(allUserEntities, mahjongPlayer, mockWSCallbacks);
-    console.log(gameState);
+    const mj = gameState as MahjongGameState;
+    mj.getMjPlayer().setAllowInteraction(true);
+
+    const timer = mj.getMjPlayer().getTimer();
+
+    timer.startTimer(new Date().getTime(), 5000);
   };
 
   const forGameTesting = () => {
@@ -170,6 +179,7 @@ const GameTestPage = (): JSX.Element => {
   function animate() {
     const mjGameState = gameState as MahjongGameState;
     mjGameState.renderCanvas(spriteFactory, pixiApplication);
+    mjGameState.update();
     forGameTesting();
     requestAnimationFrame(animate);
   }

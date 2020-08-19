@@ -17,16 +17,23 @@ import PlayerHand from '../Hand/PlayerHand';
 import Tile from '../Tile/Tile';
 import { OutgoingAction } from '../../ws';
 import WindEnums from '../enums/WindEnums';
+import HandValidator from '../HandValidator/HandValidator';
+import Timer from '../../game/Timer/Timer';
+import validateHandStructure from '../utils/functions/validateHandStructure';
 import MeldTypes from '../enums/MeldEnums';
 
 const PLAY_TILE_TEXT = 'PLAY_TILE';
+const WIN_TEXT = 'WIN ROUND';
 const SKIP_TEXT = 'SKIP';
+const WAITING_TEXT = 'Waiting for others...';
 
 /**
  * Mahjong player that holds information about current hand (tiles) and render methods
  */
 class MahjongPlayer extends UserEntity {
   private hand: PlayerHand;
+
+  private timer: Timer;
 
   private allowInteraction: boolean;
 
@@ -37,6 +44,7 @@ class MahjongPlayer extends UserEntity {
     this.hand = new PlayerHand();
     this.allowInteraction = false;
     this.interactionContainer = new PIXI.Container();
+    this.timer = new Timer();
   }
 
   public getHand(): PlayerHand {
@@ -67,6 +75,10 @@ class MahjongPlayer extends UserEntity {
     return this.allowInteraction;
   }
 
+  public getTimer(): Timer {
+    return this.timer;
+  }
+
   /**
    * Removes all children from the container in super class.
    */
@@ -79,7 +91,6 @@ class MahjongPlayer extends UserEntity {
 
   /**
    * Return a PIXI.container containing all the tile sprites
-   * TODO: render played tiles
    * @param spriteFactory SpriteFactory
    * @param callbacks references to functions that so events can send to ws
    */
@@ -171,6 +182,140 @@ class MahjongPlayer extends UserEntity {
     return text;
   }
 
+  public renderInteractionsWithPlayedTile(
+    spriteFactory: SpriteFactory,
+    callbacks: Record<string, (...args: unknown[]) => void>,
+    deadPileTiles: Tile[],
+    canCreateConsecutive: boolean,
+    currentWind: WindEnums,
+    container: PIXI.Container,
+  ): void {
+    const hand = this.hand.getTiles();
+    const playedTile = deadPileTiles[deadPileTiles.length - 1];
+    const results = HandValidator.canCreateMeld(hand, playedTile, canCreateConsecutive);
+
+    const allTiles = [...this.hand.getAllTiles(), playedTile].map((tile) => tile.toString());
+    // Validate whether player can win
+    const canWin = validateHandStructure(
+      allTiles,
+      this.hand.getWind(),
+      this.hand.getFlowerNumber(),
+      currentWind,
+      false,
+    );
+    console.log(canWin);
+    console.log(results);
+    const { quad, triplet, consecutive } = results;
+
+    // Automatically send the skip message if player cannot create a meld.
+    if (!quad.canCreate && !triplet.canCreate && !consecutive.canCreate) {
+      const payload = {
+        skipInteraction: true,
+        meldType: '',
+        playedTiles: [],
+      };
+      this.setAllowInteraction(false);
+      this.timer.stopTimer();
+      callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
+      const waitingText = new PIXI.Text(WAITING_TEXT, PIXI_TEXT_STYLE);
+      container.addChild(waitingText);
+      callbacks.REQUEST_REDRAW();
+      return;
+    }
+
+    let canCreateIndex = 0;
+
+    const meldCreateOrder = [quad, triplet, consecutive];
+
+    // Render win text when player can win from played tile
+    if (canWin.valid.length > 0 || canWin.isThirteenTerminals) {
+      const winText = new PIXI.Text(WIN_TEXT, PIXI_TEXT_STYLE);
+      winText.y = (canCreateIndex * DEFAULT_MAHJONG_HEIGHT) / 1.5;
+      Interactions.addMouseInteraction(winText, (event: PIXI.InteractionEvent) => {
+        console.log(event.target);
+        const payload = {
+          skipInteraction: false,
+          meldType: MeldTypes.WIN,
+          playedTiles: allTiles,
+        };
+        // Extra boolean check might prevent duplicate messages from sending if user double clicks fast enough
+        if (this.allowInteraction) {
+          this.setAllowInteraction(false);
+          callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
+          this.timer.stopTimer();
+        }
+        callbacks.REQUEST_REDRAW();
+      });
+      container.addChild(winText);
+      canCreateIndex += 1;
+    }
+
+    // Render possible melds that player can make.
+    // Player can click on the meld container to send message.
+    meldCreateOrder.forEach((possibleMeld) => {
+      if (possibleMeld.canCreate) {
+        possibleMeld.melds.forEach((meld) => {
+          const meldContainer = new PIXI.Container();
+
+          meld.tiles.forEach((tile: string, tileIndex: number) => {
+            const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
+            frontSprite.width = DEFAULT_MAHJONG_WIDTH / 2;
+            frontSprite.height = DEFAULT_MAHJONG_HEIGHT / 2;
+            frontSprite.x = tileIndex * (DEFAULT_MAHJONG_WIDTH / 2 + DISTANCE_FROM_TILES);
+
+            const tileSprite = spriteFactory.generateSprite(tile);
+            tileSprite.width = DEFAULT_MAHJONG_WIDTH / 2;
+            tileSprite.height = DEFAULT_MAHJONG_HEIGHT / 2;
+            tileSprite.x = tileIndex * (DEFAULT_MAHJONG_WIDTH / 2 + DISTANCE_FROM_TILES);
+
+            meldContainer.addChild(frontSprite);
+            meldContainer.addChild(tileSprite);
+          });
+          meldContainer.y += canCreateIndex * (DEFAULT_MAHJONG_HEIGHT / 2 + DISTANCE_FROM_TILES);
+
+          Interactions.addMouseInteraction(meldContainer as PIXI.Sprite, (event: PIXI.InteractionEvent) => {
+            console.log(event.target);
+            const payload = {
+              meldType: meld.type,
+              skipInteraction: false,
+              playedTiles: meld.tiles,
+            };
+            // Extra boolean check might prevent duplicate messages from sending if user double clicks fast enough
+            if (this.allowInteraction) {
+              this.setAllowInteraction(false);
+              callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
+              this.timer.stopTimer();
+            }
+            callbacks.REQUEST_REDRAW();
+          });
+
+          container.addChild(meldContainer);
+          canCreateIndex += 1;
+        });
+      }
+    });
+
+    // Skip Interaction
+    const skipText = new PIXI.Text(SKIP_TEXT, PIXI_TEXT_STYLE);
+    skipText.y = (canCreateIndex * DEFAULT_MAHJONG_HEIGHT) / 1.5;
+    Interactions.addMouseInteraction(skipText, (event: PIXI.InteractionEvent) => {
+      console.log(event.target);
+      const payload = {
+        skipInteraction: true,
+        meldType: '',
+        playedTiles: [],
+      };
+      // Extra boolean check might prevent duplicate messages from sending if user double clicks fast enough
+      if (this.allowInteraction) {
+        this.setAllowInteraction(false);
+        callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
+        this.timer.stopTimer();
+      }
+      callbacks.REQUEST_REDRAW();
+    });
+    container.addChild(skipText);
+  }
+
   /**
    * Adds assets with interactions for additional functionality (like pong and kong)
    * @param spriteFactory SpriteFactory
@@ -179,12 +324,14 @@ class MahjongPlayer extends UserEntity {
   public renderInteractions(
     spriteFactory: SpriteFactory,
     callbacks: Record<string, (...args: unknown[]) => void>,
+    deadPileTiles: Tile[],
+    canCreateConsecutive: boolean,
+    currentWind: WindEnums,
   ): void {
-    console.log(spriteFactory);
     const container = new PIXI.Container();
     container.x = 200 + this.hand.getTiles().length * DEFAULT_MAHJONG_WIDTH;
 
-    // Render play button if player has drawn.
+    // Render play button if player has drawn or can play tile after making meld.
     if (this.hand.canPlayTile()) {
       const playText = new PIXI.Text(PLAY_TILE_TEXT, PIXI_TEXT_STYLE);
       container.addChild(playText);
@@ -195,51 +342,37 @@ class MahjongPlayer extends UserEntity {
           callbacks[OutgoingAction.PLAY_TILE](tile.toString());
         }
       });
-    }
 
-    // Render interaction buttons when player is prompted to.
-    if (this.allowInteraction) {
-      // Possible interactions with creating melds.
-      Object.values(MeldTypes).forEach((possibleMeld: string, index: number) => {
-        const text = new PIXI.Text(possibleMeld, PIXI_TEXT_STYLE);
-        text.y += 30 * (index + 1);
-        container.addChild(text);
-        Interactions.addMouseInteraction(text, (event: PIXI.InteractionEvent) => {
+      // Render win button if player can win from drawing
+      const allTiles = this.hand.getAllTiles().map((tile) => tile.toString());
+      const canWin = validateHandStructure(
+        allTiles,
+        this.hand.getWind(),
+        this.hand.getFlowerNumber(),
+        currentWind,
+        this.hand.getConcealed(),
+      );
+      if (canWin.valid.length > 0 || canWin.isThirteenTerminals) {
+        const winText = new PIXI.Text(WIN_TEXT, PIXI_TEXT_STYLE);
+        winText.y = DEFAULT_MAHJONG_HEIGHT;
+        Interactions.addMouseInteraction(winText, (event: PIXI.InteractionEvent) => {
           console.log(event.target);
-          const payload = {
-            meldType: possibleMeld,
-            skipInteraction: false,
-            playedTiles: ['1_DOT', '1_DOT', '1_DOT'], // placeholder
-          };
-          // TODO: add in meld validator results
-          // Extra boolean check might prevent duplicate messages from sending if user double clicks fast enough
-          if (this.allowInteraction) {
-            this.setAllowInteraction(false);
-            callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
-          }
+          // TODO: send message to backend WIN_ROUND
           callbacks.REQUEST_REDRAW();
         });
-      });
-
-      // Skip Interaction
-      const skipText = new PIXI.Text(SKIP_TEXT, PIXI_TEXT_STYLE);
-      skipText.y = 120;
-      Interactions.addMouseInteraction(skipText, (event: PIXI.InteractionEvent) => {
-        console.log(event.target);
-        const payload = {
-          skipInteraction: true,
-          meldType: '',
-          playedTiles: [],
-        };
-        // Extra boolean check might prevent duplicate messages from sending if user double clicks fast enough
-        if (this.allowInteraction) {
-          this.setAllowInteraction(false);
-          callbacks[OutgoingAction.PLAYED_TILE_INTERACTION](payload);
-        }
-        callbacks.REQUEST_REDRAW();
-      });
-
-      container.addChild(skipText);
+        container.addChild(winText);
+      }
+    }
+    // Render interaction buttons when player is prompted to.
+    if (this.allowInteraction && deadPileTiles.length > 0) {
+      this.renderInteractionsWithPlayedTile(
+        spriteFactory,
+        callbacks,
+        deadPileTiles,
+        canCreateConsecutive,
+        currentWind,
+        container,
+      );
     }
 
     this.interactionContainer.addChild(container);
@@ -267,7 +400,7 @@ class MahjongPlayer extends UserEntity {
     }
     const playerHand = this.renderHand(spriteFactory, callbacks);
     const name = this.renderName();
-    this.renderInteractions(spriteFactory, callbacks);
+    // this.renderInteractions(spriteFactory, callbacks);
 
     playerContainer.addChild(playerHand);
     playerContainer.addChild(name);

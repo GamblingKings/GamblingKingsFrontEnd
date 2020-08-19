@@ -95,6 +95,11 @@ test('PlayerHand - draw()', () => {
   expect(fullHand.getTiles()).toStrictEqual(tiles);
 });
 
+test('PlayerHand - draw() - cannot draw', () => {
+  fullHand.setMadeMeld(true);
+  expect(fullHand.draw(TileFactory.createTileFromStringDef('7_DOT'))).toBeFalsy();
+});
+
 test('PlayerHand - getFlowerNumber()', () => {
   expect(emptyHand.getFlowerNumber()).toBe(1);
   expect(fullHand.getFlowerNumber()).toBe(1);
@@ -128,4 +133,15 @@ test('PlayerHand - setWind()', () => {
   expect(emptyHand.getWind()).toBe(WindEnums.NORTH);
   expect(emptyHand.setWind('SOMETHING' as WindEnums)).toBeFalsy();
   expect(emptyHand.getWind()).toBe(WindEnums.NORTH);
+});
+
+test('PlayerHand - removeTiles()', () => {
+  const tilesToRemove = [TileFactory.createTileFromStringDef('8_DOT'), TileFactory.createTileFromStringDef('8_DOT')];
+  expect(fullHand.removeTiles(tilesToRemove)).toBeTruthy();
+  expect(fullHand.getTiles()).toHaveLength(11);
+});
+
+test('PlayerHand - removeTiles() - bad request', () => {
+  const tilesToRemove = [TileFactory.createTileFromStringDef('8_DOT'), TileFactory.createTileFromStringDef('9_DOT')];
+  expect(fullHand.removeTiles(tilesToRemove)).toBeFalsy();
 });

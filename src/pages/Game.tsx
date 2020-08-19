@@ -110,6 +110,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
    */
   function animate() {
     const mjGameState = gameState as MahjongGameState;
+    mjGameState.update();
     mjGameState.renderCanvas(spriteFactory, pixiApplication);
     requestAnimationFrame(animate);
   }
@@ -198,7 +199,19 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       }
 
       mjPlayer.setAllowInteraction(true);
-      // TODO: (NextPR) set timeout, if nothing happens, send skip
+      const timer = mjPlayer.getTimer();
+      // Set and start timer
+      timer.setCallback(() => {
+        const wsPayload = {
+          skipInteraction: true,
+          meldType: '',
+          playedTiles: [],
+        };
+        wsCallbacks[OutgoingAction.PLAYED_TILE_INTERACTION](wsPayload);
+        mjPlayer.setAllowInteraction(false);
+        wsCallbacks.REQUEST_REDRAW();
+      });
+      timer.startTimer(new Date().getTime(), 7500);
     } else {
       // TODO (NextPR): Display msg to player who played tile to wait while others make decision
     }
@@ -248,8 +261,12 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
         const opponent = currentUserEntity as MahjongOpponent;
         opponent.drawTile();
       }
+      // Increase wall counter
+      mjGameState.getWallCounter().increaseCounter();
     } else {
       const { connectionId, playedTiles, meldType } = data;
+      // Remove last tile from deadpile
+      const playedTile = mjGameState.getDeadPile().removeLastTile();
 
       if (connectionId && playedTiles && meldType) {
         const tiles = playedTiles.map((tileStr) => TileFactory.createTileFromStringDef(tileStr));
@@ -258,7 +275,14 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
           // Player updates their PlayedTiles
           mjPlayer.getHand().addPlayedTiles(tiles);
 
-          // TODO (NextPR): remove played tiles from player hand
+          const indexOfPlayedTile = tiles.findIndex((tile) => playedTile?.toString() === tile.toString());
+          if (indexOfPlayedTile !== -1) {
+            const tilesToRemove = [...tiles];
+            tilesToRemove.splice(indexOfPlayedTile, 1);
+            mjPlayer.getHand().removeTiles(tilesToRemove);
+          } else {
+            console.error('Hand state error, could not remove tiles');
+          }
 
           mjPlayer.getHand().setMadeMeld(true);
         } else {
@@ -269,8 +293,6 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
         // Set turn to the person who interacted successfully
         mjGameState.setTurn(userIndex);
       }
-      // Remove last tile from deadpile
-      mjGameState.getDeadPile().removeLastTile();
     }
 
     mjGameState.requestRedraw();

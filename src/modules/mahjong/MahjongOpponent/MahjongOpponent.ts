@@ -56,7 +56,6 @@ class MahjongOpponent extends UserEntity {
 
   /**
    * Returns a PIXI.Container containing all back tile sprites
-   * TODO: render played tiles
    * @param spriteFactory SpriteFactory
    */
   public renderMahjongHand(spriteFactory: SpriteFactory): PIXI.Container {

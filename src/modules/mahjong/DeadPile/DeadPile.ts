@@ -62,12 +62,8 @@ class DeadPile {
   /**
    * Removes the last tile from the deadpile
    */
-  public removeLastTile(): boolean {
-    if (this.deadpile.length > 0) {
-      this.deadpile.pop();
-      return true;
-    }
-    return false;
+  public removeLastTile(): Tile | undefined {
+    return this.deadpile.pop();
   }
 
   /**
