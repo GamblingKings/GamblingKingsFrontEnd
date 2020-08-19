@@ -15,6 +15,7 @@ import {
   PlayTileJSON,
   InteractionSuccessJSON,
   PlayedTileInteractionJSON,
+  SelfPlayTileJSON,
 } from '../types';
 import GameTypes from '../modules/game/gameTypes';
 import MahjongOpponent from '../modules/mahjong/MahjongOpponent/MahjongOpponent';
@@ -23,6 +24,7 @@ import TileFactory from '../modules/mahjong/Tile/TileFactory';
 import Tile from '../modules/mahjong/Tile/Tile';
 import GameState from '../modules/game/GameState/GameState';
 import MahjongGameState from '../modules/mahjong/MahjongGameState/MahjongGameState';
+import { isBonusTile } from '../modules/mahjong/utils/functions/checkTypes';
 
 /**
  * Pixi Application References
@@ -68,6 +70,10 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       mjGameState.requestRedraw();
     },
     [OutgoingAction.PLAYED_TILE_INTERACTION]: (params: unknown) => {
+      const payload = params as Record<string, unknown>;
+      ws?.sendMessage(OutgoingAction.PLAYED_TILE_INTERACTION, { gameId: game.gameId, ...payload });
+    },
+    [OutgoingAction.SELF_PLAY_TILE]: (params: unknown) => {
       const payload = params as Record<string, unknown>;
       ws?.sendMessage(OutgoingAction.PLAYED_TILE_INTERACTION, { gameId: game.gameId, ...payload });
     },
@@ -171,6 +177,18 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     const mjPlayer = mjGameState.getMjPlayer();
 
     mjPlayer.addTileToHand(tile);
+
+    // Send SELF_PLAY_TILE if tile is a Bonus Tile
+    if (isBonusTile(data.tile)) {
+      mjPlayer.getHand().setCannotPlayTile();
+      const wsPayload = {
+        gameId: game.gameId,
+        playedTile: data.tile,
+        quad: false,
+        alreadyMeld: false,
+      };
+      ws?.sendMessage(OutgoingAction.SELF_PLAY_TILE, wsPayload);
+    }
     mjGameState.requestRedraw();
   };
 
@@ -298,6 +316,43 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     mjGameState.requestRedraw();
   };
 
+  /**
+   * For SELF_PLAY_TILE
+   * @param payload SelfPlayTileJSON
+   */
+  const mjSelfPlayTile = (payload: unknown): void => {
+    const data = payload as SelfPlayTileJSON;
+    const mjGameState = gameState as MahjongGameState;
+    const mjPlayer = mjGameState.getMjPlayer();
+    // eslint-disable-next-line
+    const { connectionId, playedTile, quad, alreadyMeld } = data;
+    const tile = TileFactory.createTileFromStringDef(playedTile);
+
+    if (connectionId === mjPlayer.getConnectionId()) {
+      const hand = mjPlayer.getHand();
+      // Form a quad
+      if (quad) {
+        hand.formQuad(tile, alreadyMeld);
+      } else {
+        // Add Bonus Tile to Played Tiles
+        hand.addPlayedTiles([tile]);
+        hand.removeTiles([tile]);
+      }
+      ws?.sendMessage(OutgoingAction.DRAW_TILE, { gameId: game.gameId });
+    } else {
+      const userIndex = mjGameState.getUsers().findIndex((user) => user.getConnectionId() === connectionId);
+      const opponent = mjGameState.getUsers()[userIndex] as MahjongOpponent;
+      const opponentHand = opponent.getHand();
+      if (quad) {
+        opponentHand.formQuad(tile, alreadyMeld);
+      } else {
+        // Add Bonus Tile to Played Tiles
+        opponentHand.addSelfPlayedTiles([tile]);
+      }
+    }
+    mjGameState.requestRedraw();
+  };
+
   // Set up PIXI application.
   useEffect(() => {
     /**
@@ -354,6 +409,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       ws.addListener(IncomingAction.PLAY_TILE, mjGamePlayTile);
       ws.addListener(IncomingAction.INTERACTION_SUCCESS, mjInteractionSuccess);
       ws.addListener(IncomingAction.PLAYED_TILE_INTERACTION, mjPlayedTileInteraction);
+      ws.addListener(IncomingAction.SELF_PLAY_TILE, mjSelfPlayTile);
     }
 
     return function cleanup() {
@@ -364,6 +420,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
         ws.removeListener(IncomingAction.PLAY_TILE);
         ws.removeListener(IncomingAction.INTERACTION_SUCCESS);
         ws.removeListener(IncomingAction.PLAYED_TILE_INTERACTION);
+        ws.removeListener(IncomingAction.SELF_PLAY_TILE);
       }
     };
     // eslint-disable-next-line

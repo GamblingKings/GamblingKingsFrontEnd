@@ -48,6 +48,16 @@ class OpponentHand {
     this.playedTiles.push(tiles);
     this.numberOfTiles -= tiles.length - 1; // Subtract 1 taken from dead pile
   }
+
+  public addSelfPlayedTiles(tiles: Tile[]): void {
+    this.playedTiles.push(tiles);
+  }
+
+  // eslint-disable-next-line
+  public formQuad(tile: Tile, alreadyMeld: boolean | undefined): void {
+    console.log(tile, alreadyMeld);
+    // TODO
+  }
 }
 
 export default OpponentHand;

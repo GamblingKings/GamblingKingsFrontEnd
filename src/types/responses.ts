@@ -158,3 +158,13 @@ export interface PlayedTileInteractionJSON {
   error: string;
   connectionId: string;
 }
+
+/**
+ * Interface for SELF_PLAY_TILE payload received
+ */
+export interface SelfPlayTileJSON {
+  connectionId: string;
+  playedTile: string;
+  quad?: boolean;
+  alreadyMeld?: boolean;
+}

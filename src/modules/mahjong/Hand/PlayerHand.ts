@@ -234,6 +234,12 @@ class PlayerHand {
   public getAllTiles(): Tile[] {
     return [...this.tiles, ...this.playedTiles.flat()];
   }
+
+  // eslint-disable-next-line
+  public formQuad(tile: Tile, alreadyMeld: boolean | undefined) {
+    console.log(tile, alreadyMeld);
+    // TODO
+  }
 }
 
 export default PlayerHand;
