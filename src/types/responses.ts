@@ -165,6 +165,6 @@ export interface PlayedTileInteractionJSON {
 export interface SelfPlayTileJSON {
   connectionId: string;
   playedTile: string;
-  quad?: boolean;
-  alreadyMeld?: boolean;
+  isQuad: boolean;
+  alreadyMeld: boolean;
 }

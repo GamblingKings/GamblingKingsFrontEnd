@@ -75,7 +75,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     },
     [OutgoingAction.SELF_PLAY_TILE]: (params: unknown) => {
       const payload = params as Record<string, unknown>;
-      ws?.sendMessage(OutgoingAction.PLAYED_TILE_INTERACTION, { gameId: game.gameId, ...payload });
+      ws?.sendMessage(OutgoingAction.SELF_PLAY_TILE, { gameId: game.gameId, ...payload });
     },
     REQUEST_REDRAW: () => {
       const mjGameState = gameState as MahjongGameState;
@@ -184,7 +184,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       const wsPayload = {
         gameId: game.gameId,
         playedTile: data.tile,
-        quad: false,
+        isQuad: false,
         alreadyMeld: false,
       };
       ws?.sendMessage(OutgoingAction.SELF_PLAY_TILE, wsPayload);
@@ -325,13 +325,13 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     const mjGameState = gameState as MahjongGameState;
     const mjPlayer = mjGameState.getMjPlayer();
     // eslint-disable-next-line
-    const { connectionId, playedTile, quad, alreadyMeld } = data;
+    const { connectionId, playedTile, isQuad, alreadyMeld } = data;
     const tile = TileFactory.createTileFromStringDef(playedTile);
 
     if (connectionId === mjPlayer.getConnectionId()) {
       const hand = mjPlayer.getHand();
       // Form a quad
-      if (quad) {
+      if (isQuad) {
         hand.formQuad(tile, alreadyMeld);
       } else {
         // Add Bonus Tile to Played Tiles
@@ -343,7 +343,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       const userIndex = mjGameState.getUsers().findIndex((user) => user.getConnectionId() === connectionId);
       const opponent = mjGameState.getUsers()[userIndex] as MahjongOpponent;
       const opponentHand = opponent.getHand();
-      if (quad) {
+      if (isQuad) {
         opponentHand.formQuad(tile, alreadyMeld);
       } else {
         // Add Bonus Tile to Played Tiles

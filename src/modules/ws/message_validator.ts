@@ -21,7 +21,7 @@ const MESSAGE_FORMATS: Record<string, string[]> = {
   [OutgoingAction.PLAY_TILE]: ['gameId', 'tile'],
   [OutgoingAction.DRAW_TILE]: ['gameId'],
   [OutgoingAction.PLAYED_TILE_INTERACTION]: ['gameId', 'playedTiles', 'meldType', 'skipInteraction'],
-  [OutgoingAction.SELF_PLAY_TILE]: ['gameId', 'playedTile', 'quad', 'alreadyMeld'],
+  [OutgoingAction.SELF_PLAY_TILE]: ['gameId', 'playedTile', 'isQuad', 'alreadyMeld'],
 };
 
 /**
