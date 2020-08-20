@@ -237,10 +237,14 @@ class PlayerHand {
 
   public formQuad(tile: Tile, alreadyMeld: boolean | undefined): void {
     if (alreadyMeld) {
-      const meldToAppend = this.playedTiles.find(
-        // Check first tile of meld with playedTile, and first and second tile are equal to find correct meld
-        (meld) => meld[0].toString() === tile.toString() && meld[0].toString() === meld[1].toString(),
-      );
+      const meldToAppend = this.playedTiles.find((meld) => {
+        if (meld.length < 3) {
+          return false;
+        }
+        const atLeastTriplet = meld[0].toString() === meld[1].toString();
+        const sameTile = meld[0].toString() === tile.toString();
+        return atLeastTriplet && sameTile;
+      });
       if (meldToAppend) meldToAppend.push(tile);
       this.removeTiles([tile]);
     } else {
