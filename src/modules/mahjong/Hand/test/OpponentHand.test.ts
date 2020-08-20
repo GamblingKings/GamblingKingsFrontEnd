@@ -8,6 +8,7 @@ const SAMPLE_TILE_ARRAY = [
   TileFactory.createTileFromStringDef('3_DOT'),
   TileFactory.createTileFromStringDef('4_DOT'),
 ];
+const DOT_7 = TileFactory.createTileFromStringDef('7_DOT');
 
 beforeEach(() => {
   opponentHand = new OpponentHand();
@@ -46,4 +47,24 @@ test('OpponentHand - change number of tiles after add played tile', () => {
   expect(opponentHand.getNumberOfTiles()).toBe(11);
   opponentHand.playedTile();
   expect(opponentHand.getNumberOfTiles()).toBe(10);
+});
+
+test('PlayerHand - formQuad() alreadymeld false', () => {
+  opponentHand.formQuad(DOT_7, false);
+  const quadMeld = [DOT_7, DOT_7, DOT_7, DOT_7];
+  expect(opponentHand.getPlayedTiles()[0]).toEqual(quadMeld);
+  expect(opponentHand.getNumberOfTiles()).toBe(11);
+  // opponent still needs to play a tile to make it 10
+});
+
+test('PlayerHand - formQuad() alreadymeld true', () => {
+  const triplet = [DOT_7, DOT_7, DOT_7];
+  opponentHand.addPlayedTiles(triplet);
+
+  opponentHand.playedTile();
+  opponentHand.formQuad(DOT_7, true);
+  const quadMeld = [DOT_7, DOT_7, DOT_7, DOT_7];
+  expect(opponentHand.getPlayedTiles()[0]).toEqual(quadMeld);
+  expect(opponentHand.getNumberOfTiles()).toBe(11);
+  // opponent still needs to play a tile to make it 10
 });

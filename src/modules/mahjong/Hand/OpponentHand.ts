@@ -69,6 +69,7 @@ class OpponentHand {
       this.playedTiles.push(quadMeld);
       this.numberOfTiles -= 3;
     }
+    this.setHasDrawn(true);
   }
 }
 
