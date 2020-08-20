@@ -235,10 +235,20 @@ class PlayerHand {
     return [...this.tiles, ...this.playedTiles.flat()];
   }
 
-  // eslint-disable-next-line
-  public formQuad(tile: Tile, alreadyMeld: boolean | undefined) {
-    console.log(tile, alreadyMeld);
-    // TODO
+  public formQuad(tile: Tile, alreadyMeld: boolean | undefined): void {
+    if (alreadyMeld) {
+      const meldToAppend = this.playedTiles.find(
+        // Check first tile of meld with playedTile, and first and second tile are equal to find correct meld
+        (meld) => meld[0].toString() === tile.toString() && meld[0].toString() === meld[1].toString(),
+      );
+      if (meldToAppend) meldToAppend.push(tile);
+      this.removeTiles([tile]);
+    } else {
+      const quadMeld = [tile, tile, tile, tile];
+      this.playedTiles.push(quadMeld);
+      this.removeTiles(quadMeld);
+    }
+    this.setSelectedTile(-1);
   }
 }
 
