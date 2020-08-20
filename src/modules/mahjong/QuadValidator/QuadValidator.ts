@@ -6,8 +6,8 @@ import TileFactory from '../Tile/TileFactory';
 
 class QuadValidator {
   static checkForQuads(playerHand: PlayerHand): CreateQuadResults[] {
-    const currentTiles = playerHand.getTiles();
-    const playedTiles = playerHand.getPlayedTiles();
+    const currentTiles = [...playerHand.getTiles()];
+    const playedTiles = [...playerHand.getPlayedTiles()];
 
     const quadResults: CreateQuadResults[] = [];
 

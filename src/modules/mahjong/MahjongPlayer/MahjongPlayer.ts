@@ -374,9 +374,10 @@ class MahjongPlayer extends UserEntity {
       if (quads) {
         quads.forEach((quadResult) => {
           const quadContainer = new PIXI.Container();
+          quadContainer.y = yPositionIndex * (DEFAULT_MAHJONG_HEIGHT / 2 + DISTANCE_FROM_TILES);
           const { alreadyMeld, tile } = quadResult;
           const tileString = tile.toString();
-          for (let i = 0; i <= 4; i += 1) {
+          for (let i = 0; i < 4; i += 1) {
             const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
             frontSprite.width = DEFAULT_MAHJONG_WIDTH / 2;
             frontSprite.height = DEFAULT_MAHJONG_HEIGHT / 2;
