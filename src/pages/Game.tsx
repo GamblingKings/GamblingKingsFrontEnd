@@ -16,6 +16,7 @@ import {
   InteractionSuccessJSON,
   PlayedTileInteractionJSON,
   SelfPlayTileJSON,
+  SelfPlayedTile,
 } from '../types';
 import GameTypes from '../modules/game/gameTypes';
 import MahjongOpponent from '../modules/mahjong/MahjongOpponent/MahjongOpponent';
@@ -146,15 +147,43 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
    */
   const gameStartInit = (payload: unknown): void => {
     const data = payload as GameStartJSON;
-    const tileArray = data.tiles;
+    const { tiles: tileArray, selfPlayedTiles, currentIndex } = data;
+
+    const mjGameState = gameState as MahjongGameState;
+
+    // Increment wall counter
+    const wallCounter = mjGameState.getWallCounter();
+    const result = wallCounter.setCurrentIndex(currentIndex);
+    if (!result) console.error('Failed to set wall counter. Please verify game state');
+
+    // Set player hand
     const tiles: Tile[] = [];
     tileArray.forEach((tile: string) => {
       tiles.push(TileFactory.createTileFromStringDef(tile));
     });
-    const mjGameState = gameState as MahjongGameState;
-
-    const mjPlayer = mjGameState.getMjPlayer();
+    const mjPlayer = mjGameState.getMjPlayer() as MahjongPlayer;
     mjPlayer.setHand(tiles);
+    const mjPlayerHand = mjPlayer.getHand();
+
+    // Set player played tiles (bonus tiles) at game start
+    const mjPlayerBonusTilesStrDef = selfPlayedTiles.filter(
+      (playedTiles: SelfPlayedTile) => playedTiles.connectionId === mjPlayer.getConnectionId(),
+    )[0].playedTiles;
+    const mjPlayerBonusTiles = mjPlayerBonusTilesStrDef.map((strDef) => TileFactory.createTileFromStringDef(strDef));
+    mjPlayerHand.addPlayedTiles(mjPlayerBonusTiles);
+
+    // Set opponents played tiles s tiles) at game start
+    const mjOpponents = mjGameState
+      .getUsers()
+      .filter((user) => user.getConnectionId() !== mjPlayer.getConnectionId()) as MahjongOpponent[];
+    const opponentsBonusTilesObjs = selfPlayedTiles.filter(
+      (playedTiles) => playedTiles.connectionId !== mjPlayer.getConnectionId(),
+    );
+    const opponentsBonusTiles = opponentsBonusTilesObjs.map((playedTileObj: SelfPlayedTile) => {
+      const tilesArray = playedTileObj.playedTiles;
+      return tilesArray.map((strDef) => TileFactory.createTileFromStringDef(strDef));
+    });
+    mjOpponents.forEach((opponent, index) => opponent.addPlayedTiles(opponentsBonusTiles[index]));
 
     const readyToGo = mjGameState.startRound();
 

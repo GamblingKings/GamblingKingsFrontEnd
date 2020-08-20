@@ -53,7 +53,7 @@ test('OpponentHand - change number of tiles after add played tile', () => {
 test('PlayerHand - formQuad() alreadymeld false', () => {
   opponentHand.formQuad(DOT_7, false);
   const quadMeld = [DOT_7, DOT_7, DOT_7, DOT_7];
-  expect(opponentHand.getPlayedTiles()[0]).toEqual(quadMeld);
+  expect(opponentHand.getPlayedTiles()[0]).toStrictEqual(quadMeld);
   expect(opponentHand.getNumberOfTiles()).toBe(11);
   // opponent still needs to play a tile to make it 10
 });
@@ -66,7 +66,7 @@ test('PlayerHand - formQuad() alreadymeld true', () => {
   opponentHand.playedTile();
   opponentHand.formQuad(DOT_7, true);
   const quadMeld = [DOT_7, DOT_7, DOT_7, DOT_7];
-  expect(opponentHand.getPlayedTiles()[1]).toEqual(quadMeld);
+  expect(opponentHand.getPlayedTiles()[1]).toStrictEqual(quadMeld);
   expect(opponentHand.getNumberOfTiles()).toBe(11);
   // opponent still needs to play a tile to make it 10
 });

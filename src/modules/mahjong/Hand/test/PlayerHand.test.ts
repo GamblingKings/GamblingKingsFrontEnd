@@ -151,7 +151,7 @@ test('PlayerHand - removeTiles() - bad request', () => {
 test('PlayerHand - formQuad() alreadymeld false', () => {
   fullHand.formQuad(DOT_7, false);
   const quadMeld = [DOT_7, DOT_7, DOT_7, DOT_7];
-  expect(fullHand.getPlayedTiles()[0]).toEqual(quadMeld);
+  expect(fullHand.getPlayedTiles()[0]).toStrictEqual(quadMeld);
   expect(fullHand.getTiles()).toHaveLength(10);
 });
 
@@ -162,6 +162,6 @@ test('PlayerHand - formQuad() alreadymeld true', () => {
   fullHand.removeTiles(triplet);
   fullHand.formQuad(DOT_7, true);
   const quadMeld = [DOT_7, DOT_7, DOT_7, DOT_7];
-  expect(fullHand.getPlayedTiles()[1]).toEqual(quadMeld);
+  expect(fullHand.getPlayedTiles()[1]).toStrictEqual(quadMeld);
   expect(fullHand.getTiles()).toHaveLength(10);
 });

@@ -77,7 +77,7 @@ beforeEach(() => {
 });
 
 test('MahjongPlayer - getName()', () => {
-  expect(mjPlayer.getName()).toEqual(NAME);
+  expect(mjPlayer.getName()).toStrictEqual(NAME);
 });
 
 test('MahjongPlayer - getContainer() - Init to be empty', () => {
@@ -87,7 +87,7 @@ test('MahjongPlayer - getContainer() - Init to be empty', () => {
 test('MahjongPlayer - setHand() / getHand()', () => {
   expect(mjPlayer.getHand().getTiles()).toHaveLength(0);
   mjPlayer.setHand(tiles);
-  expect(mjPlayer.getHand().getTiles()).toEqual(tiles);
+  expect(mjPlayer.getHand().getTiles()).toStrictEqual(tiles);
 });
 
 test('MahjongPlayer - renderName()', () => {

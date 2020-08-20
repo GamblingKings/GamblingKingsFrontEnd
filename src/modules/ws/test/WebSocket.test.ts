@@ -50,7 +50,7 @@ test('Mock WS Connection: Add listener and receive message', async () => {
   mockServer.send(invalidJSON);
 
   const receivedPayload = JSON.parse(json).payload;
-  expect(message).toEqual([JSON.stringify(receivedPayload)]);
+  expect(message).toStrictEqual([JSON.stringify(receivedPayload)]);
 });
 
 test('Mock WS Connection: Add/Remove listener', async () => {
@@ -78,5 +78,5 @@ test('Mock WS Connection: Add/Remove listener', async () => {
 
   mockServer.send(json);
 
-  expect(message).toEqual([]);
+  expect(message).toStrictEqual([]);
 });
