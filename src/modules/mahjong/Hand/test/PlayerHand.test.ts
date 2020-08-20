@@ -28,6 +28,7 @@ let tiles: Tile[];
 const tilesNot13 = tileStringsNot13.map((tile) => TileFactory.createTileFromStringDef(tile));
 const tileMeld = tileStringMeld.map((tile) => TileFactory.createTileFromStringDef(tile));
 const DOT_7 = TileFactory.createTileFromStringDef('7_DOT');
+const BONUS_TILE = TileFactory.createTileFromStringDef('3_FLOWER');
 
 beforeEach(() => {
   tiles = tileStrings.map((tile) => TileFactory.createTileFromStringDef(tile));
@@ -156,10 +157,11 @@ test('PlayerHand - formQuad() alreadymeld false', () => {
 
 test('PlayerHand - formQuad() alreadymeld true', () => {
   const triplet = [DOT_7, DOT_7, DOT_7];
+  fullHand.addPlayedTiles([BONUS_TILE]);
   fullHand.addPlayedTiles(triplet);
   fullHand.removeTiles(triplet);
   fullHand.formQuad(DOT_7, true);
   const quadMeld = [DOT_7, DOT_7, DOT_7, DOT_7];
-  expect(fullHand.getPlayedTiles()[0]).toEqual(quadMeld);
+  expect(fullHand.getPlayedTiles()[1]).toEqual(quadMeld);
   expect(fullHand.getTiles()).toHaveLength(10);
 });

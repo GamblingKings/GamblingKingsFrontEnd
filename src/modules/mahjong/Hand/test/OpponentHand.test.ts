@@ -9,6 +9,7 @@ const SAMPLE_TILE_ARRAY = [
   TileFactory.createTileFromStringDef('4_DOT'),
 ];
 const DOT_7 = TileFactory.createTileFromStringDef('7_DOT');
+const BONUS_TILE = TileFactory.createTileFromStringDef('3_FLOWER');
 
 beforeEach(() => {
   opponentHand = new OpponentHand();
@@ -59,12 +60,13 @@ test('PlayerHand - formQuad() alreadymeld false', () => {
 
 test('PlayerHand - formQuad() alreadymeld true', () => {
   const triplet = [DOT_7, DOT_7, DOT_7];
+  opponentHand.addSelfPlayedTiles([BONUS_TILE]);
   opponentHand.addPlayedTiles(triplet);
 
   opponentHand.playedTile();
   opponentHand.formQuad(DOT_7, true);
   const quadMeld = [DOT_7, DOT_7, DOT_7, DOT_7];
-  expect(opponentHand.getPlayedTiles()[0]).toEqual(quadMeld);
+  expect(opponentHand.getPlayedTiles()[1]).toEqual(quadMeld);
   expect(opponentHand.getNumberOfTiles()).toBe(11);
   // opponent still needs to play a tile to make it 10
 });
