@@ -21,6 +21,7 @@ import HandValidator from '../HandValidator/HandValidator';
 import Timer from '../../game/Timer/Timer';
 import validateHandStructure from '../utils/functions/validateHandStructure';
 import MeldTypes from '../enums/MeldEnums';
+import QuadValidator from '../QuadValidator/QuadValidator';
 
 const PLAY_TILE_TEXT = 'PLAY_TILE';
 const WIN_TEXT = 'WIN ROUND';
@@ -330,9 +331,10 @@ class MahjongPlayer extends UserEntity {
   ): void {
     const container = new PIXI.Container();
     container.x = 200 + this.hand.getTiles().length * DEFAULT_MAHJONG_WIDTH;
-
+    let yPositionIndex = 1;
+    const canPlayTile = this.hand.canPlayTile();
     // Render play button if player has drawn or can play tile after making meld.
-    if (this.hand.canPlayTile()) {
+    if (canPlayTile) {
       const playText = new PIXI.Text(PLAY_TILE_TEXT, PIXI_TEXT_STYLE);
       container.addChild(playText);
       Interactions.addMouseInteraction(playText, (event: PIXI.InteractionEvent) => {
@@ -354,13 +356,56 @@ class MahjongPlayer extends UserEntity {
       );
       if (canWin.valid.length > 0 || canWin.isThirteenTerminals) {
         const winText = new PIXI.Text(WIN_TEXT, PIXI_TEXT_STYLE);
-        winText.y = DEFAULT_MAHJONG_HEIGHT;
+        winText.y = yPositionIndex * (DEFAULT_MAHJONG_HEIGHT / 2);
         Interactions.addMouseInteraction(winText, (event: PIXI.InteractionEvent) => {
           console.log(event.target);
-          // TODO: send message to backend WIN_ROUND
-          callbacks.REQUEST_REDRAW();
+          if (canPlayTile) {
+            this.getHand().setCannotPlayTile();
+            // TODO: send message to backend WIN_ROUND
+            callbacks.REQUEST_REDRAW();
+          }
         });
         container.addChild(winText);
+        yPositionIndex += 1;
+      }
+
+      // Render quads if player can make quads
+      const quads = QuadValidator.checkForQuads(this.getHand());
+      if (quads) {
+        quads.forEach((quadResult) => {
+          const quadContainer = new PIXI.Container();
+          const { alreadyMeld, tile } = quadResult;
+          const tileString = tile.toString();
+          for (let i = 0; i <= 4; i += 1) {
+            const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
+            frontSprite.width = DEFAULT_MAHJONG_WIDTH / 2;
+            frontSprite.height = DEFAULT_MAHJONG_HEIGHT / 2;
+            frontSprite.x = i * (DEFAULT_MAHJONG_WIDTH / 2 + DISTANCE_FROM_TILES);
+
+            const tileSprite = spriteFactory.generateSprite(tileString);
+            tileSprite.width = DEFAULT_MAHJONG_WIDTH / 2;
+            tileSprite.height = DEFAULT_MAHJONG_HEIGHT / 2;
+            tileSprite.x = i * (DEFAULT_MAHJONG_WIDTH / 2 + DISTANCE_FROM_TILES);
+            quadContainer.addChild(frontSprite);
+            quadContainer.addChild(tileSprite);
+          }
+          Interactions.addMouseInteraction(quadContainer as PIXI.Sprite, (event: PIXI.InteractionEvent) => {
+            console.log(event.target);
+            const payload = {
+              playedTile: tileString,
+              isQuad: true,
+              alreadyMeld,
+            };
+            // Extra boolean check might prevent duplicate messages from sending if user double clicks fast enough
+            if (canPlayTile) {
+              this.getHand().setCannotPlayTile();
+              callbacks[OutgoingAction.SELF_PLAY_TILE](payload);
+              callbacks.REQUEST_REDRAW();
+            }
+          });
+          container.addChild(quadContainer);
+          yPositionIndex += 1;
+        });
       }
     }
     // Render interaction buttons when player is prompted to.
