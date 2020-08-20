@@ -234,6 +234,26 @@ class PlayerHand {
   public getAllTiles(): Tile[] {
     return [...this.tiles, ...this.playedTiles.flat()];
   }
+
+  public formQuad(tile: Tile, alreadyMeld: boolean | undefined): void {
+    if (alreadyMeld) {
+      const meldToAppend = this.playedTiles.find((meld) => {
+        if (meld.length < 3) {
+          return false;
+        }
+        const atLeastTriplet = meld[0].toString() === meld[1].toString();
+        const sameTile = meld[0].toString() === tile.toString();
+        return atLeastTriplet && sameTile;
+      });
+      if (meldToAppend) meldToAppend.push(tile);
+      this.removeTiles([tile]);
+    } else {
+      const quadMeld = [tile, tile, tile, tile];
+      this.playedTiles.push(quadMeld);
+      this.removeTiles(quadMeld);
+    }
+    this.setSelectedTile(-1);
+  }
 }
 
 export default PlayerHand;
