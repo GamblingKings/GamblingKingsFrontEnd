@@ -311,7 +311,7 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
         >
           <h2 className="">Games</h2>
           {games.map((game) => (
-            <GameRow gameId={game.gameId} onClickHandler={requestJoinGame} roomName={game.gameName} />
+            <GameRow gameId={game.gameId} onClickHandler={requestJoinGame} roomName={game.gameName} key={game.gameId} />
           ))}
         </div>
 

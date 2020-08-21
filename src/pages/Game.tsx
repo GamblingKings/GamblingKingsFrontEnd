@@ -22,7 +22,6 @@ import GameTypes from '../modules/game/gameTypes';
 import MahjongOpponent from '../modules/mahjong/MahjongOpponent/MahjongOpponent';
 import MahjongPlayer from '../modules/mahjong/MahjongPlayer/MahjongPlayer';
 import TileFactory from '../modules/mahjong/Tile/TileFactory';
-import Tile from '../modules/mahjong/Tile/Tile';
 import GameState from '../modules/game/GameState/GameState';
 import MahjongGameState from '../modules/mahjong/MahjongGameState/MahjongGameState';
 import { isBonusTile } from '../modules/mahjong/utils/functions/checkTypes';
@@ -157,33 +156,62 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     if (!result) console.error('Failed to set wall counter. Please verify game state');
 
     // Set player hand
-    const tiles: Tile[] = [];
-    tileArray.forEach((tile: string) => {
-      tiles.push(TileFactory.createTileFromStringDef(tile));
-    });
+    const tiles = tileArray.map((tile: string) => TileFactory.createTileFromStringDef(tile));
     const mjPlayer = mjGameState.getMjPlayer() as MahjongPlayer;
     mjPlayer.setHand(tiles);
     const mjPlayerHand = mjPlayer.getHand();
 
     // Set player played tiles (bonus tiles) at game start
-    const mjPlayerBonusTilesStrDef = selfPlayedTiles.filter(
+    const playerPlayedTileObj = selfPlayedTiles.find(
       (playedTiles: SelfPlayedTile) => playedTiles.connectionId === mjPlayer.getConnectionId(),
-    )[0].playedTiles;
-    const mjPlayerBonusTiles = mjPlayerBonusTilesStrDef.map((strDef) => TileFactory.createTileFromStringDef(strDef));
-    mjPlayerHand.addPlayedTiles(mjPlayerBonusTiles);
+    ) as SelfPlayedTile;
+    const mjPlayerBonusTilesStrDef = playerPlayedTileObj.playedTiles;
 
-    // Set opponents played tiles s tiles) at game start
+    if (mjPlayerBonusTilesStrDef.length !== 0) {
+      const mjPlayerBonusTiles = mjPlayerBonusTilesStrDef.map((strDef) => TileFactory.createTileFromStringDef(strDef));
+      mjPlayerHand.addPlayedTiles(mjPlayerBonusTiles);
+    }
+    console.log(
+      `Game - gameStartInit():\n Player '${mjPlayer.getName()}', playerBonusTiles: [${mjPlayerBonusTilesStrDef}]`,
+    );
+
+    // Get opponents in mjGameState
     const mjOpponents = mjGameState
       .getUsers()
       .filter((user) => user.getConnectionId() !== mjPlayer.getConnectionId()) as MahjongOpponent[];
     const opponentsBonusTilesObjs = selfPlayedTiles.filter(
       (playedTiles) => playedTiles.connectionId !== mjPlayer.getConnectionId(),
     );
-    const opponentsBonusTiles = opponentsBonusTilesObjs.map((playedTileObj: SelfPlayedTile) => {
-      const tilesArray = playedTileObj.playedTiles;
-      return tilesArray.map((strDef) => TileFactory.createTileFromStringDef(strDef));
+
+    // Set opponents played tiles (bonus tiles) at game start
+    let errorAddingBonusTiles = false;
+    const failedOpponents: MahjongOpponent[] = [];
+    mjOpponents.forEach((opponent) => {
+      const opponentHand = opponent.getHand();
+      const opponentPlayedTileObj = opponentsBonusTilesObjs.find(
+        (obj) => obj.connectionId === opponent.getConnectionId(),
+      );
+      if (opponentPlayedTileObj) {
+        const opponentPlayedTilesStrDef = opponentPlayedTileObj.playedTiles;
+        // eslint-disable-next-line
+        const opponentBonusTiles = opponentPlayedTilesStrDef.map((tile) => {
+          return TileFactory.createTileFromStringDef(tile);
+        });
+
+        console.log(
+          `Game gameStartInit:\n Opponent '${opponent.getName()}', opponentBonusTiles: [${opponentPlayedTilesStrDef}]`,
+        );
+
+        // Only add to playedTiles if its not empty (has bonus tiles in the array)
+        if (opponentBonusTiles.length !== 0) opponentHand.addSelfPlayedTiles(opponentBonusTiles);
+      } else {
+        // Failed to find opponent's playedTileObj
+        errorAddingBonusTiles = true;
+        failedOpponents.push(opponent);
+      }
     });
-    mjOpponents.forEach((opponent, index) => opponent.addPlayedTiles(opponentsBonusTiles[index]));
+
+    if (errorAddingBonusTiles) console.error('Opponent failed to add bonus tiles to playedTiles:', failedOpponents);
 
     const readyToGo = mjGameState.startRound();
 
