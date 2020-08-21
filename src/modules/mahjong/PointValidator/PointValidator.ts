@@ -73,7 +73,7 @@ class PointValidator {
 
     // Evaluate the pair first
     if (pair) {
-      if (isSimpleTileUtils(pair)) type = <SimpleTileTypes>TileMapper[pair].type;
+      if (isSimpleTileUtils(pair)) type = TileMapper[pair].type as SimpleTileTypes;
       else if (isBonusTileUtils(pair)) return HKHandMapper.INVALID;
     }
 
@@ -83,7 +83,7 @@ class PointValidator {
           isSemiPure = false;
         }
       } else if (isSemiPure && isSimpleTileUtils(key)) {
-        type = <SimpleTileTypes>TileMapper[key].type;
+        type = TileMapper[key].type as SimpleTileTypes;
       }
     });
 
