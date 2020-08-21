@@ -2,9 +2,6 @@ name: CD
 on:
   push:
     branches: [master]
-  # [Important!!!] For testing only, remove before merging to master
-  pull_request:
-    branches: [master]
 
 jobs:
   build-and-deploy:
@@ -40,7 +37,7 @@ jobs:
           username: GamblingKings-CD-Bot (Frontend)
           author_name: ${{ github.actor }}
           status: ${{ job.status }}
-          icon_emoji: ':punch:'
+          icon_emoji: ':fire:'
           mention: here
           if_mention: failure,cancelled
         env:
