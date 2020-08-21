@@ -1,3 +1,5 @@
+import Tile from '../../Tile/Tile';
+
 /**
  * Returns a boolean whether the meld is a triplet
  * @param tiles Tile instances
