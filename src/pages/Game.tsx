@@ -17,6 +17,8 @@ import {
   PlayedTileInteractionJSON,
   SelfPlayTileJSON,
   SelfPlayedTile,
+  WinningTilesJSON,
+  UpdateGameStateJSON,
 } from '../types';
 import GameTypes from '../modules/game/gameTypes';
 import MahjongOpponent from '../modules/mahjong/MahjongOpponent/MahjongOpponent';
@@ -25,6 +27,9 @@ import TileFactory from '../modules/mahjong/Tile/TileFactory';
 import GameState from '../modules/game/GameState/GameState';
 import MahjongGameState from '../modules/mahjong/MahjongGameState/MahjongGameState';
 import { isBonusTile } from '../modules/mahjong/utils/functions/checkTypes';
+import MeldTypes from '../modules/mahjong/enums/MeldEnums';
+import validateHandStructure from '../modules/mahjong/utils/functions/validateHandStructure';
+import PointValidator from '../modules/mahjong/PointValidator/PointValidator';
 
 /**
  * Pixi Application References
@@ -338,22 +343,47 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       // Increase wall counter
       mjGameState.getWallCounter().increaseCounter();
     } else {
-      // TODO: (nextPR) check MeldType QUAD and WIN
-      // player needs to DRAW_TILE if quad
-      const { connectionId, playedTiles, meldType } = data;
+      const { connectionId, playedTiles: playedTilesStr, meldType } = data;
       // Remove last tile from deadpile
       const playedTile = mjGameState.getDeadPile().removeLastTile();
-
-      if (connectionId && playedTiles && meldType) {
-        const tiles = playedTiles.map((tileStr) => TileFactory.createTileFromStringDef(tileStr));
+      if (connectionId && playedTilesStr && meldType) {
+        const playedTiles = playedTilesStr.map((tileStr) => TileFactory.createTileFromStringDef(tileStr));
         const userIndex = mjGameState.getUsers().findIndex((user) => user.getConnectionId() === connectionId);
-        if (connectionId === mjPlayer.getConnectionId()) {
-          // Player updates their PlayedTiles
-          mjPlayer.getHand().addPlayedTiles(tiles);
 
-          const indexOfPlayedTile = tiles.findIndex((tile) => playedTile?.toString() === tile.toString());
+        // Player Interactions
+        if (connectionId === mjPlayer.getConnectionId()) {
+          // Send WIN_ROUND
+          if (meldType === MeldTypes.WIN) {
+            const playerHand = mjPlayer.getHand();
+            const allTiles = playerHand.getAllTiles().map((tile: Tile) => tile.toString());
+            const handValidationResult = validateHandStructure(
+              allTiles,
+              playerHand.getWind(),
+              playerHand.getFlowerNumber(),
+              mjGameState.getCurrentWind(),
+              playerHand.getConcealed(),
+            );
+            const pointValidationResult = PointValidator.validateHandPoints(handValidationResult);
+            const wsPayload = {
+              gameId: game.gameId,
+              tiles: mjPlayer.getHand().getAllTiles(),
+              points: pointValidationResult.largestHand,
+            };
+            ws?.sendMessage(OutgoingAction.WIN_ROUND, wsPayload);
+            return;
+          }
+
+          // Draw a tile if Meld is a QUAD
+          if (meldType === MeldTypes.QUAD) {
+            ws?.sendMessage(OutgoingAction.DRAW_TILE, { gameId: game.gameId });
+          }
+
+          // Player updates their PlayedTiles
+          mjPlayer.getHand().addPlayedTiles(playedTiles);
+
+          const indexOfPlayedTile = playedTiles.findIndex((tile) => playedTile?.toString() === tile.toString());
           if (indexOfPlayedTile !== -1) {
-            const tilesToRemove = [...tiles];
+            const tilesToRemove = [...playedTiles];
             tilesToRemove.splice(indexOfPlayedTile, 1);
             mjPlayer.getHand().removeTiles(tilesToRemove);
           } else {
@@ -362,9 +392,17 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
 
           mjPlayer.getHand().setMadeMeld(true);
         } else {
+          // Stop processing and wait for WINNING_TILES
+          if (meldType === MeldTypes.WIN) {
+            return;
+          }
+          // Increase counter as Opponent needs to draw tile under the hood
+          if (meldType === MeldTypes.QUAD) {
+            mjGameState.getWallCounter().increaseCounter();
+          }
           // Opponent update playedTiles
           const opponent = mjGameState.getUsers()[userIndex] as MahjongOpponent;
-          opponent.getHand().addPlayedTiles(tiles);
+          opponent.getHand().addPlayedTiles(playedTiles);
         }
         // Set turn to the person who interacted successfully
         mjGameState.setTurn(userIndex);
@@ -409,6 +447,26 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       }
     }
     mjGameState.requestRedraw();
+  };
+
+  /**
+   * For WINNING_TILES
+   * @param payload WinningTilesJSON
+   */
+  const mjWinningTiles = (payload: unknown): void => {
+    const data = payload as WinningTilesJSON;
+    console.log(data);
+    // TODO
+  };
+
+  /**
+   * For UPDATE_GAME_STATE
+   * @param payload UpdateGameStateJSON
+   */
+  const mjUpdateGameState = (payload: unknown): void => {
+    const data = payload as UpdateGameStateJSON;
+    console.log(data);
+    // TODO
   };
 
   // Set up PIXI application.
@@ -468,6 +526,8 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       ws.addListener(IncomingAction.INTERACTION_SUCCESS, mjInteractionSuccess);
       ws.addListener(IncomingAction.PLAYED_TILE_INTERACTION, mjPlayedTileInteraction);
       ws.addListener(IncomingAction.SELF_PLAY_TILE, mjSelfPlayTile);
+      ws.addListener(IncomingAction.WINNING_TILES, mjWinningTiles);
+      ws.addListener(IncomingAction.UPDATE_GAME_STATE, mjUpdateGameState);
     }
 
     return function cleanup() {
@@ -479,6 +539,8 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
         ws.removeListener(IncomingAction.INTERACTION_SUCCESS);
         ws.removeListener(IncomingAction.PLAYED_TILE_INTERACTION);
         ws.removeListener(IncomingAction.SELF_PLAY_TILE);
+        ws.removeListener(IncomingAction.WINNING_TILES);
+        ws.removeListener(IncomingAction.UPDATE_GAME_STATE);
       }
     };
     // eslint-disable-next-line

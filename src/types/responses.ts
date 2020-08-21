@@ -178,3 +178,19 @@ export interface SelfPlayTileJSON {
   isQuad: boolean;
   alreadyMeld: boolean;
 }
+
+/**
+ * Interface for WINNING_TILES payload received
+ */
+export interface WinningTilesJSON {
+  connectionId: string;
+  tiles: string[];
+}
+
+/**
+ * Interface for UPDATE_GAME_STATE payload received
+ */
+export interface UpdateGameStateJSON {
+  dealer: number;
+  wind: number;
+}

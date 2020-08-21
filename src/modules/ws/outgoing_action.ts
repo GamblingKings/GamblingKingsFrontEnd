@@ -12,6 +12,7 @@ enum OutgoingAction {
   PLAY_TILE = 'PLAY_TILE',
   PLAYED_TILE_INTERACTION = 'PLAYED_TILE_INTERACTION',
   SELF_PLAY_TILE = 'SELF_PLAY_TILE',
+  WIN_ROUND = 'WIN_ROUND',
 }
 
 export default OutgoingAction;
