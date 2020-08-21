@@ -1,0 +1,46 @@
+name: CD
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@master
+
+      - name: Install Dependencies
+        run: yarn install --production
+
+      - name: Build
+        run: yarn build
+
+      # Host website on Firebase
+      - name: Deploy to Firebase
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+      # Send slack notification
+      # Docs: https://action-slack.netlify.app/
+      - name: Notify Slack
+        uses: 8398a7/action-slack@v3.6.1
+        with:
+          # Fields
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took # selectable (default: repo,message)
+          # With Parameters
+          channel: '#ci-cd'
+          username: GamblingKings-CD-Bot (Frontend)
+          author_name: ${{ github.actor }}
+          status: ${{ job.status }}
+          icon_emoji: ':fire:'
+          mention: here
+          if_mention: failure,cancelled
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # optional
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }} # required
+        if: always() # Pick up events even if the job fails or is canceled.

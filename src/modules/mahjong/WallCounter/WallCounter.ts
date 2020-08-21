@@ -32,6 +32,15 @@ class WallCounter {
     this.currentIndex += 1;
   }
 
+  public setCurrentIndex(currentIndex: number): boolean {
+    if (currentIndex < WallCounter.TOTAL_NUMBER_OF_TILES) {
+      this.currentIndex = currentIndex;
+      return true;
+    }
+
+    return false;
+  }
+
   public getNumberOfTilesLeft(): number {
     return WallCounter.TOTAL_NUMBER_OF_TILES - this.getCurrentIndex();
   }

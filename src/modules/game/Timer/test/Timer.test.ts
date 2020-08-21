@@ -11,7 +11,7 @@ beforeEach(() => {
 
 test('Timer - setCallback()', () => {
   timer.setCallback(dummyCallback);
-  expect(timer.getCallback()).toEqual(dummyCallback);
+  expect(timer.getCallback()).toStrictEqual(dummyCallback);
 });
 
 test('Timer - getIsRunning()', () => {

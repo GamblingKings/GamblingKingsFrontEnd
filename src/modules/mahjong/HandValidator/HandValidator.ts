@@ -3,12 +3,7 @@
  */
 import Tile from '../Tile/Tile';
 // eslint-disable-next-line
-import {
-  ValidPair,
-  Meld,
-  HandStructureResults,
-  CreateMeldResults,
-} from '../types/MahjongTypes';
+import { ValidPair, Meld, HandStructureResults, CreateMeldResults } from '../types/MahjongTypes';
 import TileMapper from '../Tile/map/TileMapper';
 import MeldTypes from '../enums/MeldEnums';
 import sortHandUtils from '../utils/functions/sortHand';

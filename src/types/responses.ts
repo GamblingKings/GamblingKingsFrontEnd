@@ -115,10 +115,20 @@ export interface GamePageLoadJSON {
 }
 
 /**
+ * Interface for Self Played Tile
+ */
+export interface SelfPlayedTile {
+  connectionId: string;
+  playedTiles: string[];
+}
+
+/**
  * Interface for GAME_START payload received
  */
 export interface GameStartJSON {
   tiles: string[];
+  selfPlayedTiles: SelfPlayedTile[];
+  currentIndex: number;
 }
 
 /**

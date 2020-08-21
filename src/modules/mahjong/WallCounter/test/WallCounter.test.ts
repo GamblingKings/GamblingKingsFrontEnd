@@ -34,8 +34,23 @@ test('WallCounter - render()', () => {
   expect(pixiStage.children).toHaveLength(1);
 });
 
-test('WallCounter - reomveAllAssets()', () => {
+test('WallCounter - removeAllAssets()', () => {
   wallCounter.render(spriteFactory, pixiStage);
   wallCounter.removeAllAssets();
   expect(wallCounter.getContainer().children).toHaveLength(0);
+});
+
+test('WallCounter - setCurrentIndex() with valid index', () => {
+  const validIndex = 50;
+  const result = wallCounter.setCurrentIndex(validIndex);
+  expect(wallCounter.getCurrentIndex()).toBe(validIndex);
+  expect(result).toBeTruthy();
+});
+
+test('WallCounter - setCurrentIndex() with invalid index', () => {
+  const initialCount = wallCounter.getCurrentIndex();
+  const invalidIndex = 145;
+  const result = wallCounter.setCurrentIndex(invalidIndex);
+  expect(wallCounter.getCurrentIndex()).toBe(initialCount);
+  expect(result).toBeFalsy();
 });
