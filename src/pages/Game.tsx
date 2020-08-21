@@ -355,7 +355,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
           // Send WIN_ROUND
           if (meldType === MeldTypes.WIN) {
             const playerHand = mjPlayer.getHand();
-            const allTiles = playerHand.getAllTiles().map((tile: Tile) => tile.toString());
+            const allTiles = playerHand.getAllTiles().map((tile) => tile.toString());
             const handValidationResult = validateHandStructure(
               allTiles,
               playerHand.getWind(),
