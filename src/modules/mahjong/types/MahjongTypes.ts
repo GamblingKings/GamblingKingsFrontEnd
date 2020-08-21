@@ -92,3 +92,8 @@ export interface CreateMeldResults {
   triplet: CreateMeld;
   consecutive: CreateMeld;
 }
+
+export interface CreateQuadResults {
+  tile: Tile;
+  alreadyMeld: boolean;
+}

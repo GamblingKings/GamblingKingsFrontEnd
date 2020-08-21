@@ -282,6 +282,8 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       // Increase wall counter
       mjGameState.getWallCounter().increaseCounter();
     } else {
+      // TODO: (nextPR) check MeldType QUAD and WIN
+      // player needs to DRAW_TILE if quad
       const { connectionId, playedTiles, meldType } = data;
       // Remove last tile from deadpile
       const playedTile = mjGameState.getDeadPile().removeLastTile();

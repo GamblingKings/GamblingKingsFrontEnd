@@ -50,6 +50,7 @@ const winnableTiles = winnableTileStrings.map((tile) => TileFactory.createTileFr
 let tiles: Tile[];
 const tile = TileFactory.createTileFromStringDef('1_DOT');
 const tile8 = TileFactory.createTileFromStringDef('8_DOT');
+const tile7 = TileFactory.createTileFromStringDef('7_DOT');
 let deadPile: DeadPile;
 
 const spriteFactory = new SpriteFactory({});
@@ -272,4 +273,11 @@ test('MahjongPlayer - renderInteractionsWithPlayedTiles()', () => {
     container,
   );
   expect(container.children).toHaveLength(1);
+});
+
+test('MahjongPlayer - renderInteractions() with quad', () => {
+  mjPlayer.setHand(tiles);
+  mjPlayer.addTileToHand(tile7);
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST);
+  expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 });

@@ -205,7 +205,7 @@ class PlayerHand {
   }
 
   public throw(): Tile | null {
-    if (this.selectedTile >= 0 && this.selectedTile < this.tiles.length && this.canPlayTile) {
+    if (this.selectedTile >= 0 && this.selectedTile < this.tiles.length && this.canPlayTile()) {
       const index = this.selectedTile;
       const tile = this.tiles[index];
       this.tiles.splice(index, 1);
