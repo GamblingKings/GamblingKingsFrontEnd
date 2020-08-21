@@ -162,11 +162,12 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     const mjPlayerHand = mjPlayer.getHand();
 
     // Set player played tiles (bonus tiles) at game start
-    const playerPlayedTileObj = selfPlayedTiles.find(
+    const playerPlayedTileObjs = selfPlayedTiles.find(
       (playedTiles: SelfPlayedTile) => playedTiles.connectionId === mjPlayer.getConnectionId(),
     ) as SelfPlayedTile;
-    const mjPlayerBonusTilesStrDef = playerPlayedTileObj.playedTiles;
+    const mjPlayerBonusTilesStrDef = playerPlayedTileObjs.playedTiles;
 
+    // Only add to playedTiles if its not empty (has bonus tiles in the array)
     if (mjPlayerBonusTilesStrDef.length !== 0) {
       const mjPlayerBonusTiles = mjPlayerBonusTilesStrDef.map((strDef) => TileFactory.createTileFromStringDef(strDef));
       mjPlayerHand.addPlayedTiles(mjPlayerBonusTiles);
@@ -193,17 +194,15 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       );
       if (opponentPlayedTileObj) {
         const opponentPlayedTilesStrDef = opponentPlayedTileObj.playedTiles;
-        // eslint-disable-next-line
-        const opponentBonusTiles = opponentPlayedTilesStrDef.map((tile) => {
-          return TileFactory.createTileFromStringDef(tile);
-        });
+        // Only add to playedTiles if its not empty (has bonus tiles in the array)
+        if (opponentPlayedTilesStrDef.length !== 0) {
+          const opponentBonusTiles = opponentPlayedTilesStrDef.map((tile) => TileFactory.createTileFromStringDef(tile));
+          opponentHand.addSelfPlayedTiles(opponentBonusTiles);
+        }
 
         console.log(
           `Game gameStartInit:\n Opponent '${opponent.getName()}', opponentBonusTiles: [${opponentPlayedTilesStrDef}]`,
         );
-
-        // Only add to playedTiles if its not empty (has bonus tiles in the array)
-        if (opponentBonusTiles.length !== 0) opponentHand.addSelfPlayedTiles(opponentBonusTiles);
       } else {
         // Failed to find opponent's playedTileObj
         errorAddingBonusTiles = true;
