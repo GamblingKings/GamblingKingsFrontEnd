@@ -175,6 +175,17 @@ class MahjongGameState extends GameState {
     }
   }
 
+  public gameStateSync(dealer: number, wind: number): void {
+    const numberToWindConvert = {
+      0: WindEnums.EAST,
+      1: WindEnums.SOUTH,
+      2: WindEnums.WEST,
+      3: WindEnums.NORTH,
+    } as Record<number, WindEnums>;
+    this.dealer = dealer;
+    this.currentWind = numberToWindConvert[wind];
+  }
+
   public update(): void {
     if (this.mjPlayer.getAllowInteraction()) {
       const timer = this.mjPlayer.getTimer();

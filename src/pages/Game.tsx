@@ -464,8 +464,9 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
    */
   const mjUpdateGameState = (payload: unknown): void => {
     const data = payload as UpdateGameStateJSON;
-    console.log(data);
-    // TODO
+    const { dealer, wind } = data;
+    const mjGameState = gameState as MahjongGameState;
+    mjGameState.gameStateSync(dealer, wind);
   };
 
   // Set up PIXI application.
