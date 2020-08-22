@@ -366,8 +366,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
             const pointValidationResult = PointValidator.validateHandPoints(handValidationResult);
             const wsPayload = {
               gameId: game.gameId,
-              tiles: mjPlayer.getHand().getAllTiles(),
-              points: pointValidationResult.largestHand,
+              handPointResults: pointValidationResult.largestHand,
             };
             ws?.sendMessage(OutgoingAction.WIN_ROUND, wsPayload);
             return;

@@ -364,8 +364,7 @@ class MahjongPlayer extends UserEntity {
             this.getHand().setCannotPlayTile();
             const pointsResult = PointValidator.validateHandPoints(canWin);
             const payload = {
-              tiles: this.hand.getAllTiles(),
-              points: pointsResult.largestHand,
+              handPointResults: pointsResult.largestHand,
             };
             callbacks[OutgoingAction.WIN_ROUND](payload);
             callbacks.REQUEST_REDRAW();
