@@ -454,8 +454,11 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
    */
   const mjWinningTiles = (payload: unknown): void => {
     const data = payload as WinningTilesJSON;
-    console.log(data);
-    // TODO
+    const { connectionId, handPointResults } = data;
+    const mjGameState = gameState as MahjongGameState;
+    mjGameState.endRound();
+    mjGameState.winnerFound();
+    mjGameState.setWinnerInfo(connectionId, handPointResults);
   };
 
   /**
@@ -467,6 +470,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     const { dealer, wind } = data;
     const mjGameState = gameState as MahjongGameState;
     mjGameState.gameStateSync(dealer, wind);
+    mjGameState.resetEverything();
   };
 
   // Set up PIXI application.

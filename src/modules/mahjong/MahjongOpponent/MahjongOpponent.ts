@@ -44,6 +44,11 @@ class MahjongOpponent extends UserEntity {
 
   public playedTile(): void {
     this.opponentHand.playedTile();
+    this.removeAllAssets();
+  }
+
+  public resetEverything(): void {
+    this.opponentHand.resetEverything();
   }
 
   /**

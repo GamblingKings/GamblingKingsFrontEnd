@@ -49,6 +49,8 @@ abstract class UserEntity {
 
   abstract removeAllAssets(): void;
 
+  abstract resetEverything(): void;
+
   public abstract render(
     spriteFactory: SpriteFactory,
     pixiStage: PIXI.Container,

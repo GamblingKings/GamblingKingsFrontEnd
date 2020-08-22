@@ -32,6 +32,11 @@ class WallCounter {
     this.currentIndex += 1;
   }
 
+  public resetEverything(): void {
+    this.removeAllAssets();
+    this.currentIndex = WallCounter.NUMBER_OF_TILES_PER_HAND * WallCounter.NUMBER_OF_PLAYERS;
+  }
+
   public setCurrentIndex(currentIndex: number): boolean {
     if (currentIndex < WallCounter.TOTAL_NUMBER_OF_TILES) {
       this.currentIndex = currentIndex;

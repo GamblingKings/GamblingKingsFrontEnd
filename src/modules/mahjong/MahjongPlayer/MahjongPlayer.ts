@@ -57,6 +57,12 @@ class MahjongPlayer extends UserEntity {
     return this.hand.setTiles(tiles);
   }
 
+  public resetEverything(): void {
+    this.allowInteraction = false;
+    this.hand.resetEverything();
+    this.removeAllAssets();
+  }
+
   public getInteractionContainer(): PIXI.Container {
     return this.interactionContainer;
   }

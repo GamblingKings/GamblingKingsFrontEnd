@@ -9,6 +9,7 @@ import WallCounter from '../WallCounter/WallCounter';
 import { OutgoingAction } from '../../ws';
 import MahjongPlayer from '../MahjongPlayer/MahjongPlayer';
 import MahjongOpponent from '../MahjongOpponent/MahjongOpponent';
+import { HandPointResults } from '../types/MahjongTypes';
 
 /**
  * Get flower number based on player and dealer position
@@ -71,6 +72,10 @@ class MahjongGameState extends GameState {
 
   private roundStarted: boolean;
 
+  private isRoundEnded: boolean;
+
+  private isWinnerFound: boolean;
+
   private wsCallbacks: Record<string, (...args: unknown[]) => void>;
 
   private dealer: number;
@@ -81,11 +86,17 @@ class MahjongGameState extends GameState {
 
   private mjPlayer: MahjongPlayer;
 
+  private previousWinner: UserEntity | undefined;
+
+  private previousHandPointResults: HandPointResults | undefined;
+
   constructor(users: UserEntity[], mjPlayer: MahjongPlayer, wsCallbacks: Record<string, (...args: unknown[]) => void>) {
     super(users);
     this.currentWind = WindEnums.EAST;
     this.redrawPending = false;
     this.roundStarted = false;
+    this.isRoundEnded = false;
+    this.isWinnerFound = false;
     this.dealer = 0;
     this.deadPile = new DeadPile();
     this.wallCounter = new WallCounter();
@@ -121,6 +132,8 @@ class MahjongGameState extends GameState {
   }
 
   public startRound(): boolean {
+    this.isRoundEnded = false;
+    this.isWinnerFound = false;
     this.roundStarted = true;
     const gameUsers = super.getUsers();
     const indexOfUser = gameUsers.findIndex((user) => user.getConnectionId() === this.mjPlayer.getConnectionId());
@@ -141,6 +154,17 @@ class MahjongGameState extends GameState {
 
   public endRound(): void {
     this.roundStarted = false;
+    this.isRoundEnded = true;
+  }
+
+  public winnerFound(): void {
+    this.isWinnerFound = true;
+  }
+
+  public setWinnerInfo(connectionId: string, handPointResults: HandPointResults): void {
+    const winner = this.getUsers().find((user) => user.getConnectionId() === connectionId);
+    this.previousWinner = winner;
+    this.previousHandPointResults = handPointResults;
   }
 
   public getRoundStarted(): boolean {
@@ -175,7 +199,13 @@ class MahjongGameState extends GameState {
     }
   }
 
+  /**
+   * Syncs up game state when a round ends
+   * @param dealer number
+   * @param wind number
+   */
   public gameStateSync(dealer: number, wind: number): void {
+    // If backend enums ever changes, this object will also change.
     const numberToWindConvert = {
       0: WindEnums.EAST,
       1: WindEnums.SOUTH,
@@ -184,6 +214,17 @@ class MahjongGameState extends GameState {
     } as Record<number, WindEnums>;
     this.dealer = dealer;
     this.currentWind = numberToWindConvert[wind];
+  }
+
+  /**
+   * Resets everything to prepare for next round.
+   */
+  public resetEverything(): void {
+    this.getUsers().forEach((user) => {
+      user.resetEverything();
+    });
+    this.deadPile.resetEverything();
+    this.wallCounter.resetEverything();
   }
 
   public update(): void {
@@ -197,41 +238,53 @@ class MahjongGameState extends GameState {
   public renderCanvas(spriteFactory: SpriteFactory, pixiApp: PIXI.Application): void {
     const { view, stage } = pixiApp;
     const currentTurn = super.getCurrentTurn();
-    if (!this.redrawPending) {
-      this.redrawPending = true;
-      stage.removeChildren(0, stage.children.length);
-      this.getUsers().forEach((user: UserEntity, index: number) => {
-        const isUserTurn = index === currentTurn;
-        user.removeAllAssets();
-        user.render(spriteFactory, stage, isUserTurn, this.wsCallbacks);
-        user.reposition(view);
-      });
 
-      const deadPileTiles = this.deadPile.getDeadPile();
-      const playerIndex = this.getUsers().findIndex(
-        (user) => user.getConnectionId() === this.mjPlayer.getConnectionId(),
-      );
-      const canCreateConsecutive = playerIndex === (this.getCurrentTurn() + 1) % 4;
-      this.mjPlayer.renderInteractions(
-        spriteFactory,
-        this.wsCallbacks,
-        deadPileTiles,
-        canCreateConsecutive,
-        this.getCurrentWind(),
-      );
+    // Main Game Render
+    if (this.roundStarted) {
+      if (!this.redrawPending) {
+        this.redrawPending = true;
+        stage.removeChildren(0, stage.children.length);
+        this.getUsers().forEach((user: UserEntity, index: number) => {
+          const isUserTurn = index === currentTurn;
+          user.removeAllAssets();
+          user.render(spriteFactory, stage, isUserTurn, this.wsCallbacks);
+          user.reposition(view);
+        });
 
-      if (this.mjPlayer.getAllowInteraction()) {
-        const timer = this.mjPlayer.getTimer().getContainer();
-        timer.y = pixiApp.view.clientHeight - 100;
-        stage.addChild(timer);
+        const deadPileTiles = this.deadPile.getDeadPile();
+        const playerIndex = this.getUsers().findIndex(
+          (user) => user.getConnectionId() === this.mjPlayer.getConnectionId(),
+        );
+        const canCreateConsecutive = playerIndex === (this.getCurrentTurn() + 1) % 4;
+        this.mjPlayer.renderInteractions(
+          spriteFactory,
+          this.wsCallbacks,
+          deadPileTiles,
+          canCreateConsecutive,
+          this.getCurrentWind(),
+        );
+
+        if (this.mjPlayer.getAllowInteraction()) {
+          const timer = this.mjPlayer.getTimer().getContainer();
+          timer.y = pixiApp.view.clientHeight - 100;
+          stage.addChild(timer);
+        }
+
+        // Render Wall
+        this.wallCounter.removeAllAssets();
+        this.wallCounter.render(spriteFactory, stage);
+        // Render DeadPile
+        this.deadPile.removeAllAssets();
+        this.deadPile.render(spriteFactory, stage);
       }
-
-      // Render Wall
-      this.wallCounter.removeAllAssets();
-      this.wallCounter.render(spriteFactory, stage);
-      // Render DeadPile
-      this.deadPile.removeAllAssets();
-      this.deadPile.render(spriteFactory, stage);
+    }
+    if (this.isRoundEnded) {
+      // Render Winning tiles
+      if (this.isWinnerFound && this.previousHandPointResults && this.previousWinner) {
+        // render winning hand and points
+      } else {
+        // Round draw state state
+      }
     }
   }
 }
