@@ -102,6 +102,7 @@ test('MahjongGameState - getCurrentWind(), changeWind()', () => {
 });
 
 test('MahjongGameState - renderCanvas()', () => {
+  gameState.startRound();
   gameState.renderCanvas(spriteFactory, pixiApp);
   expect(pixiApp.stage.children).toHaveLength(6); // 4 - users, 1 deadpile, 1 wall
   gameState.requestRedraw();
@@ -130,6 +131,7 @@ test('MahjongGameState - update()', () => {
 });
 
 test('MahjongGameState - renderCanvas() -include timer', () => {
+  gameState.startRound();
   mjPlayer.setAllowInteraction(true);
   gameState.renderCanvas(spriteFactory, pixiApp);
   expect(pixiApp.stage.children).toHaveLength(7); // 4 - users, 1 deadpile, 1 wall, 1 timer
