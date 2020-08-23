@@ -17,6 +17,8 @@ import UserEntity from '../modules/game/UserEntity/UserEntity';
 import Interactions from '../pixi/Interactions';
 import HongKongWall from '../modules/mahjong/Wall/version/HongKongWall';
 import Tile from '../modules/mahjong/Tile/Tile';
+import validateHandStructure from '../modules/mahjong/utils/functions/validateHandStructure';
+import PointValidator from '../modules/mahjong/PointValidator/PointValidator';
 // import Timer from '../modules/game/Timer/Timer';
 
 /**
@@ -46,14 +48,15 @@ const tileStrings = [
   '7_DOT',
   '8_DOT',
   '8_DOT',
-  '2_BAMBOO',
+  '8_DOT',
   '5_BAMBOO',
-  '9_BAMBOO',
-  '9_CHARACTER',
+  '5_BAMBOO',
+  '5_BAMBOO',
+  'NORTH',
   'NORTH',
   'EAST',
-  'REDDRAGON',
-  'WHITEDRAGON',
+  'EAST',
+  // 'EAST',
 ];
 const tiles = tileStrings.map((tile) => TileFactory.createTileFromStringDef(tile));
 
@@ -132,8 +135,8 @@ const GameTestPage = (): JSX.Element => {
     player = new MahjongPlayer(CURRENT_USER.username, CURRENT_USER.connectionId);
     const mahjongPlayer = player as MahjongPlayer;
     mahjongPlayer.setHand(tiles);
-    mahjongPlayer.getHand().addPlayedTiles(playedTilesOne);
-    mahjongPlayer.getHand().addPlayedTiles(playedTilesTwo);
+    // mahjongPlayer.getHand().addPlayedTiles(playedTilesOne);
+    // mahjongPlayer.getHand().addPlayedTiles(playedTilesTwo);
 
     allUserEntities[indexOfCurrentUser] = mahjongPlayer;
 
@@ -148,6 +151,7 @@ const GameTestPage = (): JSX.Element => {
     const timer = mj.getMjPlayer().getTimer();
 
     timer.startTimer(new Date().getTime(), 5000);
+    mj.startRound();
   };
 
   const forGameTesting = () => {
@@ -157,7 +161,9 @@ const GameTestPage = (): JSX.Element => {
     const drawText = new PIXI.Text('Draw Tile', PIXI_TEXT_STYLE);
     Interactions.addMouseInteraction(drawText, (event: PIXI.InteractionEvent) => {
       const tile = wall.draw() as Tile;
-      mjPlayer.addTileToHand(tile);
+      console.log(tile);
+      const tile1 = TileFactory.createTileFromStringDef('EAST');
+      mjPlayer.addTileToHand(tile1);
       console.log(event);
       mjGameState.requestRedraw();
     });
@@ -169,6 +175,32 @@ const GameTestPage = (): JSX.Element => {
       mjGameState.requestRedraw();
       console.log(mockWSCallbacks.DRAW_TILE());
     });
+    const endGameText = new PIXI.Text('End DrawGame', PIXI_TEXT_STYLE);
+    Interactions.addMouseInteraction(endGameText, () => {
+      mjGameState.endRound();
+      mjGameState.requestRedraw();
+    });
+    endGameText.x = 400;
+    const endGameWinnerText = new PIXI.Text('End Game w/ Winner', PIXI_TEXT_STYLE);
+    Interactions.addMouseInteraction(endGameWinnerText, () => {
+      const connectionId = 'def';
+      const playerHand = mjPlayer.getHand();
+      const handValidationResult = validateHandStructure(
+        playerHand.getAllTiles().map((tile) => tile.toString()),
+        playerHand.getWind(),
+        playerHand.getFlowerNumber(),
+        mjGameState.getCurrentWind(),
+        playerHand.getConcealed(),
+      );
+      const pointValidationResult = PointValidator.validateHandPoints(handValidationResult);
+      mjGameState.endRound();
+      mjGameState.winnerFound();
+      mjGameState.setWinnerInfo(connectionId, pointValidationResult.largestHand);
+      mjGameState.requestRedraw();
+    });
+    endGameWinnerText.x = 600;
+    stage.addChild(endGameWinnerText);
+    stage.addChild(endGameText);
     stage.addChild(drawText);
     stage.addChild(nextTurnText);
   };

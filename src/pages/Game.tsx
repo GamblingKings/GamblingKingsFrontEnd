@@ -459,6 +459,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     mjGameState.endRound();
     mjGameState.winnerFound();
     mjGameState.setWinnerInfo(connectionId, handPointResults);
+    mjGameState.requestRedraw();
   };
 
   /**

@@ -10,6 +10,17 @@ import { OutgoingAction } from '../../ws';
 import MahjongPlayer from '../MahjongPlayer/MahjongPlayer';
 import MahjongOpponent from '../MahjongOpponent/MahjongOpponent';
 import { HandPointResults } from '../types/MahjongTypes';
+import {
+  PIXI_TEXT_STYLE,
+  FRONT_TILE,
+  DEFAULT_MAHJONG_WIDTH,
+  PLAYER_HAND_SPRITE_X,
+  DISTANCE_FROM_TILES,
+  DEFAULT_MAHJONG_HEIGHT,
+} from '../../../pixi/mahjongConstants';
+import Tile from '../Tile/Tile';
+
+const ROUND_DRAW_TEXT = 'Round Draw';
 
 /**
  * Get flower number based on player and dealer position
@@ -227,6 +238,48 @@ class MahjongGameState extends GameState {
     this.wallCounter.resetEverything();
   }
 
+  public renderWinState(spriteFactory: SpriteFactory, stage: PIXI.Container): void {
+    if (this.previousHandPointResults && this.previousWinner) {
+      const container = new PIXI.Container();
+      const { tiles, totalPoints } = this.previousHandPointResults;
+
+      const winnerText = new PIXI.Text(`Winner: ${this.previousWinner.getName()}`, PIXI_TEXT_STYLE);
+      winnerText.y = DEFAULT_MAHJONG_HEIGHT;
+      container.addChild(winnerText);
+
+      tiles.forEach((tile: Tile, index: number) => {
+        const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
+        frontSprite.width = DEFAULT_MAHJONG_WIDTH;
+        frontSprite.height = DEFAULT_MAHJONG_HEIGHT;
+        frontSprite.x = PLAYER_HAND_SPRITE_X + index * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
+        frontSprite.y = DEFAULT_MAHJONG_HEIGHT * 2;
+
+        const sprite = spriteFactory.generateSprite(tile.toString());
+        sprite.width = DEFAULT_MAHJONG_WIDTH;
+        sprite.height = DEFAULT_MAHJONG_HEIGHT;
+        sprite.x = PLAYER_HAND_SPRITE_X + index * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
+        sprite.y = DEFAULT_MAHJONG_HEIGHT * 2;
+        container.addChild(frontSprite);
+        container.addChild(sprite);
+      });
+
+      const pointsObtained = new PIXI.Text(`Total Points: ${totalPoints}`, PIXI_TEXT_STYLE);
+      pointsObtained.y = DEFAULT_MAHJONG_HEIGHT * 4;
+      container.addChild(pointsObtained);
+
+      stage.addChild(container);
+    }
+  }
+
+  public renderDrawState(spriteFactory: SpriteFactory, stage: PIXI.Container): void {
+    console.log(spriteFactory);
+    console.log(this.isRoundEnded);
+    const drawText = new PIXI.Text(ROUND_DRAW_TEXT, PIXI_TEXT_STYLE);
+    drawText.x = 200;
+    drawText.y = 200;
+    stage.addChild(drawText);
+  }
+
   public update(): void {
     if (this.mjPlayer.getAllowInteraction()) {
       const timer = this.mjPlayer.getTimer();
@@ -279,11 +332,17 @@ class MahjongGameState extends GameState {
       }
     }
     if (this.isRoundEnded) {
-      // Render Winning tiles
-      if (this.isWinnerFound && this.previousHandPointResults && this.previousWinner) {
-        // render winning hand and points
-      } else {
-        // Round draw state state
+      if (!this.redrawPending) {
+        this.redrawPending = true;
+        stage.removeChildren(0, stage.children.length);
+        // Render Winning tiles
+        if (this.isWinnerFound) {
+          // render winning hand and points
+          this.renderWinState(spriteFactory, stage);
+        } else {
+          // Round draw state state
+          this.renderDrawState(spriteFactory, stage);
+        }
       }
     }
   }
