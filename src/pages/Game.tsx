@@ -238,7 +238,10 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
    */
   const mjGameDrawTile = (payload: unknown): void => {
     const data = payload as DrawTileJSON;
-    const tile = TileFactory.createTileFromStringDef(data.tile);
+    const { tile: tileStr, currentIndex } = data;
+    // TODO: can sync wall counter with current index
+    console.log(currentIndex);
+    const tile = TileFactory.createTileFromStringDef(tileStr);
 
     const mjGameState = gameState as MahjongGameState;
     const mjPlayer = mjGameState.getMjPlayer();
@@ -246,7 +249,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     mjPlayer.addTileToHand(tile);
 
     // Send SELF_PLAY_TILE if tile is a Bonus Tile
-    if (isBonusTile(data.tile)) {
+    if (isBonusTile(tileStr)) {
       mjPlayer.getHand().setCannotPlayTile();
       const wsPayload = {
         gameId: game.gameId,

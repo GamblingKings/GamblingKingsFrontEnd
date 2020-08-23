@@ -137,6 +137,7 @@ export interface GameStartJSON {
  */
 export interface DrawTileJSON {
   tile: string;
+  currentIndex: number;
 }
 
 /**
