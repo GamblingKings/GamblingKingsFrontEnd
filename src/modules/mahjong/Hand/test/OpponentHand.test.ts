@@ -50,7 +50,7 @@ test('OpponentHand - change number of tiles after add played tile', () => {
   expect(opponentHand.getNumberOfTiles()).toBe(10);
 });
 
-test('PlayerHand - formQuad() alreadymeld false', () => {
+test('OpponentHand - formQuad() alreadymeld false', () => {
   opponentHand.formQuad(DOT_7, false);
   const quadMeld = [DOT_7, DOT_7, DOT_7, DOT_7];
   expect(opponentHand.getPlayedTiles()[0]).toStrictEqual(quadMeld);
@@ -58,7 +58,7 @@ test('PlayerHand - formQuad() alreadymeld false', () => {
   // opponent still needs to play a tile to make it 10
 });
 
-test('PlayerHand - formQuad() alreadymeld true', () => {
+test('OpponentHand - formQuad() alreadymeld true', () => {
   const triplet = [DOT_7, DOT_7, DOT_7];
   opponentHand.addSelfPlayedTiles([BONUS_TILE]);
   opponentHand.addPlayedTiles(triplet);
@@ -69,4 +69,16 @@ test('PlayerHand - formQuad() alreadymeld true', () => {
   expect(opponentHand.getPlayedTiles()[1]).toStrictEqual(quadMeld);
   expect(opponentHand.getNumberOfTiles()).toBe(11);
   // opponent still needs to play a tile to make it 10
+});
+
+test('OpponentHand - resetEverything()', () => {
+  const triplet = [DOT_7, DOT_7, DOT_7];
+  opponentHand.addSelfPlayedTiles([BONUS_TILE]);
+  opponentHand.addPlayedTiles(triplet);
+  opponentHand.playedTile();
+  opponentHand.resetEverything();
+
+  expect(opponentHand.getNumberOfTiles()).toBe(13);
+  expect(opponentHand.getPlayedTiles()).toStrictEqual([]);
+  expect(opponentHand.getHasDrawn()).toBeFalsy();
 });

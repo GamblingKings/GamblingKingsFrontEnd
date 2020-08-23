@@ -35,6 +35,7 @@ enum IncomingAction {
   SELF_PLAY_TILE = 'SELF_PLAY_TILE',
   WINNING_TILES = 'WINNING_TILES',
   UPDATE_GAME_STATE = 'UPDATE_GAME_STATE',
+  DRAW_ROUND = 'DRAW_ROUND',
 }
 
 export default IncomingAction;

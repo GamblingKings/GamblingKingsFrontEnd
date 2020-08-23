@@ -113,6 +113,7 @@ class PlayerHand {
     this.hasDrawn = false;
     this.madeMeld = false;
     this.concealed = true;
+    this.selectedTile = -1;
   }
 
   public getPlayedTiles(): Tile[][] {

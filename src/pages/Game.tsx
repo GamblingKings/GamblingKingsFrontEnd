@@ -474,6 +474,17 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     mjGameState.resetEverything();
   };
 
+  /**
+   * For DRAW_ROUND
+   * @param payload ???????
+   */
+  const mjDrawRound = (payload: unknown): void => {
+    console.log(payload);
+    const mjGameState = gameState as MahjongGameState;
+    mjGameState.endRound();
+    mjGameState.requestRedraw();
+  };
+
   // Set up PIXI application.
   useEffect(() => {
     /**
@@ -533,6 +544,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       ws.addListener(IncomingAction.SELF_PLAY_TILE, mjSelfPlayTile);
       ws.addListener(IncomingAction.WINNING_TILES, mjWinningTiles);
       ws.addListener(IncomingAction.UPDATE_GAME_STATE, mjUpdateGameState);
+      ws.addListener(IncomingAction.DRAW_ROUND, mjDrawRound);
     }
 
     return function cleanup() {
@@ -546,6 +558,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
         ws.removeListener(IncomingAction.SELF_PLAY_TILE);
         ws.removeListener(IncomingAction.WINNING_TILES);
         ws.removeListener(IncomingAction.UPDATE_GAME_STATE);
+        ws.removeListener(IncomingAction.DRAW_ROUND);
       }
     };
     // eslint-disable-next-line

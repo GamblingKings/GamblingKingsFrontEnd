@@ -274,10 +274,14 @@ class MahjongGameState extends GameState {
   public renderDrawState(spriteFactory: SpriteFactory, stage: PIXI.Container): void {
     console.log(spriteFactory);
     console.log(this.isRoundEnded);
+    const container = new PIXI.Container();
+
     const drawText = new PIXI.Text(ROUND_DRAW_TEXT, PIXI_TEXT_STYLE);
     drawText.x = 200;
     drawText.y = 200;
-    stage.addChild(drawText);
+    container.addChild(drawText);
+
+    stage.addChild(container);
   }
 
   public update(): void {
