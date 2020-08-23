@@ -24,6 +24,12 @@ class OpponentHand {
     return this.playedTiles;
   }
 
+  public resetEverything(): void {
+    this.numberOfTiles = 13;
+    this.hasDrawn = false;
+    this.playedTiles = [];
+  }
+
   public getHasDrawn(): boolean {
     return this.hasDrawn;
   }

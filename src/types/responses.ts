@@ -1,4 +1,5 @@
 import { User, Game } from './client';
+import { HandPointResults } from '../modules/mahjong/types/MahjongTypes';
 
 /**
  * Interface for all messages received from WebSocket.
@@ -136,6 +137,7 @@ export interface GameStartJSON {
  */
 export interface DrawTileJSON {
   tile: string;
+  currentIndex: number;
 }
 
 /**
@@ -177,4 +179,28 @@ export interface SelfPlayTileJSON {
   playedTile: string;
   isQuad: boolean;
   alreadyMeld: boolean;
+}
+
+/**
+ * Interface for WINNING_TILES payload received
+ */
+export interface WinningTilesJSON {
+  connectionId: string;
+  handPointResults: HandPointResults;
+}
+
+/**
+ * Interface for UPDATE_GAME_STATE payload received
+ */
+export interface UpdateGameStateJSON {
+  dealer: number;
+  wind: number;
+}
+
+/**
+ * Interface for DRAW_ROUND payload received
+ */
+export interface DrawRoundJSON {
+  gameId: string;
+  connectionId: string;
 }

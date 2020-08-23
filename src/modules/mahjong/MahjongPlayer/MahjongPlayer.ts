@@ -22,6 +22,7 @@ import Timer from '../../game/Timer/Timer';
 import validateHandStructure from '../utils/functions/validateHandStructure';
 import MeldTypes from '../enums/MeldEnums';
 import QuadValidator from '../QuadValidator/QuadValidator';
+import PointValidator from '../PointValidator/PointValidator';
 
 const PLAY_TILE_TEXT = 'PLAY_TILE';
 const WIN_TEXT = 'WIN ROUND';
@@ -54,6 +55,12 @@ class MahjongPlayer extends UserEntity {
 
   public setHand(tiles: Tile[]): boolean {
     return this.hand.setTiles(tiles);
+  }
+
+  public resetEverything(): void {
+    this.allowInteraction = false;
+    this.hand.resetEverything();
+    this.removeAllAssets();
   }
 
   public getInteractionContainer(): PIXI.Container {
@@ -361,7 +368,11 @@ class MahjongPlayer extends UserEntity {
           console.log(event.target);
           if (canPlayTile) {
             this.getHand().setCannotPlayTile();
-            // TODO: send message to backend WIN_ROUND
+            const pointsResult = PointValidator.validateHandPoints(canWin);
+            const payload = {
+              handPointResults: pointsResult.largestHand,
+            };
+            callbacks[OutgoingAction.WIN_ROUND](payload);
             callbacks.REQUEST_REDRAW();
           }
         });

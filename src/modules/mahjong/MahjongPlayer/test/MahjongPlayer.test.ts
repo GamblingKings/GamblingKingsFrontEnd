@@ -281,3 +281,16 @@ test('MahjongPlayer - renderInteractions() with quad', () => {
   mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 });
+
+test('MahjongPlayer - resetEverything()', () => {
+  mjPlayer.setHand(tiles);
+  mjPlayer.addTileToHand(tile7);
+  mjPlayer.setAllowInteraction(true);
+  mjPlayer.render(spriteFactory, pixiStage, false, callbacks);
+
+  mjPlayer.resetEverything();
+
+  expect(mjPlayer.getAllowInteraction()).toBeFalsy();
+  expect(mjPlayer.getContainer().children).toHaveLength(0);
+  expect(mjPlayer.getHand().getTiles()).toStrictEqual([]);
+});

@@ -8,6 +8,9 @@ import RenderDirection from '../../../../pixi/directions';
 import MahjongGameState from '../MahjongGameState';
 import UserEntity from '../../../game/UserEntity/UserEntity';
 import WindEnums from '../../enums/WindEnums';
+import PointValidator from '../../PointValidator/PointValidator';
+import validateHandStructure from '../../utils/functions/validateHandStructure';
+import TileFactory from '../../Tile/TileFactory';
 
 let mjPlayer: MahjongPlayer;
 let mjOpponent1: MahjongOpponent;
@@ -26,6 +29,23 @@ const callbacks = {
   DRAW_TILE: () => {},
   PLAY_TILE: () => {},
 };
+
+const tileStrings = [
+  '7_DOT',
+  '7_DOT',
+  '7_DOT',
+  '8_DOT',
+  '8_DOT',
+  '8_DOT',
+  '5_BAMBOO',
+  '5_BAMBOO',
+  '5_BAMBOO',
+  'NORTH',
+  'NORTH',
+  'EAST',
+  'EAST',
+];
+const tiles = tileStrings.map((tile) => TileFactory.createTileFromStringDef(tile));
 
 beforeEach(() => {
   mjPlayer = new MahjongPlayer(PLAYER_NAME, 'connectionId');
@@ -102,6 +122,7 @@ test('MahjongGameState - getCurrentWind(), changeWind()', () => {
 });
 
 test('MahjongGameState - renderCanvas()', () => {
+  gameState.startRound();
   gameState.renderCanvas(spriteFactory, pixiApp);
   expect(pixiApp.stage.children).toHaveLength(6); // 4 - users, 1 deadpile, 1 wall
   gameState.requestRedraw();
@@ -130,9 +151,96 @@ test('MahjongGameState - update()', () => {
 });
 
 test('MahjongGameState - renderCanvas() -include timer', () => {
+  gameState.startRound();
   mjPlayer.setAllowInteraction(true);
   gameState.renderCanvas(spriteFactory, pixiApp);
   expect(pixiApp.stage.children).toHaveLength(7); // 4 - users, 1 deadpile, 1 wall, 1 timer
   gameState.requestRedraw();
   expect(pixiApp.stage.children).toHaveLength(7);
+});
+
+test('MahjongGameState - gameStateSync()', () => {
+  gameState.gameStateSync(0, 0);
+  expect(gameState.getDealer()).toBe(0);
+  expect(gameState.getCurrentWind()).toBe(WindEnums.EAST);
+  gameState.gameStateSync(1, 1);
+  expect(gameState.getDealer()).toBe(1);
+  expect(gameState.getCurrentWind()).toBe(WindEnums.SOUTH);
+  gameState.gameStateSync(2, 2);
+  expect(gameState.getDealer()).toBe(2);
+  expect(gameState.getCurrentWind()).toBe(WindEnums.WEST);
+  gameState.gameStateSync(3, 3);
+  expect(gameState.getDealer()).toBe(3);
+  expect(gameState.getCurrentWind()).toBe(WindEnums.NORTH);
+});
+
+test('MahjongGameState - resetEverything()', () => {
+  gameState.startRound();
+  gameState.renderCanvas(spriteFactory, pixiApp);
+
+  gameState.resetEverything();
+
+  expect(gameState.getDeadPile().getContainer().children).toHaveLength(0);
+  expect(gameState.getWallCounter().getContainer().children).toHaveLength(0);
+});
+
+test('MahjongGameState - renderWinState()', () => {
+  const connectionId = 'connectionId';
+  mjPlayer.setHand(tiles);
+  mjPlayer.addTileToHand(TileFactory.createTileFromStringDef('EAST'));
+  const playerHand = mjPlayer.getHand();
+  const handValidationResult = validateHandStructure(
+    playerHand.getAllTiles().map((tile) => tile.toString()),
+    playerHand.getWind(),
+    playerHand.getFlowerNumber(),
+    gameState.getCurrentWind(),
+    playerHand.getConcealed(),
+  );
+  const pointValidationResult = PointValidator.validateHandPoints(handValidationResult);
+  gameState.endRound();
+  gameState.winnerFound();
+  gameState.setWinnerInfo(connectionId, pointValidationResult.largestHand);
+  gameState.requestRedraw();
+  gameState.renderWinState(spriteFactory, pixiApp.stage);
+
+  expect(pixiApp.stage.children).toHaveLength(1);
+});
+
+test('MahjongGameState - renderWinState() through renderCanvas', () => {
+  const connectionId = 'connectionId';
+  mjPlayer.setHand(tiles);
+  mjPlayer.addTileToHand(TileFactory.createTileFromStringDef('EAST'));
+  const playerHand = mjPlayer.getHand();
+  const handValidationResult = validateHandStructure(
+    playerHand.getAllTiles().map((tile) => tile.toString()),
+    playerHand.getWind(),
+    playerHand.getFlowerNumber(),
+    gameState.getCurrentWind(),
+    playerHand.getConcealed(),
+  );
+  const pointValidationResult = PointValidator.validateHandPoints(handValidationResult);
+  gameState.endRound();
+  gameState.winnerFound();
+  gameState.setWinnerInfo(connectionId, pointValidationResult.largestHand);
+  gameState.requestRedraw();
+  gameState.renderCanvas(spriteFactory, pixiApp);
+
+  expect(pixiApp.stage.children).toHaveLength(1);
+});
+
+test('MahjongGameState - renderDrawState()', () => {
+  gameState.endRound();
+  gameState.requestRedraw();
+  gameState.renderDrawState(spriteFactory, pixiApp.stage);
+
+  expect(pixiApp.stage.children).toHaveLength(1);
+});
+
+test('MahjongGameState - renderDrawState() through renderCanvas', () => {
+  gameState.endRound();
+  gameState.requestRedraw();
+
+  gameState.renderCanvas(spriteFactory, pixiApp);
+
+  expect(pixiApp.stage.children).toHaveLength(1);
 });

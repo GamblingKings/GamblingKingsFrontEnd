@@ -55,3 +55,14 @@ test('DeadPile - removeLastTile()', () => {
   expect(d.removeLastTile()).toBeTruthy();
   expect(d.getDeadPile()).toHaveLength(1);
 });
+
+test('DeadPile - resetEverything()', () => {
+  d.add(charSimpleTile);
+  d.add(bambooSimpleTile);
+
+  d.resetEverything();
+
+  expect(d.getDeadPile()).toStrictEqual([]);
+  expect(d.getLastThrown()).toBeNull();
+  expect(d.getContainer().children).toHaveLength(0);
+});

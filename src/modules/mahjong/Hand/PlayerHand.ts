@@ -104,6 +104,18 @@ class PlayerHand {
     return true;
   }
 
+  /**
+   * Reset all values to DEFAULT (except for wind and flowerNumber)
+   */
+  public resetEverything(): void {
+    this.tiles = [];
+    this.playedTiles = [];
+    this.hasDrawn = false;
+    this.madeMeld = false;
+    this.concealed = true;
+    this.selectedTile = -1;
+  }
+
   public getPlayedTiles(): Tile[][] {
     return this.playedTiles;
   }

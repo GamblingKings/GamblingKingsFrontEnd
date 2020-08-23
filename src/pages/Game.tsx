@@ -17,6 +17,9 @@ import {
   PlayedTileInteractionJSON,
   SelfPlayTileJSON,
   SelfPlayedTile,
+  WinningTilesJSON,
+  UpdateGameStateJSON,
+  DrawRoundJSON,
 } from '../types';
 import GameTypes from '../modules/game/gameTypes';
 import MahjongOpponent from '../modules/mahjong/MahjongOpponent/MahjongOpponent';
@@ -25,6 +28,10 @@ import TileFactory from '../modules/mahjong/Tile/TileFactory';
 import GameState from '../modules/game/GameState/GameState';
 import MahjongGameState from '../modules/mahjong/MahjongGameState/MahjongGameState';
 import { isBonusTile } from '../modules/mahjong/utils/functions/checkTypes';
+import MeldTypes from '../modules/mahjong/enums/MeldEnums';
+import validateHandStructure from '../modules/mahjong/utils/functions/validateHandStructure';
+import PointValidator from '../modules/mahjong/PointValidator/PointValidator';
+import convertStrArrToTileArr from '../modules/mahjong/utils/functions/convertStrArrToTileArr';
 
 /**
  * Pixi Application References
@@ -76,6 +83,10 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     [OutgoingAction.SELF_PLAY_TILE]: (params: unknown) => {
       const payload = params as Record<string, unknown>;
       ws?.sendMessage(OutgoingAction.SELF_PLAY_TILE, { gameId: game.gameId, ...payload });
+    },
+    [OutgoingAction.WIN_ROUND]: (params: unknown) => {
+      const payload = params as Record<string, unknown>;
+      ws?.sendMessage(OutgoingAction.WIN_ROUND, { gameId: game.gameId, ...payload });
     },
     REQUEST_REDRAW: () => {
       const mjGameState = gameState as MahjongGameState;
@@ -156,7 +167,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     if (!result) console.error('Failed to set wall counter. Please verify game state');
 
     // Set player hand
-    const tiles = tileArray.map((tile: string) => TileFactory.createTileFromStringDef(tile));
+    const tiles = convertStrArrToTileArr(tileArray);
     const mjPlayer = mjGameState.getMjPlayer() as MahjongPlayer;
     mjPlayer.setHand(tiles);
     const mjPlayerHand = mjPlayer.getHand();
@@ -169,7 +180,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
 
     // Only add to playedTiles if its not empty (has bonus tiles in the array)
     if (mjPlayerBonusTilesStrDef.length !== 0) {
-      const mjPlayerBonusTiles = mjPlayerBonusTilesStrDef.map((strDef) => TileFactory.createTileFromStringDef(strDef));
+      const mjPlayerBonusTiles = convertStrArrToTileArr(mjPlayerBonusTilesStrDef);
       mjPlayerHand.addPlayedTiles(mjPlayerBonusTiles);
     }
     console.log(
@@ -196,7 +207,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
         const opponentPlayedTilesStrDef = opponentPlayedTileObj.playedTiles;
         // Only add to playedTiles if its not empty (has bonus tiles in the array)
         if (opponentPlayedTilesStrDef.length !== 0) {
-          const opponentBonusTiles = opponentPlayedTilesStrDef.map((tile) => TileFactory.createTileFromStringDef(tile));
+          const opponentBonusTiles = convertStrArrToTileArr(opponentPlayedTilesStrDef);
           opponentHand.addSelfPlayedTiles(opponentBonusTiles);
         }
 
@@ -227,7 +238,10 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
    */
   const mjGameDrawTile = (payload: unknown): void => {
     const data = payload as DrawTileJSON;
-    const tile = TileFactory.createTileFromStringDef(data.tile);
+    const { tile: tileStr, currentIndex } = data;
+    // TODO: can sync wall counter with current index
+    console.log(currentIndex);
+    const tile = TileFactory.createTileFromStringDef(tileStr);
 
     const mjGameState = gameState as MahjongGameState;
     const mjPlayer = mjGameState.getMjPlayer();
@@ -235,7 +249,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     mjPlayer.addTileToHand(tile);
 
     // Send SELF_PLAY_TILE if tile is a Bonus Tile
-    if (isBonusTile(data.tile)) {
+    if (isBonusTile(tileStr)) {
       mjPlayer.getHand().setCannotPlayTile();
       const wsPayload = {
         gameId: game.gameId,
@@ -338,22 +352,46 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       // Increase wall counter
       mjGameState.getWallCounter().increaseCounter();
     } else {
-      // TODO: (nextPR) check MeldType QUAD and WIN
-      // player needs to DRAW_TILE if quad
-      const { connectionId, playedTiles, meldType } = data;
+      const { connectionId, playedTiles: playedTilesStr, meldType } = data;
       // Remove last tile from deadpile
       const playedTile = mjGameState.getDeadPile().removeLastTile();
-
-      if (connectionId && playedTiles && meldType) {
-        const tiles = playedTiles.map((tileStr) => TileFactory.createTileFromStringDef(tileStr));
+      if (connectionId && playedTilesStr && meldType) {
+        const playedTiles = convertStrArrToTileArr(playedTilesStr);
         const userIndex = mjGameState.getUsers().findIndex((user) => user.getConnectionId() === connectionId);
-        if (connectionId === mjPlayer.getConnectionId()) {
-          // Player updates their PlayedTiles
-          mjPlayer.getHand().addPlayedTiles(tiles);
 
-          const indexOfPlayedTile = tiles.findIndex((tile) => playedTile?.toString() === tile.toString());
+        // Player Interactions
+        if (connectionId === mjPlayer.getConnectionId()) {
+          // Send WIN_ROUND
+          if (meldType === MeldTypes.WIN) {
+            const playerHand = mjPlayer.getHand();
+            const allTiles = playerHand.getAllTiles().map((tile) => tile.toString());
+            const handValidationResult = validateHandStructure(
+              allTiles,
+              playerHand.getWind(),
+              playerHand.getFlowerNumber(),
+              mjGameState.getCurrentWind(),
+              playerHand.getConcealed(),
+            );
+            const pointValidationResult = PointValidator.validateHandPoints(handValidationResult);
+            const wsPayload = {
+              gameId: game.gameId,
+              handPointResults: pointValidationResult.largestHand,
+            };
+            ws?.sendMessage(OutgoingAction.WIN_ROUND, wsPayload);
+            return;
+          }
+
+          // Draw a tile if Meld is a QUAD
+          if (meldType === MeldTypes.QUAD) {
+            ws?.sendMessage(OutgoingAction.DRAW_TILE, { gameId: game.gameId });
+          }
+
+          // Player updates their PlayedTiles
+          mjPlayer.getHand().addPlayedTiles(playedTiles);
+
+          const indexOfPlayedTile = playedTiles.findIndex((tile) => playedTile?.toString() === tile.toString());
           if (indexOfPlayedTile !== -1) {
-            const tilesToRemove = [...tiles];
+            const tilesToRemove = [...playedTiles];
             tilesToRemove.splice(indexOfPlayedTile, 1);
             mjPlayer.getHand().removeTiles(tilesToRemove);
           } else {
@@ -362,9 +400,17 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
 
           mjPlayer.getHand().setMadeMeld(true);
         } else {
+          // Stop processing and wait for WINNING_TILES
+          if (meldType === MeldTypes.WIN) {
+            return;
+          }
+          // Increase counter as Opponent needs to draw tile under the hood
+          if (meldType === MeldTypes.QUAD) {
+            mjGameState.getWallCounter().increaseCounter();
+          }
           // Opponent update playedTiles
           const opponent = mjGameState.getUsers()[userIndex] as MahjongOpponent;
-          opponent.getHand().addPlayedTiles(tiles);
+          opponent.getHand().addPlayedTiles(playedTiles);
         }
         // Set turn to the person who interacted successfully
         mjGameState.setTurn(userIndex);
@@ -408,6 +454,44 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
         opponentHand.addSelfPlayedTiles([tile]);
       }
     }
+    mjGameState.requestRedraw();
+  };
+
+  /**
+   * For WINNING_TILES
+   * @param payload WinningTilesJSON
+   */
+  const mjWinningTiles = (payload: unknown): void => {
+    const data = payload as WinningTilesJSON;
+    const { connectionId, handPointResults } = data;
+    const mjGameState = gameState as MahjongGameState;
+    mjGameState.endRound();
+    mjGameState.winnerFound();
+    mjGameState.setWinnerInfo(connectionId, handPointResults);
+    mjGameState.requestRedraw();
+  };
+
+  /**
+   * For UPDATE_GAME_STATE
+   * @param payload UpdateGameStateJSON
+   */
+  const mjUpdateGameState = (payload: unknown): void => {
+    const data = payload as UpdateGameStateJSON;
+    const { dealer, wind } = data;
+    const mjGameState = gameState as MahjongGameState;
+    mjGameState.gameStateSync(dealer, wind);
+    mjGameState.resetEverything();
+  };
+
+  /**
+   * For DRAW_ROUND
+   * @param payload DrawRoundJSON
+   */
+  const mjDrawRound = (payload: unknown): void => {
+    const data = payload as DrawRoundJSON;
+    console.log(data);
+    const mjGameState = gameState as MahjongGameState;
+    mjGameState.endRound();
     mjGameState.requestRedraw();
   };
 
@@ -468,6 +552,9 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       ws.addListener(IncomingAction.INTERACTION_SUCCESS, mjInteractionSuccess);
       ws.addListener(IncomingAction.PLAYED_TILE_INTERACTION, mjPlayedTileInteraction);
       ws.addListener(IncomingAction.SELF_PLAY_TILE, mjSelfPlayTile);
+      ws.addListener(IncomingAction.WINNING_TILES, mjWinningTiles);
+      ws.addListener(IncomingAction.UPDATE_GAME_STATE, mjUpdateGameState);
+      ws.addListener(IncomingAction.DRAW_ROUND, mjDrawRound);
     }
 
     return function cleanup() {
@@ -479,6 +566,9 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
         ws.removeListener(IncomingAction.INTERACTION_SUCCESS);
         ws.removeListener(IncomingAction.PLAYED_TILE_INTERACTION);
         ws.removeListener(IncomingAction.SELF_PLAY_TILE);
+        ws.removeListener(IncomingAction.WINNING_TILES);
+        ws.removeListener(IncomingAction.UPDATE_GAME_STATE);
+        ws.removeListener(IncomingAction.DRAW_ROUND);
       }
     };
     // eslint-disable-next-line

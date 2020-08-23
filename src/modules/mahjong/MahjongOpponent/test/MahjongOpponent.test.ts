@@ -144,3 +144,13 @@ test('MahjongOpponent - playedTile()', () => {
   mjOpponent.playedTile();
   expect(mjOpponent.getHand().getHasDrawn()).toBeFalsy();
 });
+
+test('MahjongOpponent - resetEverything()', () => {
+  mjOpponent.drawTile();
+  mjOpponent.playedTile();
+  mjOpponent.render(spriteFactory, pixiStage, true);
+
+  mjOpponent.resetEverything();
+  expect(mjOpponent.getContainer().children).toHaveLength(0);
+  expect(mjOpponent.getHand().getNumberOfTiles()).toBe(13);
+});

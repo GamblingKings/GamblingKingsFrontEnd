@@ -54,3 +54,13 @@ test('WallCounter - setCurrentIndex() with invalid index', () => {
   expect(wallCounter.getCurrentIndex()).toBe(initialCount);
   expect(result).toBeFalsy();
 });
+
+test('WallCounter - resetEverything()', () => {
+  wallCounter.increaseCounter();
+  wallCounter.render(spriteFactory, pixiStage);
+
+  wallCounter.resetEverything();
+
+  expect(wallCounter.getContainer().children).toHaveLength(0);
+  expect(wallCounter.getCurrentIndex()).toBe(WallCounter.NUMBER_OF_TILES_PER_HAND * WallCounter.NUMBER_OF_PLAYERS);
+});

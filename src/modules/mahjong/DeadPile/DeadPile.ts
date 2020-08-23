@@ -50,6 +50,12 @@ class DeadPile {
     return this.container;
   }
 
+  public resetEverything(): void {
+    this.deadpile = [];
+    this.lastThrow = null;
+    this.removeAllAssets();
+  }
+
   /**
    * Adds a tile to the deadpile
    * @param t A Tile object, i.e. SimpleTile, BonusTile, HonorTile

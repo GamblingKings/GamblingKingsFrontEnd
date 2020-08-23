@@ -165,3 +165,17 @@ test('PlayerHand - formQuad() alreadymeld true', () => {
   expect(fullHand.getPlayedTiles()[1]).toStrictEqual(quadMeld);
   expect(fullHand.getTiles()).toHaveLength(10);
 });
+
+test('PlayerHand - resetEverything()', () => {
+  const triplet = [DOT_7, DOT_7, DOT_7];
+  fullHand.addPlayedTiles([BONUS_TILE]);
+  fullHand.addPlayedTiles(triplet);
+  fullHand.draw(TileFactory.createTileFromStringDef('7_DOT'));
+  fullHand.setSelectedTile(0);
+
+  fullHand.resetEverything();
+  expect(fullHand.getTiles()).toStrictEqual([]);
+  expect(fullHand.getPlayedTiles()).toStrictEqual([]);
+  expect(fullHand.getHasDrawn()).toBeFalsy();
+  expect(fullHand.getConcealed()).toBeTruthy();
+});
