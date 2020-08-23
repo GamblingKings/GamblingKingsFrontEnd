@@ -195,3 +195,11 @@ export interface UpdateGameStateJSON {
   dealer: number;
   wind: number;
 }
+
+/**
+ * Interface for DRAW_ROUND payload received
+ */
+export interface DrawRoundJSON {
+  gameId: string;
+  connectionId: string;
+}

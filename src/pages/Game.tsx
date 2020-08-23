@@ -19,6 +19,7 @@ import {
   SelfPlayedTile,
   WinningTilesJSON,
   UpdateGameStateJSON,
+  DrawRoundJSON,
 } from '../types';
 import GameTypes from '../modules/game/gameTypes';
 import MahjongOpponent from '../modules/mahjong/MahjongOpponent/MahjongOpponent';
@@ -30,6 +31,7 @@ import { isBonusTile } from '../modules/mahjong/utils/functions/checkTypes';
 import MeldTypes from '../modules/mahjong/enums/MeldEnums';
 import validateHandStructure from '../modules/mahjong/utils/functions/validateHandStructure';
 import PointValidator from '../modules/mahjong/PointValidator/PointValidator';
+import convertStrArrToTileArr from '../modules/mahjong/utils/functions/convertStrArrToTileArr';
 
 /**
  * Pixi Application References
@@ -81,6 +83,10 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     [OutgoingAction.SELF_PLAY_TILE]: (params: unknown) => {
       const payload = params as Record<string, unknown>;
       ws?.sendMessage(OutgoingAction.SELF_PLAY_TILE, { gameId: game.gameId, ...payload });
+    },
+    [OutgoingAction.WIN_ROUND]: (params: unknown) => {
+      const payload = params as Record<string, unknown>;
+      ws?.sendMessage(OutgoingAction.WIN_ROUND, { gameId: game.gameId, ...payload });
     },
     REQUEST_REDRAW: () => {
       const mjGameState = gameState as MahjongGameState;
@@ -161,7 +167,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     if (!result) console.error('Failed to set wall counter. Please verify game state');
 
     // Set player hand
-    const tiles = tileArray.map((tile: string) => TileFactory.createTileFromStringDef(tile));
+    const tiles = convertStrArrToTileArr(tileArray);
     const mjPlayer = mjGameState.getMjPlayer() as MahjongPlayer;
     mjPlayer.setHand(tiles);
     const mjPlayerHand = mjPlayer.getHand();
@@ -174,7 +180,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
 
     // Only add to playedTiles if its not empty (has bonus tiles in the array)
     if (mjPlayerBonusTilesStrDef.length !== 0) {
-      const mjPlayerBonusTiles = mjPlayerBonusTilesStrDef.map((strDef) => TileFactory.createTileFromStringDef(strDef));
+      const mjPlayerBonusTiles = convertStrArrToTileArr(mjPlayerBonusTilesStrDef);
       mjPlayerHand.addPlayedTiles(mjPlayerBonusTiles);
     }
     console.log(
@@ -201,7 +207,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
         const opponentPlayedTilesStrDef = opponentPlayedTileObj.playedTiles;
         // Only add to playedTiles if its not empty (has bonus tiles in the array)
         if (opponentPlayedTilesStrDef.length !== 0) {
-          const opponentBonusTiles = opponentPlayedTilesStrDef.map((tile) => TileFactory.createTileFromStringDef(tile));
+          const opponentBonusTiles = convertStrArrToTileArr(opponentPlayedTilesStrDef);
           opponentHand.addSelfPlayedTiles(opponentBonusTiles);
         }
 
@@ -347,7 +353,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       // Remove last tile from deadpile
       const playedTile = mjGameState.getDeadPile().removeLastTile();
       if (connectionId && playedTilesStr && meldType) {
-        const playedTiles = playedTilesStr.map((tileStr) => TileFactory.createTileFromStringDef(tileStr));
+        const playedTiles = convertStrArrToTileArr(playedTilesStr);
         const userIndex = mjGameState.getUsers().findIndex((user) => user.getConnectionId() === connectionId);
 
         // Player Interactions
@@ -476,10 +482,11 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
 
   /**
    * For DRAW_ROUND
-   * @param payload ???????
+   * @param payload DrawRoundJSON
    */
   const mjDrawRound = (payload: unknown): void => {
-    console.log(payload);
+    const data = payload as DrawRoundJSON;
+    console.log(data);
     const mjGameState = gameState as MahjongGameState;
     mjGameState.endRound();
     mjGameState.requestRedraw();
