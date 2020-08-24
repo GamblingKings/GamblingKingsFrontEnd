@@ -32,6 +32,7 @@ import MeldTypes from '../modules/mahjong/enums/MeldEnums';
 import validateHandStructure from '../modules/mahjong/utils/functions/validateHandStructure';
 import PointValidator from '../modules/mahjong/PointValidator/PointValidator';
 import convertStrArrToTileArr from '../modules/mahjong/utils/functions/convertStrArrToTileArr';
+import Tile from '../modules/mahjong/Tile/Tile';
 
 /**
  * Pixi Application References
@@ -354,7 +355,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
     } else {
       const { connectionId, playedTiles: playedTilesStr, meldType } = data;
       // Remove last tile from deadpile
-      const playedTile = mjGameState.getDeadPile().removeLastTile();
+      const playedTile = mjGameState.getDeadPile().removeLastTile() as Tile;
       if (connectionId && playedTilesStr && meldType) {
         const playedTiles = convertStrArrToTileArr(playedTilesStr);
         const userIndex = mjGameState.getUsers().findIndex((user) => user.getConnectionId() === connectionId);
@@ -364,7 +365,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
           // Send WIN_ROUND
           if (meldType === MeldTypes.WIN) {
             const playerHand = mjPlayer.getHand();
-            const allTiles = playerHand.getAllTiles().map((tile) => tile.toString());
+            const allTiles = [...playerHand.getAllTiles(), playedTile].map((tile) => tile.toString());
             const handValidationResult = validateHandStructure(
               allTiles,
               playerHand.getWind(),
