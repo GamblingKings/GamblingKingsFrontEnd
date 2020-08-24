@@ -230,7 +230,7 @@ class PlayerHand {
   }
 
   public draw(tile: Tile): boolean {
-    if (this.canPlayTile()) {
+    if (this.hasDrawn) {
       return false;
     }
     this.tiles.push(tile);

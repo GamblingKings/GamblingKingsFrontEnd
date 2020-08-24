@@ -240,14 +240,14 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
   const mjGameDrawTile = (payload: unknown): void => {
     const data = payload as DrawTileJSON;
     const { tile: tileStr, currentIndex } = data;
-    // TODO: can sync wall counter with current index
-    console.log(currentIndex);
     const tile = TileFactory.createTileFromStringDef(tileStr);
 
     const mjGameState = gameState as MahjongGameState;
     const mjPlayer = mjGameState.getMjPlayer();
 
     mjPlayer.addTileToHand(tile);
+
+    mjGameState.getWallCounter().setCurrentIndex(currentIndex);
 
     // Send SELF_PLAY_TILE if tile is a Bonus Tile
     if (isBonusTile(tileStr)) {
