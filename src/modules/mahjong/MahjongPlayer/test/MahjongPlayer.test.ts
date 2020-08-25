@@ -14,6 +14,13 @@ const { JSDOM } = jsdom;
 const dom = new JSDOM();
 const canvas = dom.window.document.createElement('canvas');
 
+const mockCanvasRef = {
+  current: {
+    clientHeight: 1080,
+    clientWidth: 1920,
+  },
+} as React.RefObject<HTMLDivElement>;
+
 const tileStrings = [
   '7_DOT',
   '7_DOT',
@@ -97,23 +104,23 @@ test('MahjongPlayer - renderName()', () => {
 
 test('MahjongPlayer - renderHand()', () => {
   // Empty hand
-  const handContainerEmpty = mjPlayer.renderHand(spriteFactory, callbacks);
+  const handContainerEmpty = mjPlayer.renderHand(spriteFactory, callbacks, mockCanvasRef);
 
   expect(handContainerEmpty.children).toHaveLength(1); // 1 child for playedtiles container
 
   // 13 tiles for front and 13 tiles for back
   mjPlayer.setHand(tiles);
-  const handContainerFull = mjPlayer.renderHand(spriteFactory, callbacks);
+  const handContainerFull = mjPlayer.renderHand(spriteFactory, callbacks, mockCanvasRef);
   expect(handContainerFull.children).toHaveLength(27); // 26 + 1 child for playedtiles container
 });
 
 test('MahjongPlayer - render() - empty hand', () => {
-  mjPlayer.render(spriteFactory, pixiStage, false, callbacks);
+  mjPlayer.render(spriteFactory, pixiStage, false, mockCanvasRef, callbacks);
   expect(pixiStage.children).toHaveLength(1);
 
   mjPlayer.removeAllAssets();
   mjPlayer.setHand(tiles);
-  mjPlayer.render(spriteFactory, pixiStage, false, callbacks);
+  mjPlayer.render(spriteFactory, pixiStage, false, mockCanvasRef, callbacks);
   expect(pixiStage.children).toHaveLength(1);
 });
 
@@ -135,31 +142,31 @@ test('MahjongPlayer - render() - full hand', () => {
 test('MahjongPlayer - renderHand() - has drawn tile', () => {
   mjPlayer.setHand(tiles);
   mjPlayer.getHand().draw(tile);
-  const hand = mjPlayer.renderHand(spriteFactory, callbacks);
+  const hand = mjPlayer.renderHand(spriteFactory, callbacks, mockCanvasRef);
   expect(hand.children).toHaveLength(29); // 28 + 1 child for playedtiles container
 });
 
 test('MahjongPlayer - renderHand() - with played tiles', () => {
   mjPlayer.setHand(tiles);
   mjPlayer.getHand().addPlayedTiles(SAMPLE_TILE_ARRAY);
-  let hand = mjPlayer.renderHand(spriteFactory, callbacks);
+  let hand = mjPlayer.renderHand(spriteFactory, callbacks, mockCanvasRef);
 
   // test will fail when tiles in hand get removed
   expect(hand.children).toHaveLength(27); // 26 + 1 child for playedtiles container
   mjPlayer.removeAllAssets();
   mjPlayer.getHand().addPlayedTiles(SAMPLE_TILE_ARRAY);
-  hand = mjPlayer.renderHand(spriteFactory, callbacks);
+  hand = mjPlayer.renderHand(spriteFactory, callbacks, mockCanvasRef);
   // test will fail when tiles in hand get removed
   expect(hand.children).toHaveLength(27); // 26 + 1 child for playedtiles container
 });
 
 test('MahjongPlayer - removeAllAssets()', () => {
-  mjPlayer.render(spriteFactory, pixiStage, false, callbacks);
+  mjPlayer.render(spriteFactory, pixiStage, false, mockCanvasRef, callbacks);
   mjPlayer.removeAllAssets();
   expect(mjPlayer.getContainer().children).toHaveLength(0);
 
   mjPlayer.setHand(tiles);
-  mjPlayer.render(spriteFactory, pixiStage, false, callbacks);
+  mjPlayer.render(spriteFactory, pixiStage, false, mockCanvasRef, callbacks);
   mjPlayer.removeAllAssets();
   expect(mjPlayer.getContainer().children).toHaveLength(0);
 });
@@ -168,8 +175,9 @@ test('MahjongPlayer - reposition()', () => {
   // canvas width and height are both 0
   mjPlayer.reposition(canvas);
 
-  expect(mjPlayer.getContainer().x).toBe(100);
-  expect(mjPlayer.getContainer().y).toBe(-160);
+  // Can't test as x and y are dependent on clientHeight/clientWidth which cannot be changed from 0
+  expect(mjPlayer.getContainer().x).toBe(0);
+  expect(mjPlayer.getContainer().y).toBe(0);
 });
 
 test('MahjongPlayer - setWindAndFlower()', () => {
@@ -202,7 +210,7 @@ test('MahjongPlayer - getAllowInteraction()', () => {
 test('MahjongPlayer - renderInteraction()', () => {
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(0);
 
-  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST);
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST, mockCanvasRef);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 });
 
@@ -212,7 +220,7 @@ test('MahjongPlayer - renderInteraction() with deadpile', () => {
   mjPlayer.setAllowInteraction(true);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(0);
 
-  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST);
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST, mockCanvasRef);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 });
 
@@ -222,7 +230,7 @@ test('MahjongPlayer - renderInteraction() with deadpile and skip', () => {
   mjPlayer.setAllowInteraction(true);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(0);
 
-  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST);
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST, mockCanvasRef);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1); // empty container
 });
 
@@ -230,13 +238,13 @@ test('MahjongPlayer - renderInteraction() with other parameters', () => {
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(0);
 
   mjPlayer.setAllowInteraction(true);
-  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST);
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST, mockCanvasRef);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 
   mjPlayer.removeAllAssets();
   mjPlayer.setAllowInteraction(false);
   mjPlayer.getHand().draw(tile);
-  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST);
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST, mockCanvasRef);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 });
 
@@ -248,14 +256,14 @@ test('MahjongPlayer - getTimer()', () => {
 test('MahjongPlayer - canWin + renderInteraction()', () => {
   mjPlayer.setHand(winnableTiles);
   deadPile.add(tile8);
-  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST);
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST, mockCanvasRef);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 });
 
 test('MahjongPlayer - canWin selfdrawn + renderInteraction()', () => {
   mjPlayer.setHand(winnableTiles);
   mjPlayer.addTileToHand(tile8);
-  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST);
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST, mockCanvasRef);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 });
 
@@ -278,7 +286,7 @@ test('MahjongPlayer - renderInteractionsWithPlayedTiles()', () => {
 test('MahjongPlayer - renderInteractions() with quad', () => {
   mjPlayer.setHand(tiles);
   mjPlayer.addTileToHand(tile7);
-  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST);
+  mjPlayer.renderInteractions(spriteFactory, callbacks, deadPile.getDeadPile(), false, WindEnums.EAST, mockCanvasRef);
   expect(mjPlayer.getInteractionContainer().children).toHaveLength(1);
 });
 
@@ -286,7 +294,7 @@ test('MahjongPlayer - resetEverything()', () => {
   mjPlayer.setHand(tiles);
   mjPlayer.addTileToHand(tile7);
   mjPlayer.setAllowInteraction(true);
-  mjPlayer.render(spriteFactory, pixiStage, false, callbacks);
+  mjPlayer.render(spriteFactory, pixiStage, false, mockCanvasRef, callbacks);
 
   mjPlayer.resetEverything();
 

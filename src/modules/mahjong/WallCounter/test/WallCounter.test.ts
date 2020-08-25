@@ -7,6 +7,12 @@ import WallCounter from '../WallCounter';
 let wallCounter: WallCounter;
 let pixiStage: PIXI.Container;
 const spriteFactory = new SpriteFactory({});
+const mockCanvasRef = {
+  current: {
+    clientHeight: 1080,
+    clientWidth: 1920,
+  },
+} as React.RefObject<HTMLDivElement>;
 
 beforeEach(() => {
   wallCounter = new WallCounter();
@@ -29,13 +35,13 @@ test('WallCounter - getNumberOfTilesLeft()', () => {
 });
 
 test('WallCounter - render()', () => {
-  wallCounter.render(spriteFactory, pixiStage);
+  wallCounter.render(spriteFactory, pixiStage, mockCanvasRef);
   expect(wallCounter.getContainer().children).toHaveLength(2);
   expect(pixiStage.children).toHaveLength(1);
 });
 
 test('WallCounter - removeAllAssets()', () => {
-  wallCounter.render(spriteFactory, pixiStage);
+  wallCounter.render(spriteFactory, pixiStage, mockCanvasRef);
   wallCounter.removeAllAssets();
   expect(wallCounter.getContainer().children).toHaveLength(0);
 });
@@ -57,7 +63,7 @@ test('WallCounter - setCurrentIndex() with invalid index', () => {
 
 test('WallCounter - resetEverything()', () => {
   wallCounter.increaseCounter();
-  wallCounter.render(spriteFactory, pixiStage);
+  wallCounter.render(spriteFactory, pixiStage, mockCanvasRef);
 
   wallCounter.resetEverything();
 

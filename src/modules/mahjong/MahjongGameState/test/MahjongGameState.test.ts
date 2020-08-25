@@ -12,6 +12,13 @@ import PointValidator from '../../PointValidator/PointValidator';
 import validateHandStructure from '../../utils/functions/validateHandStructure';
 import TileFactory from '../../Tile/TileFactory';
 
+const mockCanvasRef = {
+  current: {
+    clientHeight: 1080,
+    clientWidth: 1920,
+  },
+} as React.RefObject<HTMLDivElement>;
+
 let mjPlayer: MahjongPlayer;
 let mjOpponent1: MahjongOpponent;
 let mjOpponent2: MahjongOpponent;
@@ -123,7 +130,7 @@ test('MahjongGameState - getCurrentWind(), changeWind()', () => {
 
 test('MahjongGameState - renderCanvas()', () => {
   gameState.startRound();
-  gameState.renderCanvas(spriteFactory, pixiApp);
+  gameState.renderCanvas(spriteFactory, pixiApp, mockCanvasRef);
   expect(pixiApp.stage.children).toHaveLength(6); // 4 - users, 1 deadpile, 1 wall
   gameState.requestRedraw();
   expect(pixiApp.stage.children).toHaveLength(6);
@@ -153,7 +160,7 @@ test('MahjongGameState - update()', () => {
 test('MahjongGameState - renderCanvas() -include timer', () => {
   gameState.startRound();
   mjPlayer.setAllowInteraction(true);
-  gameState.renderCanvas(spriteFactory, pixiApp);
+  gameState.renderCanvas(spriteFactory, pixiApp, mockCanvasRef);
   expect(pixiApp.stage.children).toHaveLength(7); // 4 - users, 1 deadpile, 1 wall, 1 timer
   gameState.requestRedraw();
   expect(pixiApp.stage.children).toHaveLength(7);
@@ -176,7 +183,7 @@ test('MahjongGameState - gameStateSync()', () => {
 
 test('MahjongGameState - resetEverything()', () => {
   gameState.startRound();
-  gameState.renderCanvas(spriteFactory, pixiApp);
+  gameState.renderCanvas(spriteFactory, pixiApp, mockCanvasRef);
 
   gameState.resetEverything();
 
@@ -223,7 +230,7 @@ test('MahjongGameState - renderWinState() through renderCanvas', () => {
   gameState.winnerFound();
   gameState.setWinnerInfo(connectionId, pointValidationResult.largestHand);
   gameState.requestRedraw();
-  gameState.renderCanvas(spriteFactory, pixiApp);
+  gameState.renderCanvas(spriteFactory, pixiApp, mockCanvasRef);
 
   expect(pixiApp.stage.children).toHaveLength(1);
 });
@@ -240,7 +247,7 @@ test('MahjongGameState - renderDrawState() through renderCanvas', () => {
   gameState.endRound();
   gameState.requestRedraw();
 
-  gameState.renderCanvas(spriteFactory, pixiApp);
+  gameState.renderCanvas(spriteFactory, pixiApp, mockCanvasRef);
 
   expect(pixiApp.stage.children).toHaveLength(1);
 });
