@@ -450,7 +450,7 @@ class PointValidator {
     });
 
     result.largestHand = largestHand;
-    if (result.largestHand.totalPoints > PointValidator.MAX_POINTS) {
+    if (result.largestHand.totalPoints >= PointValidator.MAX_POINTS) {
       result.largestHand.totalPoints = PointValidator.MAX_POINTS;
     }
     return result;

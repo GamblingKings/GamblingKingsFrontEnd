@@ -97,3 +97,8 @@ export interface CreateQuadResults {
   tile: Tile;
   alreadyMeld: boolean;
 }
+
+export interface TileDimensions {
+  tileHeight: number;
+  tileWidth: number;
+}

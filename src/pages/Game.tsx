@@ -129,7 +129,7 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
   function animate() {
     const mjGameState = gameState as MahjongGameState;
     mjGameState.update();
-    mjGameState.renderCanvas(spriteFactory, pixiApplication);
+    mjGameState.renderCanvas(spriteFactory, pixiApplication, canvasRef);
     requestAnimationFrame(animate);
   }
 

@@ -1,12 +1,8 @@
 import * as PIXI from 'pixi.js';
 
 import SpriteFactory from '../../../pixi/SpriteFactory';
-import {
-  BACK_TILE,
-  DEFAULT_MAHJONG_WIDTH,
-  DEFAULT_MAHJONG_HEIGHT,
-  PIXI_TEXT_STYLE,
-} from '../../../pixi/mahjongConstants';
+import { BACK_TILE, PIXI_TEXT_STYLE, OPPONENT_TILE_WIDTH_MULTIPLER } from '../../../pixi/mahjongConstants';
+import determineTileSize from '../utils/functions/determineTileSize';
 
 class WallCounter {
   private currentIndex: number;
@@ -58,22 +54,29 @@ class WallCounter {
     this.container.removeChildren(0, this.container.children.length);
   }
 
-  public render(spriteFactory: SpriteFactory, pixiStage: PIXI.Container): void {
+  public render(
+    spriteFactory: SpriteFactory,
+    pixiStage: PIXI.Container,
+    canvasRef: React.RefObject<HTMLDivElement>,
+  ): void {
     const container = new PIXI.Container();
-    const tileSprite = spriteFactory.generateSprite(BACK_TILE);
-    tileSprite.width = DEFAULT_MAHJONG_WIDTH;
-    tileSprite.height = DEFAULT_MAHJONG_HEIGHT;
-    container.addChild(tileSprite);
+    if (canvasRef.current) {
+      const { tileWidth, tileHeight } = determineTileSize(canvasRef.current.clientWidth, OPPONENT_TILE_WIDTH_MULTIPLER);
+      const tileSprite = spriteFactory.generateSprite(BACK_TILE);
+      tileSprite.width = tileWidth;
+      tileSprite.height = tileHeight;
+      container.addChild(tileSprite);
 
-    const numberOfTilesLeftText = new PIXI.Text(`${this.getNumberOfTilesLeft()} tiles left`, PIXI_TEXT_STYLE);
+      const numberOfTilesLeftText = new PIXI.Text(`${this.getNumberOfTilesLeft()} tiles left`, PIXI_TEXT_STYLE);
 
-    this.container.addChild(container);
-    this.container.addChild(numberOfTilesLeftText);
-    // Location is a Placeholder
-    this.container.x = 250;
-    this.container.y = 250;
+      this.container.addChild(container);
+      this.container.addChild(numberOfTilesLeftText);
+      // Location is a Placeholder
+      this.container.x = canvasRef.current.clientWidth * 0.3;
+      this.container.y = canvasRef.current.clientHeight * 0.3;
 
-    pixiStage.addChild(this.container);
+      pixiStage.addChild(this.container);
+    }
   }
 }
 

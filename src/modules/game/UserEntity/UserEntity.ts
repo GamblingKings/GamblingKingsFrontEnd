@@ -1,6 +1,8 @@
 import * as PIXI from 'pixi.js';
 import SpriteFactory from '../../../pixi/SpriteFactory';
 import RenderDirection from '../../../pixi/directions';
+import { PLAYER_TILE_WIDTH_MULTIPLER, NUMBER_OF_TILES, DISTANCE_FROM_TILES } from '../../../pixi/mahjongConstants';
+import determineTileSize from '../../mahjong/utils/functions/determineTileSize';
 
 /**
  * UserEntity class that holds PIXI container reference to render based on its position
@@ -55,6 +57,7 @@ abstract class UserEntity {
     spriteFactory: SpriteFactory,
     pixiStage: PIXI.Container,
     isUserTurn: boolean,
+    canvasRef: React.RefObject<HTMLDivElement>,
     callbacks: Record<string, (...args: unknown[]) => void>,
   ): void;
 
@@ -64,22 +67,52 @@ abstract class UserEntity {
    * @param canvasRef HTMLCanvasElement
    */
   static getContainerPosition(direction: RenderDirection, canvasRef: HTMLCanvasElement): { x: number; y: number } {
+    const { clientHeight, clientWidth } = canvasRef;
+    const { tileWidth, tileHeight } = determineTileSize(clientWidth, PLAYER_TILE_WIDTH_MULTIPLER);
+    const horizontalHandContainer = {
+      width: tileWidth * (NUMBER_OF_TILES + DISTANCE_FROM_TILES),
+      height: tileHeight * 2 + DISTANCE_FROM_TILES, // 2 because of tiles in hand and tiles in meld container
+    };
+
+    const verticalHandContainer = {
+      width: horizontalHandContainer.height,
+      height: horizontalHandContainer.width,
+    };
+
+    const X_MARGIN = 0.1;
+
+    // Right Container
+    const RIGHT_X = clientWidth - clientWidth * X_MARGIN - verticalHandContainer.width / 2;
+    const RIGHT_Y = clientHeight * 0.5 - verticalHandContainer.height / 3;
+
+    // Left Container
+    const LEFT_X = clientWidth * X_MARGIN;
+    const LEFT_Y = RIGHT_Y;
+
+    // Top Container
+    const TOP_X = clientWidth * 0.5 - horizontalHandContainer.width / 2;
+    const TOP_Y = RIGHT_Y - tileHeight;
+
+    // Bottom Container
+    const BOTTOM_X = TOP_X;
+    const BOTTOM_Y = clientHeight * 0.5 + verticalHandContainer.height / 3;
+
     const positions = {
       [RenderDirection.LEFT]: {
-        x: 100,
-        y: 80,
+        x: LEFT_X,
+        y: LEFT_Y,
       },
       [RenderDirection.TOP]: {
-        x: 200,
-        y: 80,
+        x: TOP_X,
+        y: TOP_Y,
       },
       [RenderDirection.RIGHT]: {
-        x: canvasRef.clientWidth - 160,
-        y: 80,
+        x: RIGHT_X,
+        y: RIGHT_Y,
       },
       [RenderDirection.BOTTOM]: {
-        x: 100,
-        y: canvasRef.clientHeight - 160,
+        x: BOTTOM_X,
+        y: BOTTOM_Y,
       },
     };
     return positions[direction];
