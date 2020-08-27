@@ -52,14 +52,17 @@ function ImageInit(gameType: GameTypes): ImageType[] {
         url: imageImport[type],
       });
     });
-    Object.values(BonusTileTypes).forEach((type) => {
-      console.log(type);
-      // TODO: find bonus tile assets
-      // images.push({
-      //   name: type,
-      //   url: imageImport[type],
-      // });
-    });
+
+    // Load Bonus Tile Assets
+    for (let i = 1; i <= 4; i += 1) {
+      Object.values(BonusTileTypes).forEach((type) => {
+        const imageName = `${i}_${type}`;
+        images.push({
+          name: imageName,
+          url: imageImport[imageName],
+        });
+      });
+    }
   }
   images.push({
     name: 'Back',

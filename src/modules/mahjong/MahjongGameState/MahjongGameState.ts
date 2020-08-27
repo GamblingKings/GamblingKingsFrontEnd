@@ -292,7 +292,11 @@ class MahjongGameState extends GameState {
     }
   }
 
-  public renderCanvas(spriteFactory: SpriteFactory, pixiApp: PIXI.Application): void {
+  public renderCanvas(
+    spriteFactory: SpriteFactory,
+    pixiApp: PIXI.Application,
+    canvasRef: React.RefObject<HTMLDivElement>,
+  ): void {
     const { view, stage } = pixiApp;
     const currentTurn = super.getCurrentTurn();
 
@@ -304,7 +308,7 @@ class MahjongGameState extends GameState {
         this.getUsers().forEach((user: UserEntity, index: number) => {
           const isUserTurn = index === currentTurn;
           user.removeAllAssets();
-          user.render(spriteFactory, stage, isUserTurn, this.wsCallbacks);
+          user.render(spriteFactory, stage, isUserTurn, canvasRef, this.wsCallbacks);
           user.reposition(view);
         });
 
@@ -319,6 +323,7 @@ class MahjongGameState extends GameState {
           deadPileTiles,
           canCreateConsecutive,
           this.getCurrentWind(),
+          canvasRef,
         );
 
         if (this.mjPlayer.getAllowInteraction()) {
@@ -329,10 +334,10 @@ class MahjongGameState extends GameState {
 
         // Render Wall
         this.wallCounter.removeAllAssets();
-        this.wallCounter.render(spriteFactory, stage);
+        this.wallCounter.render(spriteFactory, stage, canvasRef);
         // Render DeadPile
         this.deadPile.removeAllAssets();
-        this.deadPile.render(spriteFactory, stage);
+        this.deadPile.render(spriteFactory, stage, canvasRef);
       }
     }
     if (this.isRoundEnded) {

@@ -77,6 +77,8 @@ let player: UserEntity;
 const wall = new HongKongWall();
 const playedTilesOne = ['1_DOT', '1_DOT', '1_DOT'].map((tile) => TileFactory.createTileFromStringDef(tile));
 const playedTilesTwo = ['4_DOT', '5_DOT', '6_DOT'].map((tile) => TileFactory.createTileFromStringDef(tile));
+const playedFlowersOne = ['1_FLOWER', '2_FLOWER'].map((tile) => TileFactory.createTileFromStringDef(tile));
+const playedSeasonOne = ['1_SEASON', '2_SEASON'].map((tile) => TileFactory.createTileFromStringDef(tile));
 
 // const timer = new Timer();
 // timer.startTimer(new Date().getTime(), 10000);
@@ -135,8 +137,10 @@ const GameTestPage = (): JSX.Element => {
     player = new MahjongPlayer(CURRENT_USER.username, CURRENT_USER.connectionId);
     const mahjongPlayer = player as MahjongPlayer;
     mahjongPlayer.setHand(tiles);
-    // mahjongPlayer.getHand().addPlayedTiles(playedTilesOne);
-    // mahjongPlayer.getHand().addPlayedTiles(playedTilesTwo);
+    mahjongPlayer.getHand().addPlayedTiles(playedTilesOne);
+    mahjongPlayer.getHand().addPlayedTiles(playedTilesTwo);
+    mahjongPlayer.getHand().addPlayedTiles(playedFlowersOne);
+    mahjongPlayer.getHand().addPlayedTiles(playedSeasonOne);
 
     allUserEntities[indexOfCurrentUser] = mahjongPlayer;
 
@@ -149,6 +153,8 @@ const GameTestPage = (): JSX.Element => {
     mj.getMjPlayer().setAllowInteraction(true);
 
     const timer = mj.getMjPlayer().getTimer();
+    const testDeadPileTiles = [...playedTilesOne, ...playedTilesTwo];
+    testDeadPileTiles.forEach((t) => mj.getDeadPile().add(t));
 
     timer.startTimer(new Date().getTime(), 5000);
     mj.startRound();
@@ -210,7 +216,7 @@ const GameTestPage = (): JSX.Element => {
    */
   function animate() {
     const mjGameState = gameState as MahjongGameState;
-    mjGameState.renderCanvas(spriteFactory, pixiApplication);
+    mjGameState.renderCanvas(spriteFactory, pixiApplication, canvasRef);
     mjGameState.update();
     forGameTesting();
     requestAnimationFrame(animate);

@@ -9,12 +9,8 @@ import SpriteFactory from '../../../pixi/SpriteFactory';
  */
 
 import Tile from '../Tile/Tile';
-import {
-  FRONT_TILE,
-  DEFAULT_MAHJONG_WIDTH,
-  DEFAULT_MAHJONG_HEIGHT,
-  PIXI_TEXT_STYLE,
-} from '../../../pixi/mahjongConstants';
+import { FRONT_TILE, OPPONENT_TILE_WIDTH_MULTIPLER } from '../../../pixi/mahjongConstants';
+import determineTileSize from '../utils/functions/determineTileSize';
 
 class DeadPile {
   private deadpile: Tile[];
@@ -96,35 +92,43 @@ class DeadPile {
     this.container.removeChildren(0, this.container.children.length);
   }
 
-  public renderTiles(spriteFactory: SpriteFactory): PIXI.Container {
+  public renderTiles(spriteFactory: SpriteFactory, canvasRef: React.RefObject<HTMLDivElement>): PIXI.Container {
     const container = new PIXI.Container();
 
-    this.deadpile.forEach((tile: Tile, index: number) => {
-      const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
-      frontSprite.width = DEFAULT_MAHJONG_WIDTH;
-      frontSprite.height = DEFAULT_MAHJONG_HEIGHT;
-      frontSprite.x = index * DEFAULT_MAHJONG_WIDTH;
-      const tileSprite = spriteFactory.generateSprite(tile.toString());
-      tileSprite.width = DEFAULT_MAHJONG_WIDTH;
-      tileSprite.height = DEFAULT_MAHJONG_HEIGHT;
-      tileSprite.x = index * DEFAULT_MAHJONG_WIDTH;
+    if (canvasRef.current) {
+      const { tileWidth, tileHeight } = determineTileSize(canvasRef.current.clientWidth, OPPONENT_TILE_WIDTH_MULTIPLER);
 
-      container.addChild(frontSprite);
-      container.addChild(tileSprite);
-    });
+      this.deadpile.forEach((tile: Tile, index: number) => {
+        const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
+        frontSprite.width = tileWidth;
+        frontSprite.height = tileHeight;
+        frontSprite.x = index * tileWidth;
+        const tileSprite = spriteFactory.generateSprite(tile.toString());
+        tileSprite.width = tileWidth;
+        tileSprite.height = tileHeight;
+        tileSprite.x = index * tileWidth;
+
+        container.addChild(frontSprite);
+        container.addChild(tileSprite);
+      });
+    }
 
     return container;
   }
 
-  public render(spriteFactory: SpriteFactory, pixiStage: PIXI.Container): void {
-    const tileContainer = this.renderTiles(spriteFactory);
+  public render(
+    spriteFactory: SpriteFactory,
+    pixiStage: PIXI.Container,
+    canvasRef: React.RefObject<HTMLDivElement>,
+  ): void {
+    const tileContainer = this.renderTiles(spriteFactory, canvasRef);
 
-    const placeholderText = new PIXI.Text('Dead Pile', PIXI_TEXT_STYLE);
+    if (canvasRef.current) {
+      this.container.x = canvasRef.current.clientWidth * 0.3 - this.container.width / 2;
+      this.container.y = canvasRef.current.clientHeight * 0.5;
+    }
+
     this.container.addChild(tileContainer);
-    this.container.addChild(placeholderText);
-    this.container.x = 250;
-    this.container.y = 400;
-
     pixiStage.addChild(this.container);
   }
 }

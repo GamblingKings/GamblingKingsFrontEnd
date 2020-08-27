@@ -13,6 +13,13 @@ const spriteFactory = new SpriteFactory({});
 let d: DeadPile;
 let pixiStage: PIXI.Container;
 
+const mockCanvasRef = {
+  current: {
+    clientHeight: 1080,
+    clientWidth: 1920,
+  },
+} as React.RefObject<HTMLDivElement>;
+
 beforeEach(() => {
   d = new DeadPile();
   pixiStage = new PIXI.Container();
@@ -34,15 +41,15 @@ test('Test that the DeadPile only has one tile in the dead pile', () => {
 test('DeadPile - renderTiles()', () => {
   d.add(charSimpleTile);
   d.add(bambooSimpleTile);
-  const container = d.renderTiles(spriteFactory);
+  const container = d.renderTiles(spriteFactory, mockCanvasRef);
   expect(container.children).toHaveLength(4);
 });
 
 test('DeadPile - render()', () => {
   d.add(charSimpleTile);
   d.add(bambooSimpleTile);
-  d.render(spriteFactory, pixiStage);
-  expect(d.getContainer().children).toHaveLength(2);
+  d.render(spriteFactory, pixiStage, mockCanvasRef);
+  expect(d.getContainer().children).toHaveLength(1);
   d.removeAllAssets();
   expect(d.getContainer().children).toHaveLength(0);
 });

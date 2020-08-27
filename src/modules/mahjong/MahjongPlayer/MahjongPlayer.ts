@@ -10,6 +10,7 @@ import {
   PIXI_TEXT_STYLE,
   FRONT_TILE,
   PLAYER_HAND_SPRITE_X,
+  PLAYER_TILE_WIDTH_MULTIPLER,
 } from '../../../pixi/mahjongConstants';
 import RenderDirection from '../../../pixi/directions';
 import UserEntity from '../../game/UserEntity/UserEntity';
@@ -23,6 +24,7 @@ import validateHandStructure from '../utils/functions/validateHandStructure';
 import MeldTypes from '../enums/MeldEnums';
 import QuadValidator from '../QuadValidator/QuadValidator';
 import PointValidator from '../PointValidator/PointValidator';
+import determineTileSize from '../utils/functions/determineTileSize';
 
 const PLAY_TILE_TEXT = 'PLAY_TILE';
 const WIN_TEXT = 'WIN ROUND';
@@ -105,80 +107,85 @@ class MahjongPlayer extends UserEntity {
   public renderHand(
     spriteFactory: SpriteFactory,
     callbacks: Record<string, (...args: unknown[]) => void>,
+    canvasRef: React.RefObject<HTMLDivElement>,
   ): PIXI.Container {
-    const container = new PIXI.Container();
+    if (canvasRef.current) {
+      const { tileWidth, tileHeight } = determineTileSize(canvasRef.current.clientWidth, PLAYER_TILE_WIDTH_MULTIPLER);
+      const container = new PIXI.Container();
 
-    const selectedTile = this.hand.getSelectedTile();
-    const tiles = this.hand.getTiles();
-    const hasDrawn = this.hand.getHasDrawn();
-    const lastTile = hasDrawn ? tiles.length - 1 : -1;
+      const selectedTile = this.hand.getSelectedTile();
+      const tiles = this.hand.getTiles();
+      const hasDrawn = this.hand.getHasDrawn();
+      const lastTile = hasDrawn ? tiles.length - 1 : -1;
 
-    tiles.forEach((tile: Tile, index: number) => {
-      const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
-      frontSprite.width = DEFAULT_MAHJONG_WIDTH;
-      frontSprite.height = DEFAULT_MAHJONG_HEIGHT;
-      frontSprite.x = PLAYER_HAND_SPRITE_X + index * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
-      container.addChild(frontSprite);
-
-      const sprite = spriteFactory.generateSprite(tile.toString());
-      sprite.width = DEFAULT_MAHJONG_WIDTH;
-      sprite.height = DEFAULT_MAHJONG_HEIGHT;
-      sprite.x = PLAYER_HAND_SPRITE_X + index * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
-
-      if (index === selectedTile) {
-        sprite.y = -10;
-        frontSprite.y = -10;
-      }
-      if (index === lastTile) {
-        sprite.x += DISTANCE_FROM_TILES * 3;
-        frontSprite.x += DISTANCE_FROM_TILES * 3;
-      }
-      Interactions.addMouseInteraction(sprite, (event: PIXI.InteractionEvent) => {
-        console.log(event.target);
-        this.hand?.setSelectedTile(index);
-        callbacks.REQUEST_REDRAW();
-      });
-
-      container.addChild(sprite);
-    });
-
-    // Render played tiles
-    const allMeldsContainer = new PIXI.Container();
-    const playedTiles = this.hand.getPlayedTiles();
-    playedTiles.forEach((meld: Tile[], index: number) => {
-      const meldContainer = new PIXI.Container();
-      meld.forEach((tile: Tile, tileIndex: number) => {
+      tiles.forEach((tile: Tile, index: number) => {
         const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
-        frontSprite.width = DEFAULT_MAHJONG_WIDTH;
-        frontSprite.height = DEFAULT_MAHJONG_HEIGHT;
-        frontSprite.x = PLAYER_HAND_SPRITE_X + tileIndex * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
-        frontSprite.y += DEFAULT_MAHJONG_HEIGHT + DISTANCE_FROM_TILES;
-        meldContainer.addChild(frontSprite);
+        frontSprite.width = tileWidth;
+        frontSprite.height = tileHeight;
+        frontSprite.x = PLAYER_HAND_SPRITE_X + index * (tileWidth + DISTANCE_FROM_TILES);
+        container.addChild(frontSprite);
 
         const sprite = spriteFactory.generateSprite(tile.toString());
-        sprite.width = DEFAULT_MAHJONG_WIDTH;
-        sprite.height = DEFAULT_MAHJONG_HEIGHT;
-        sprite.x = PLAYER_HAND_SPRITE_X + tileIndex * (DEFAULT_MAHJONG_WIDTH + DISTANCE_FROM_TILES);
-        sprite.y += DEFAULT_MAHJONG_HEIGHT + DISTANCE_FROM_TILES;
-        meldContainer.addChild(sprite);
+        sprite.width = tileWidth;
+        sprite.height = tileHeight;
+        sprite.x = PLAYER_HAND_SPRITE_X + index * (tileWidth + DISTANCE_FROM_TILES);
+
+        if (index === selectedTile) {
+          sprite.y = -10;
+          frontSprite.y = -10;
+        }
+        if (index === lastTile) {
+          sprite.x += DISTANCE_FROM_TILES * 3;
+          frontSprite.x += DISTANCE_FROM_TILES * 3;
+        }
+        Interactions.addMouseInteraction(sprite, (event: PIXI.InteractionEvent) => {
+          console.log(event.target);
+          this.hand?.setSelectedTile(index);
+          callbacks.REQUEST_REDRAW();
+        });
+
+        container.addChild(sprite);
       });
 
-      // Give adequate/correct spacing between each meld for readability
-      if (index !== 0) {
-        const previousMeldLength = playedTiles[index - 1].length;
-        // eslint + prettier conflict
-        // eslint-disable-next-line operator-linebreak
-        meldContainer.x =
+      // Render played tiles
+      const allMeldsContainer = new PIXI.Container();
+      const playedTiles = this.hand.getPlayedTiles();
+      playedTiles.forEach((meld: Tile[], index: number) => {
+        const meldContainer = new PIXI.Container();
+        meld.forEach((tile: Tile, tileIndex: number) => {
+          const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
+          frontSprite.width = tileWidth;
+          frontSprite.height = tileHeight;
+          frontSprite.x = PLAYER_HAND_SPRITE_X + tileIndex * (tileWidth + DISTANCE_FROM_TILES);
+          frontSprite.y += tileHeight + DISTANCE_FROM_TILES;
+          meldContainer.addChild(frontSprite);
+
+          const sprite = spriteFactory.generateSprite(tile.toString());
+          sprite.width = tileWidth;
+          sprite.height = tileHeight;
+          sprite.x = PLAYER_HAND_SPRITE_X + tileIndex * (tileWidth + DISTANCE_FROM_TILES);
+          sprite.y += tileHeight + DISTANCE_FROM_TILES;
+          meldContainer.addChild(sprite);
+        });
+
+        // Give adequate/correct spacing between each meld for readability
+        if (index !== 0) {
+          const previousMeldLength = playedTiles[index - 1].length;
+          // eslint + prettier conflict
           // eslint-disable-next-line operator-linebreak
-          (DEFAULT_MAHJONG_WIDTH + 3 * DISTANCE_FROM_TILES) * previousMeldLength +
-          allMeldsContainer.getChildAt(index - 1).x;
-      }
+          meldContainer.x =
+            // eslint-disable-next-line operator-linebreak
+            (tileWidth + 3 * DISTANCE_FROM_TILES) * previousMeldLength + allMeldsContainer.getChildAt(index - 1).x;
+        }
 
-      allMeldsContainer.addChild(meldContainer);
-    });
-    container.addChild(allMeldsContainer);
+        allMeldsContainer.addChild(meldContainer);
+      });
+      container.addChild(allMeldsContainer);
 
-    return container;
+      return container;
+    }
+
+    return new PIXI.Container();
   }
 
   /**
@@ -335,91 +342,98 @@ class MahjongPlayer extends UserEntity {
     deadPileTiles: Tile[],
     canCreateConsecutive: boolean,
     currentWind: WindEnums,
+    canvasRef: React.RefObject<HTMLDivElement>,
   ): void {
     const container = new PIXI.Container();
-    container.x = 200 + this.hand.getTiles().length * DEFAULT_MAHJONG_WIDTH;
-    let yPositionIndex = 1;
-    const canPlayTile = this.hand.canPlayTile();
-    // Render play button if player has drawn or can play tile after making meld.
-    if (canPlayTile) {
-      const playText = new PIXI.Text(PLAY_TILE_TEXT, PIXI_TEXT_STYLE);
-      container.addChild(playText);
-      Interactions.addMouseInteraction(playText, (event: PIXI.InteractionEvent) => {
-        console.log(event.target);
-        const tile = this.hand.throw();
-        if (tile !== null) {
-          callbacks[OutgoingAction.PLAY_TILE](tile.toString());
-        }
-      });
 
-      // Render win button if player can win from drawing
-      const allTiles = this.hand.getAllTiles().map((tile) => tile.toString());
-      const canWin = validateHandStructure(
-        allTiles,
-        this.hand.getWind(),
-        this.hand.getFlowerNumber(),
-        currentWind,
-        this.hand.getConcealed(),
-      );
-      if (canWin.valid.length > 0 || canWin.isThirteenTerminals) {
-        const winText = new PIXI.Text(WIN_TEXT, PIXI_TEXT_STYLE);
-        winText.y = yPositionIndex * (DEFAULT_MAHJONG_HEIGHT / 2);
-        Interactions.addMouseInteraction(winText, (event: PIXI.InteractionEvent) => {
+    if (canvasRef.current) {
+      const { tileWidth, tileHeight } = determineTileSize(canvasRef.current.clientWidth, PLAYER_TILE_WIDTH_MULTIPLER);
+      container.x = 200 + this.hand.getTiles().length * tileWidth;
+
+      let yPositionIndex = 1;
+      const canPlayTile = this.hand.canPlayTile();
+      // Render play button if player has drawn or can play tile after making meld.
+      if (canPlayTile) {
+        const playText = new PIXI.Text(PLAY_TILE_TEXT, PIXI_TEXT_STYLE);
+        container.addChild(playText);
+        Interactions.addMouseInteraction(playText, (event: PIXI.InteractionEvent) => {
           console.log(event.target);
-          if (canPlayTile) {
-            this.getHand().setCannotPlayTile();
-            const pointsResult = PointValidator.validateHandPoints(canWin);
-            const payload = {
-              handPointResults: pointsResult.largestHand,
-            };
-            callbacks[OutgoingAction.WIN_ROUND](payload);
-            callbacks.REQUEST_REDRAW();
+          const tile = this.hand.throw();
+          if (tile !== null) {
+            callbacks[OutgoingAction.PLAY_TILE](tile.toString());
           }
         });
-        container.addChild(winText);
-        yPositionIndex += 1;
-      }
 
-      // Render quads if player can make quads
-      const quads = QuadValidator.checkForQuads(this.getHand());
-      if (quads) {
-        quads.forEach((quadResult) => {
-          const quadContainer = new PIXI.Container();
-          quadContainer.y = yPositionIndex * (DEFAULT_MAHJONG_HEIGHT / 2 + DISTANCE_FROM_TILES);
-          const { alreadyMeld, tile } = quadResult;
-          const tileString = tile.toString();
-          for (let i = 0; i < 4; i += 1) {
-            const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
-            frontSprite.width = DEFAULT_MAHJONG_WIDTH / 2;
-            frontSprite.height = DEFAULT_MAHJONG_HEIGHT / 2;
-            frontSprite.x = i * (DEFAULT_MAHJONG_WIDTH / 2 + DISTANCE_FROM_TILES);
-
-            const tileSprite = spriteFactory.generateSprite(tileString);
-            tileSprite.width = DEFAULT_MAHJONG_WIDTH / 2;
-            tileSprite.height = DEFAULT_MAHJONG_HEIGHT / 2;
-            tileSprite.x = i * (DEFAULT_MAHJONG_WIDTH / 2 + DISTANCE_FROM_TILES);
-            quadContainer.addChild(frontSprite);
-            quadContainer.addChild(tileSprite);
-          }
-          Interactions.addMouseInteraction(quadContainer as PIXI.Sprite, (event: PIXI.InteractionEvent) => {
+        // Render win button if player can win from drawing
+        const allTiles = this.hand.getAllTiles().map((tile) => tile.toString());
+        const canWin = validateHandStructure(
+          allTiles,
+          this.hand.getWind(),
+          this.hand.getFlowerNumber(),
+          currentWind,
+          this.hand.getConcealed(),
+        );
+        if (canWin.valid.length > 0 || canWin.isThirteenTerminals) {
+          const winText = new PIXI.Text(WIN_TEXT, PIXI_TEXT_STYLE);
+          winText.y = yPositionIndex * (tileHeight / 2);
+          Interactions.addMouseInteraction(winText, (event: PIXI.InteractionEvent) => {
             console.log(event.target);
-            const payload = {
-              playedTile: tileString,
-              isQuad: true,
-              alreadyMeld,
-            };
-            // Extra boolean check might prevent duplicate messages from sending if user double clicks fast enough
             if (canPlayTile) {
               this.getHand().setCannotPlayTile();
-              callbacks[OutgoingAction.SELF_PLAY_TILE](payload);
+              const pointsResult = PointValidator.validateHandPoints(canWin);
+              const payload = {
+                handPointResults: pointsResult.largestHand,
+              };
+              callbacks[OutgoingAction.WIN_ROUND](payload);
               callbacks.REQUEST_REDRAW();
             }
           });
-          container.addChild(quadContainer);
+          container.addChild(winText);
           yPositionIndex += 1;
-        });
+        }
+
+        // Render quads if player can make quads
+        const quads = QuadValidator.checkForQuads(this.getHand());
+        if (quads) {
+          quads.forEach((quadResult) => {
+            const quadContainer = new PIXI.Container();
+            quadContainer.y = yPositionIndex * (tileHeight / 2 + DISTANCE_FROM_TILES);
+            const { alreadyMeld, tile } = quadResult;
+            const tileString = tile.toString();
+            for (let i = 0; i < 4; i += 1) {
+              const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
+              frontSprite.width = tileWidth / 2;
+              frontSprite.height = tileHeight / 2;
+              frontSprite.x = i * (tileWidth / 2 + DISTANCE_FROM_TILES);
+
+              const tileSprite = spriteFactory.generateSprite(tileString);
+              tileSprite.width = tileWidth / 2;
+              tileSprite.height = tileHeight / 2;
+              tileSprite.x = i * (tileWidth / 2 + DISTANCE_FROM_TILES);
+              quadContainer.addChild(frontSprite);
+              quadContainer.addChild(tileSprite);
+            }
+            Interactions.addMouseInteraction(quadContainer as PIXI.Sprite, (event: PIXI.InteractionEvent) => {
+              console.log(event.target);
+              const payload = {
+                playedTile: tileString,
+                isQuad: true,
+                alreadyMeld,
+              };
+              // Extra boolean check might prevent duplicate messages from sending if user double clicks fast enough
+              if (canPlayTile) {
+                this.getHand().setCannotPlayTile();
+                callbacks[OutgoingAction.SELF_PLAY_TILE](payload);
+                callbacks.REQUEST_REDRAW();
+              }
+            });
+            container.addChild(quadContainer);
+            yPositionIndex += 1;
+          });
+        }
       }
     }
+
     // Render interaction buttons when player is prompted to.
     if (this.allowInteraction && deadPileTiles.length > 0) {
       this.renderInteractionsWithPlayedTile(
@@ -446,6 +460,7 @@ class MahjongPlayer extends UserEntity {
     spriteFactory: SpriteFactory,
     pixiStage: PIXI.Container,
     isUserTurn: boolean,
+    canvasRef: React.RefObject<HTMLDivElement>,
     callbacks: Record<string, () => void>,
   ): void {
     const playerContainer = super.getContainer();
@@ -455,12 +470,15 @@ class MahjongPlayer extends UserEntity {
       graphics.drawCircle(0, 0, 20);
       playerContainer.addChild(graphics);
     }
-    const playerHand = this.renderHand(spriteFactory, callbacks);
+    const playerHand = this.renderHand(spriteFactory, callbacks, canvasRef);
     const name = this.renderName();
     // this.renderInteractions(spriteFactory, callbacks);
 
-    playerContainer.addChild(playerHand);
+    name.y = playerHand.y - 50;
+    name.x = playerHand.x + playerHand.width / 2;
+
     playerContainer.addChild(name);
+    playerContainer.addChild(playerHand);
     playerContainer.addChild(this.interactionContainer);
 
     pixiStage.addChild(playerContainer);
