@@ -132,7 +132,7 @@ class DeadPile {
 
     if (canvasRef.current) {
       this.container.x = canvasRef.current.clientWidth * 0.3 - this.container.width / 2;
-      this.container.y = canvasRef.current.clientHeight * 0.5;
+      this.container.y = canvasRef.current.clientHeight * 0.4;
     }
 
     this.container.addChild(tileContainer);
