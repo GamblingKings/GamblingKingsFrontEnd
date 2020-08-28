@@ -230,7 +230,16 @@ const GamePage = ({ ws, currentUser }: GameProps): JSX.Element => {
       console.error('Game start error. Verify the game state.');
     }
 
-    animate();
+    /**
+     * Loops animation frame if game hasn't started
+     * Otherwise, request redraw.
+     */
+    if (!mjGameState.getGameStarted()) {
+      mjGameState.setGameStarted(true);
+      animate();
+    } else {
+      mjGameState.requestRedraw();
+    }
   };
 
   /**

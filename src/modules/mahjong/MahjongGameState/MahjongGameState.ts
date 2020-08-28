@@ -81,6 +81,8 @@ class MahjongGameState extends GameState {
 
   private redrawPending: boolean;
 
+  private gameStarted: boolean;
+
   private roundStarted: boolean;
 
   private isRoundEnded: boolean;
@@ -108,6 +110,7 @@ class MahjongGameState extends GameState {
     this.roundStarted = false;
     this.isRoundEnded = false;
     this.isWinnerFound = false;
+    this.gameStarted = false;
     this.dealer = 0;
     this.deadPile = new DeadPile();
     this.wallCounter = new WallCounter();
@@ -128,6 +131,10 @@ class MahjongGameState extends GameState {
 
   public getDealer(): number {
     return this.dealer;
+  }
+
+  public getGameStarted(): boolean {
+    return this.gameStarted;
   }
 
   public getDeadPile(): DeadPile {
@@ -225,6 +232,10 @@ class MahjongGameState extends GameState {
     } as Record<number, WindEnums>;
     this.dealer = dealer;
     this.currentWind = numberToWindConvert[wind];
+  }
+
+  public setGameStarted(bool: boolean): void {
+    this.gameStarted = bool;
   }
 
   /**

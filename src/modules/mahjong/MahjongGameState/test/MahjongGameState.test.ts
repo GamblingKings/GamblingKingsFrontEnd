@@ -251,3 +251,13 @@ test('MahjongGameState - renderDrawState() through renderCanvas', () => {
 
   expect(pixiApp.stage.children).toHaveLength(1);
 });
+
+test('MahjongGameState - getGameStarted', () => {
+  expect(gameState.getGameStarted()).toBeFalsy();
+});
+
+test('MahjongGameState - setGameStarted', () => {
+  expect(gameState.getGameStarted()).toBeFalsy();
+  gameState.setGameStarted(true);
+  expect(gameState.getGameStarted()).toBeTruthy();
+});
