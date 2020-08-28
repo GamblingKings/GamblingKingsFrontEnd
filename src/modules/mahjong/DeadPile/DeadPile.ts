@@ -12,6 +12,8 @@ import Tile from '../Tile/Tile';
 import { FRONT_TILE, OPPONENT_TILE_WIDTH_MULTIPLER } from '../../../pixi/mahjongConstants';
 import determineTileSize from '../utils/functions/determineTileSize';
 
+const MAX_TILES_PER_ROW = 13;
+
 class DeadPile {
   private deadpile: Tile[];
 
@@ -98,15 +100,20 @@ class DeadPile {
     if (canvasRef.current) {
       const { tileWidth, tileHeight } = determineTileSize(canvasRef.current.clientWidth, OPPONENT_TILE_WIDTH_MULTIPLER);
 
+      let tileCounter = 0;
       this.deadpile.forEach((tile: Tile, index: number) => {
         const frontSprite = spriteFactory.generateSprite(FRONT_TILE);
         frontSprite.width = tileWidth;
         frontSprite.height = tileHeight;
-        frontSprite.x = index * tileWidth;
+        frontSprite.x = tileCounter * tileWidth;
+        frontSprite.y = Math.floor(index / MAX_TILES_PER_ROW) * tileHeight;
         const tileSprite = spriteFactory.generateSprite(tile.toString());
         tileSprite.width = tileWidth;
         tileSprite.height = tileHeight;
-        tileSprite.x = index * tileWidth;
+        tileSprite.x = tileCounter * tileWidth;
+        tileSprite.y = Math.floor(index / MAX_TILES_PER_ROW) * tileHeight;
+
+        tileCounter = (tileCounter + 1) % MAX_TILES_PER_ROW;
 
         container.addChild(frontSprite);
         container.addChild(tileSprite);
