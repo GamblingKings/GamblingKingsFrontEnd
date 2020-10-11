@@ -78,7 +78,7 @@ const CreateGameForm = ({ ws, toggleOff }: CreateGameFormProps): JSX.Element => 
 
   return (
     <div className="modal">
-      <div className="center-modal background-color-white margin-top-30 border-radius-10">
+      <div className="modal-content background-color-white margin-top-30 border-radius-10" style={{ width: '50vw' }}>
         <div className="flex-column justify-content-center align-items-center padding-20">
           <h2 className="text-align-center margin-bottom-30">Create Game</h2>
           <Input

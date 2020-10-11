@@ -92,7 +92,7 @@ footer,
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  height: 50vh;
+  height: 75vh;
   width: 50vw;
   opacity: 1;
 }
