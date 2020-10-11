@@ -65,9 +65,9 @@ const MainPage = ({ setWs, setCurrentUser, ws }: MainProps): JSX.Element => {
               value={username}
               onChange={handleSetUsername}
               className="margin-bottom-10 font-size-1rem padding-5"
-              placeholder="Enter a name"
+              placeholder="Enter a name to start"
             />
-            <input type="submit" value="Play" className="background-color-primary button color-white padding-5" />
+            <input type="submit" value="Log in" className="background-color-primary button color-white padding-5" />
           </form>
         </div>
       </div>

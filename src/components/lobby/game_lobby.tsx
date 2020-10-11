@@ -153,39 +153,48 @@ const GameLobby = ({ ws, game, gameRef, setGame }: GameLobbyProps): JSX.Element 
   const classes = useStyles();
 
   return (
-    <div className="padding-30 flex-column justify-content-center min-width-100">
-      <div>
-        <h2 className="padding-10">Game Lobby</h2>
-      </div>
-      {game && (
-        <>
-          <div className="flex-column min-width-100 margin-10 border-color-black border-radius-5 padding-20">
-            <p>Game Info</p>
-            <p>{`Game Name: ${game.gameName}`}</p>
-            <p>{`Game Type: ${game.gameType}`}</p>
-            <p>{`Game Version: ${game.gameVersion}`}</p>
-            <p>{`Host: ${game.host.username}`}</p>
+    <div className="modal">
+      <div className="center-modal background-color-white margin-top-30 border-radius-10">
+        <div className="padding-30 flex-column justify-content-center min-width-100">
+          <div>
+            <h2 className="padding-10">Game Lobby</h2>
           </div>
-        </>
-      )}
+          {game && (
+            <>
+              <div className="flex-column min-width-100 margin-10 border-color-black border-radius-5 padding-20">
+                <p>Game Info</p>
+                <p>{`Game Name: ${game.gameName}`}</p>
+                <p>{`Game Type: ${game.gameType}`}</p>
+                <p>{`Game Version: ${game.gameVersion}`}</p>
+                <p>{`Host: ${game.host.username}`}</p>
+              </div>
+            </>
+          )}
 
-      <div className="flex-column min-width-100 margin-10 border-color-black border-radius-5 padding-20">
-        <h3>Users</h3>
-        {game && game.users.map((user) => <p key={user.connectionId}>{user.username}</p>)}
-      </div>
-      <div>
-        {messages.map(({ message, username, time }) => (
-          <p key={time.toString()}>{`${time} ${username} ${message}`}</p>
-        ))}
-      </div>
+          <div className="flex-column min-width-100 margin-10 border-color-black border-radius-5 padding-20">
+            <h3>Users</h3>
+            {game && game.users.map((user) => <p key={user.connectionId}>{user.username}</p>)}
+          </div>
+          <div>
+            {messages.map(({ message, username, time }) => (
+              <p key={time.toString()}>{`${time} ${username} ${message}`}</p>
+            ))}
+          </div>
 
-      <div className="flex-row justify-content-center align-items-center margin-top-20 min-width-100">
-        <Button classes={{ root: classes.marginRight }} variant="contained" color="primary" onClick={requestLeaveGame}>
-          Leave Game
-        </Button>
-        <Button variant="contained" color="secondary" onClick={requestStartGame}>
-          Start Game
-        </Button>
+          <div className="flex-row justify-content-center align-items-center margin-top-20 min-width-100">
+            <Button
+              classes={{ root: classes.marginRight }}
+              variant="contained"
+              color="primary"
+              onClick={requestLeaveGame}
+            >
+              Leave Game
+            </Button>
+            <Button variant="contained" color="secondary" onClick={requestStartGame}>
+              Start Game
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
