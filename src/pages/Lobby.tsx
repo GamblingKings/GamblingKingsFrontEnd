@@ -16,6 +16,7 @@ import {
   JoinGameJSON,
 } from '../types';
 
+import IntroModal from '../components/lobby/intro_modal';
 import CreateGameForm from '../components/lobby/create_game';
 import SendMessageForm from '../components/lobby/send_message';
 import GameLobby from '../components/lobby/game_lobby';
@@ -85,12 +86,14 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
   const currentGameRef = useStateRef(currentGame);
 
   const [createGameModal, setCreateGameModal] = useState<boolean>(false);
+  const [introModal, setIntroModal] = useState<boolean>(true);
 
   /**
    * State Handlers.
    */
   const toggleCreateGameModal = (): void => setCreateGameModal(!createGameModal);
   const closeCreateGameModal = (): void => setCreateGameModal(false);
+  const closeIntroModal = (): void => setIntroModal(false);
 
   /**
    * Functions
@@ -310,6 +313,12 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
           className="border-color-white padding-30 games-container-1 border-radius-5 background-color-secondary overflow-y"
         >
           <h2 className="">Games</h2>
+          {games.length === 0 && (
+            <div className="margin-top-20 margin-left-10">
+              <h3>No games found.</h3>
+              <h4>You can create one by clicking on the button above!</h4>
+            </div>
+          )}
           {games.map((game) => (
             <GameRow gameId={game.gameId} onClickHandler={requestJoinGame} roomName={game.gameName} key={game.gameId} />
           ))}
@@ -329,23 +338,19 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
         </div>
       </div>
 
-      {createGameModal && (
-        <div className="center-modal background-color-grey margin-top-30">
-          <CreateGameForm ws={ws} toggleOff={closeCreateGameModal} />
-        </div>
-      )}
+      {createGameModal && <CreateGameForm ws={ws} toggleOff={closeCreateGameModal} />}
 
       {currentGame && (
-        <div className="center-modal background-color-grey margin-top-30">
-          <GameLobby
-            ws={ws}
-            gameRef={currentGameRef}
-            game={currentGame}
-            setGame={setCurrentGame}
-            removeGame={removeGameFromList}
-          />
-        </div>
+        <GameLobby
+          ws={ws}
+          gameRef={currentGameRef}
+          game={currentGame}
+          setGame={setCurrentGame}
+          removeGame={removeGameFromList}
+        />
       )}
+
+      {introModal && <IntroModal closeModal={closeIntroModal} />}
     </div>
   );
 };

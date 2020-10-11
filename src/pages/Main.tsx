@@ -1,6 +1,10 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import MainThreeJSComponent from '../components/MainThreeJSComponent';
+import AboutModal from '../components/main/about_modal';
+import HowToPlayModal from '../components/main/how_to_play_modal';
 
 import { WebSocketConnection, IncomingAction } from '../modules/ws';
 import { CurrentUser, LoginSuccessJSON } from '../types';
@@ -19,6 +23,8 @@ const MainPage = ({ setWs, setCurrentUser, ws }: MainProps): JSX.Element => {
    * States
    */
   const [username, setUsername] = useState<string>('');
+  const [aboutModal, setAboutModal] = useState<boolean>(false);
+  const [howToPlayModal, setHowToPlayModal] = useState<boolean>(false);
   const history = useHistory();
 
   /**
@@ -27,6 +33,8 @@ const MainPage = ({ setWs, setCurrentUser, ws }: MainProps): JSX.Element => {
   const handleSetUsername = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setUsername(event.target.value);
   };
+  const toggleAboutModal = () => setAboutModal(!aboutModal);
+  const toggleHowToPlayModal = () => setHowToPlayModal(!howToPlayModal);
 
   /**
    * Methods
@@ -65,22 +73,27 @@ const MainPage = ({ setWs, setCurrentUser, ws }: MainProps): JSX.Element => {
               value={username}
               onChange={handleSetUsername}
               className="margin-bottom-10 font-size-1rem padding-5"
-              placeholder="Enter a name"
+              placeholder="Enter a name to start"
             />
-            <input type="submit" value="Play" className="background-color-primary button color-white padding-5" />
+            <input type="submit" value="Log in" className="background-color-primary button color-white padding-5" />
           </form>
         </div>
       </div>
       <footer className="flex-row justify-content-center">
         <div className="background-color-white padding-5 padding-left-10 padding-right-10">
           <p>
-            <Link to="/aboutus" className="color-black">
+            <span onClick={toggleAboutModal} className="button">
               about
-            </Link>
-            &nbsp;| how to play
+            </span>
+            &nbsp;|&nbsp;
+            <span onClick={toggleHowToPlayModal} className="button">
+              how to play
+            </span>
           </p>
         </div>
       </footer>
+      {aboutModal && <AboutModal closeModal={toggleAboutModal} />}
+      {howToPlayModal && <HowToPlayModal closeModal={toggleHowToPlayModal} />}
     </div>
   );
 };

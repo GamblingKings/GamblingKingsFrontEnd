@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 import Main from './pages/Main';
-import About from './pages/About';
 import Lobby from './pages/Lobby';
 import Game from './pages/Game';
 import GameTest from './pages/GameTest';
@@ -19,7 +18,6 @@ function App(): JSX.Element {
     <Router>
       <Switch>
         <Route exact path="/" component={() => <Main setWs={setWs} setCurrentUser={setCurrentUser} ws={ws} />} />
-        <Route exact path="/aboutUs" component={About} />
         <Route exact path="/lobby" component={() => <Lobby ws={ws} currentUser={currentUser} />} />
         <Route exact path="/game" component={() => <Game ws={ws} currentUser={currentUser} />} />
         <Route exact path="/gametest" component={() => <GameTest />} />

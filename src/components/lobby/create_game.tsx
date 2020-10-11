@@ -77,50 +77,55 @@ const CreateGameForm = ({ ws, toggleOff }: CreateGameFormProps): JSX.Element => 
   const classes = useStyles();
 
   return (
-    <div className="flex-column justify-content-center align-items-center padding-20">
-      <Input
-        classes={{ root: classes.input }}
-        placeholder="Enter a Game Name"
-        defaultValue={gameName}
-        onChange={handleSetGameName}
-      />
+    <div className="modal">
+      <div className="modal-content background-color-white margin-top-30 border-radius-10" style={{ width: '50vw' }}>
+        <div className="flex-column justify-content-center align-items-center padding-20">
+          <h2 className="text-align-center margin-bottom-30">Create Game</h2>
+          <Input
+            classes={{ root: classes.input }}
+            placeholder="Enter a Game Name"
+            defaultValue={gameName}
+            onChange={handleSetGameName}
+          />
 
-      <FormControl className={classes.formControl}>
-        <InputLabel>Game</InputLabel>
-        <Select value={gameType} onChange={handleSetGameType}>
-          {Object.keys(GameTypes).map((game) => (
-            <MenuItem value={game} key={game}>
-              {game}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+          <FormControl className={classes.formControl}>
+            <InputLabel>Game</InputLabel>
+            <Select value={gameType} onChange={handleSetGameType}>
+              {Object.keys(GameTypes).map((game) => (
+                <MenuItem value={game} key={game}>
+                  {game}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-      <FormControl className={classes.formControl}>
-        <InputLabel>Game Verson</InputLabel>
-        <Select value={gameVersion} onChange={handleSetGameVersion}>
-          {gameType === GameTypes.Mahjong &&
-            Object.keys(MahjongVersions).map((version) => (
-              <MenuItem value={version} key={version}>
-                {version}
-              </MenuItem>
-            ))}
-          {gameType === GameTypes.BigTwo &&
-            Object.keys(BigTwoVersions).map((version) => (
-              <MenuItem value={version} key={version}>
-                {version}
-              </MenuItem>
-            ))}
-        </Select>
-      </FormControl>
+          <FormControl className={classes.formControl}>
+            <InputLabel>Game Verson</InputLabel>
+            <Select value={gameVersion} onChange={handleSetGameVersion}>
+              {gameType === GameTypes.Mahjong &&
+                Object.keys(MahjongVersions).map((version) => (
+                  <MenuItem value={version} key={version}>
+                    {version}
+                  </MenuItem>
+                ))}
+              {gameType === GameTypes.BigTwo &&
+                Object.keys(BigTwoVersions).map((version) => (
+                  <MenuItem value={version} key={version}>
+                    {version}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
 
-      <div className="flex-row justify-content-center align-items-center margin-top-20">
-        <Button classes={{ root: classes.marginRight }} variant="contained" color="primary" onClick={createGame}>
-          Create
-        </Button>
-        <Button variant="contained" color="secondary" onClick={toggleOff}>
-          Cancel
-        </Button>
+          <div className="flex-row justify-content-center align-items-center margin-top-20">
+            <Button classes={{ root: classes.marginRight }} variant="contained" color="primary" onClick={createGame}>
+              Create
+            </Button>
+            <Button variant="contained" color="secondary" onClick={toggleOff}>
+              Cancel
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

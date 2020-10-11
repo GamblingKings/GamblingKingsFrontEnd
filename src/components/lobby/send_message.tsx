@@ -37,7 +37,7 @@ const SendMessageForm = ({ ws, currentUser }: SendMessageFormProps): JSX.Element
 
   return (
     <div>
-      <Input placeholder="Enter a Message" defaultValue={message} onChange={handleSetMessage} />
+      <Input placeholder="Enter a Message" value={message} onChange={handleSetMessage} />
       <Button variant="contained" color="primary" onClick={sendMessage}>
         Send
       </Button>
