@@ -129,6 +129,7 @@ const GameLobby = ({ ws, game, gameRef, setGame }: GameLobbyProps): JSX.Element 
       history.push({ pathname: '/game', state: { game: gameRef.current } });
     } else {
       console.log(`Error in starting game: ${error}`);
+      alert('You need 4 players to start the game.');
     }
   };
 
@@ -185,12 +186,12 @@ const GameLobby = ({ ws, game, gameRef, setGame }: GameLobbyProps): JSX.Element 
             <Button
               classes={{ root: classes.marginRight }}
               variant="contained"
-              color="primary"
+              color="secondary"
               onClick={requestLeaveGame}
             >
               Leave Game
             </Button>
-            <Button variant="contained" color="secondary" onClick={requestStartGame}>
+            <Button variant="contained" color="primary" onClick={requestStartGame}>
               Start Game
             </Button>
           </div>

@@ -316,7 +316,7 @@ const LobbyPage = ({ ws, currentUser }: LobbyProps): JSX.Element => {
           {games.length === 0 && (
             <div className="margin-top-20 margin-left-10">
               <h3>No games found.</h3>
-              <h4>You can create one!</h4>
+              <h4>You can create one by clicking on the button above!</h4>
             </div>
           )}
           {games.map((game) => (
