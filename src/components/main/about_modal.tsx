@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+/* eslint-disable react/jsx-one-expression-per-line */
 import React from 'react';
 
 type AboutModalProps = {
@@ -12,16 +12,14 @@ const AboutModal = ({ closeModal }: AboutModalProps): JSX.Element => (
       <div className="margin-left-30 margin-bottom-30">
         <h2 className="margin-bottom-20">We are three students from the BCIT CST program.</h2>
         <h3 className="margin-bottom-20">
-          <a href="https://www.linkedin.com/in/1patrickjiang/">Patrick Jiang</a>
-          - Back-end Developer / CICD Lead
+          <a href="https://www.linkedin.com/in/1patrickjiang/">Patrick Jiang</a> - Back-end Developer / CICD Lead
         </h3>
         <h3 className="margin-bottom-20">
-          <a href="https://www.linkedin.com/in/derricklee91/">Derrick Lee</a>
-          - Front-end Developer / Team Lead
+          <a href="https://www.linkedin.com/in/derricklee91/">Derrick Lee</a> - Front-end Developer / Team Lead
         </h3>
         <h3 className="margin-bottom-20">
-          <a href="https://www.linkedin.com/in/vincent-wong-cs/">Vincent Wong</a>
-          - Front-end Developer / Game Logic Lead
+          <a href="https://www.linkedin.com/in/vincent-wong-cs/">Vincent Wong</a> - Front-end Developer / Game Logic
+          Lead
         </h3>
       </div>
       <div className="text-align-center">
